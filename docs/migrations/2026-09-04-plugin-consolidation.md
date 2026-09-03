@@ -38,6 +38,18 @@
 
 ## 验证记录
 
-- `pytest -q tests/test_repository_layout.py`：6 passed。
+- 路径迁移阶段 `pytest -q tests/test_repository_layout.py`：6 passed；加入缓存防护后最终为 7 passed。
 - `pytest -q research-knowledge/tests`：14 passed。
 - `python plugins/paper-project/skills/prl-shared/scripts/validate_knowledge_repository.py research-knowledge`：退出码 0，解析到 `/home/donk/yz-skills/research-knowledge`。
+
+最终验证（均使用禁用 pytest 缓存和字节码写入的方式执行）：
+
+- 七个 `.codex-plugin/plugin.json` 均通过 `python -m json.tool`。
+- 结构与知识库联合测试：21 passed。
+- 七个插件逐一通过官方 `validate_plugin.py`。
+- `plugins/paper-project/tests`：28 passed。
+- 知识库验证器再次返回退出码 0。
+- 全仓旧路径扫描仅命中 `CONTEXT-MAP.md`、本迁移日志、迁移规格、实施计划和回归测试，均为追溯或测试用途。
+- 旧开发仓库的分支、revision 和 dirty 条目数与迁移前一致：calc-project `main@38ecb7d`（4）、dev-project `main@f8faf0c`（1）、osm-project-dev `feat/log2ob@978ba49`（0）、paper-project `main@36db45c`（111）、research-knowledge `main@c8a8b73`（0）。复制过程未修改源仓库。
+
+外层开发仓库中的历史测试、发布测试和参考素材测试未迁入统一仓库；它们依赖旧外层目录或明确属于首轮边界外。统一仓库使用根结构测试、插件 validator、知识库测试与插件内自带测试覆盖迁移后的发布边界。
