@@ -35,7 +35,7 @@ Only continue to the Python/R backend gate for plotting, charting, data visualiz
 Read [manifest.yaml](manifest.yaml). It declares the `backend` axis, the allowed values, and the file paths each value maps to.
 
 Also read every file listed under `always_load`. From
-`references/knowledge-source.yaml`, resolve `/home/donk/plugins/research-knowledge`,
+`references/knowledge-source.yaml`, resolve `/home/donk/yz-skills/research-knowledge`,
 read its `CONSUMER_CONTRACT.md`, then read `cards/INDEX.md` and the smallest
 applicable formal card set under `task/figure`. Read the current working tree
 on every new lookup and never read or search `candidates/`. If the configured

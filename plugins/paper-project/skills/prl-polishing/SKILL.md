@@ -24,7 +24,7 @@ Follow these five steps every time the skill is invoked.
 Read [manifest.yaml](manifest.yaml). It declares the axes (`paper_type`, `section`, `language`, `journal`), the allowed values, and the file paths each value maps to.
 
 Also read every file listed under `always_load`. From
-`references/knowledge-source.yaml`, resolve `/home/donk/plugins/research-knowledge`,
+`references/knowledge-source.yaml`, resolve `/home/donk/yz-skills/research-knowledge`,
 then read its `CONSUMER_CONTRACT.md` before `cards/INDEX.md` or any card. On
 every new lookup, read the current working tree and load the smallest relevant
 formal card set. Never read or search `candidates/`.

@@ -34,6 +34,10 @@
 
 实施阶段将运行时依赖 `/home/donk/plugins/research-knowledge` 改为 `/home/donk/yz-skills/research-knowledge`。历史规格、计划和归档中的旧路径保留为历史事实，并从运行时扫描中显式排除。
 
+已更新 27 个 `calc-project` 与 `paper-project` 的有效技能、配置、脚本索引、方法说明和配套 README。全仓剩余旧路径只出现在 `CONTEXT-MAP.md`、本迁移日志、迁移规格、实施计划及用于防止回归的测试常量中；这些命中均承担迁移追溯或测试用途，不参与运行时解析。
+
 ## 验证记录
 
-尚未执行迁移验证。
+- `pytest -q tests/test_repository_layout.py`：6 passed。
+- `pytest -q research-knowledge/tests`：14 passed。
+- `python plugins/paper-project/skills/prl-shared/scripts/validate_knowledge_repository.py research-knowledge`：退出码 0，解析到 `/home/donk/yz-skills/research-knowledge`。

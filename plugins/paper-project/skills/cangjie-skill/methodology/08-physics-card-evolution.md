@@ -1,8 +1,8 @@
 # 物理卡片演化协议
 
 本协议只处理已经通过来源支持、知识价值、原子性和一致性检查的物理候选。开始前先读
-`../../prl-shared/SKILL.md`、`/home/donk/plugins/research-knowledge/cards/INDEX.md` 和
-`/home/donk/plugins/research-knowledge/cards/physics/PHYSICS_INDEX.md`。
+`../../prl-shared/SKILL.md`、`/home/donk/yz-skills/research-knowledge/cards/INDEX.md` 和
+`/home/donk/yz-skills/research-knowledge/cards/physics/PHYSICS_INDEX.md`。
 
 ## 来源边界
 

@@ -2,7 +2,7 @@
 
 This catalog covers bundled executable helpers only. Reusable `*.template`
 assets are formal content in
-`/home/donk/plugins/research-knowledge/templates/INDEX.md`; `script-management`
+`/home/donk/yz-skills/research-knowledge/templates/INDEX.md`; `script-management`
 validates them and the named downstream workflow decides whether and how a
 formal template is copied into a task.
 

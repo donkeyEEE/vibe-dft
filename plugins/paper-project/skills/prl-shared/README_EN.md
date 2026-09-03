@@ -3,7 +3,7 @@
 `prl-shared` is an internal paper-project governance skill. Formal shared cards
 and templates live in the external repository configured by
 `references/knowledge-source.yaml`, currently
-`/home/donk/plugins/research-knowledge`.
+`/home/donk/yz-skills/research-knowledge`.
 
 This skill owns schemas, admission, index rules, and validation boundaries.
 Cangjie is the only supported formal promotion workflow. Consumers read the

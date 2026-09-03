@@ -1,6 +1,6 @@
 # 阶段 2 — 构造 ATOM CARD
 
-写入前必须依次阅读 `../prl-shared/SKILL.md` 和 `/home/donk/plugins/research-knowledge/cards/INDEX.md`；物理候选继续阅读物理索引。
+写入前必须依次阅读 `../prl-shared/SKILL.md` 和 `/home/donk/yz-skills/research-knowledge/cards/INDEX.md`；物理候选继续阅读物理索引。
 
 使用 `templates/ATOM_CARD.md.template`。卡片 frontmatter 只能使用：
 

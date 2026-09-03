@@ -28,7 +28,7 @@ Cangjie 是 `prl-shared` 当前受支持的正式写入流程；先读取
 输入是计算维护 track、运行证据或现有 `TRK-NNN` 候选时，先读
 [`methodology/10-calc-track-distillation.md`](methodology/10-calc-track-distillation.md)，
 将 observation、evidence、conditions and limits、candidate knowledge、冲突和建议归属整理到
-`/home/donk/plugins/research-knowledge/candidates/cards/calc-project/`。该候选区只供治理流程使用，不是正式消费输入。
+`/home/donk/yz-skills/research-knowledge/candidates/cards/calc-project/`。该候选区只供治理流程使用，不是正式消费输入。
 
 AI 根据来源和人类意图提出候选 ATOM CARD 的 `name`、`type` 和 tags；物理候选还要展示
 `new card`、`append source`、`revise card` 或 `split card` 拟执行动作、核心陈述和来源定位。
@@ -48,7 +48,7 @@ AI 根据来源和人类意图提出候选 ATOM CARD 的 `name`、`type` 和 tag
 候选先写入隔离区，确认和验证后才晋升到正式区：
 
 ```text
-/home/donk/plugins/research-knowledge/
+/home/donk/yz-skills/research-knowledge/
 ├── candidates/cards/                       # 未晋升卡片，禁止消费
 ├── candidates/templates/                   # 未验收模板，禁止消费
 ├── cards/atoms/<atom-name>.md              # 正式通用 ATOM CARD
@@ -60,8 +60,8 @@ AI 根据来源和人类意图提出候选 ATOM CARD 的 `name`、`type` 和 tag
 ```
 
 构造候选或交付前，必须先读 `../prl-shared/SKILL.md`，再读
-`../prl-shared/references/admission-contract.md` 和 `/home/donk/plugins/research-knowledge/cards/INDEX.md`；处理物理候选时还必须读
-`/home/donk/plugins/research-knowledge/cards/physics/PHYSICS_INDEX.md`。完全遵循相应知识区域的准入、命名和索引规则。
+`../prl-shared/references/admission-contract.md` 和 `/home/donk/yz-skills/research-knowledge/cards/INDEX.md`；处理物理候选时还必须读
+`/home/donk/yz-skills/research-knowledge/cards/physics/PHYSICS_INDEX.md`。完全遵循相应知识区域的准入、命名和索引规则。
 卡片 frontmatter 只能包含 `name`、`type`、`tags`、`updated_at`。
 
 ## 流程
@@ -86,7 +86,7 @@ AI 根据来源和人类意图提出候选 ATOM CARD 的 `name`、`type` 和 tag
 ### 阶段 2 — 构造 ATOM CARD
 
 先读 `../prl-shared/SKILL.md`、`../prl-shared/references/admission-contract.md` 和
-`/home/donk/plugins/research-knowledge/cards/INDEX.md`。通用卡按
+`/home/donk/yz-skills/research-knowledge/cards/INDEX.md`。通用卡按
 `templates/ATOM_CARD.md.template` 构造；物理概念卡继续读取物理索引，并按
 `templates/PHYSICS_CONCEPT_CARD.md.template` 构造；物理现象卡按
 `templates/PHYSICS_PHENOMENON_CARD.md.template` 构造；物理理论与模型卡按
@@ -110,7 +110,7 @@ AI 根据来源和人类意图提出候选 ATOM CARD 的 `name`、`type` 和 tag
 
 ### 阶段 3 — 纳入共享索引
 
-先将卡片写入 `/home/donk/plugins/research-knowledge/candidates/cards/`。获得用户确认后，通用卡片平铺晋升到 `/home/donk/plugins/research-knowledge/cards/atoms/`。三类物理卡分别晋升到概念、现象、理论与模型类别，并在物理索引登记对应 `concept`、`phenomenon` 或 `theory-model` 类型、`established` 或 `contested`
+先将卡片写入 `/home/donk/yz-skills/research-knowledge/candidates/cards/`。获得用户确认后，通用卡片平铺晋升到 `/home/donk/yz-skills/research-knowledge/cards/atoms/`。三类物理卡分别晋升到概念、现象、理论与模型类别，并在物理索引登记对应 `concept`、`phenomenon` 或 `theory-model` 类型、`established` 或 `contested`
 状态以及单层 tags。新增 tag 时先登记到相应索引，再写卡片。
 
 计算模板先写入 `candidates/templates/`，只有记录 `calc-project` 对方法语义、集群假设和可执行性的验收后，才能晋升到 `templates/computation/` 并更新 `templates/INDEX.md`。
@@ -121,7 +121,7 @@ AI 根据来源和人类意图提出候选 ATOM CARD 的 `name`、`type` 和 tag
 
 ### 阶段 5 — 交付
 
-运行 `../prl-shared/scripts/validate_knowledge_repository.py /home/donk/plugins/research-knowledge`。汇报新增或更新的资源、执行动作、type、tags、索引状态、验证结果、Git revision 和 dirty 状态；不得自动提交。通用卡另报告用户确认过的预期消费者；物理卡不要求预先指定消费者。不要安装任何 Skill，不生成 `test-prompts.json`，也不接入 darwin-skill。
+运行 `../prl-shared/scripts/validate_knowledge_repository.py /home/donk/yz-skills/research-knowledge`。汇报新增或更新的资源、执行动作、type、tags、索引状态、验证结果、Git revision 和 dirty 状态；不得自动提交。通用卡另报告用户确认过的预期消费者；物理卡不要求预先指定消费者。不要安装任何 Skill，不生成 `test-prompts.json`，也不接入 darwin-skill。
 
 ## 质量红线
 

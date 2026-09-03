@@ -4,9 +4,9 @@
 
 ## 输入与输出
 
-输入是可访问来源及用户说明的知识意图。候选先进入 `/home/donk/plugins/research-knowledge/candidates/cards/`；用户确认后，通用卡晋升到 `/home/donk/plugins/research-knowledge/cards/atoms/` 并更新
-`/home/donk/plugins/research-knowledge/cards/INDEX.md`；物理卡按三类写入物理子库并更新
-`/home/donk/plugins/research-knowledge/cards/physics/PHYSICS_INDEX.md`。物理卡的新增与演化另见
+输入是可访问来源及用户说明的知识意图。候选先进入 `/home/donk/yz-skills/research-knowledge/candidates/cards/`；用户确认后，通用卡晋升到 `/home/donk/yz-skills/research-knowledge/cards/atoms/` 并更新
+`/home/donk/yz-skills/research-knowledge/cards/INDEX.md`；物理卡按三类写入物理子库并更新
+`/home/donk/yz-skills/research-knowledge/cards/physics/PHYSICS_INDEX.md`。物理卡的新增与演化另见
 [08-physics-card-evolution.md](08-physics-card-evolution.md)。
 
 ## 不变量

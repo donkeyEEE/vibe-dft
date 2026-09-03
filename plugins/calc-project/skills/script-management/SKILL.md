@@ -8,7 +8,7 @@ description: Maintain and validate approved calculation template assets in exter
 Own reusable template assets, including extracting approved templates from
 completed calculation workflows; do not generate task-local files.
 Read `references/knowledge-source.yaml`, then the configured repository's
-`CONSUMER_CONTRACT.md` and `/home/donk/plugins/research-knowledge/templates/INDEX.md`
+`CONSUMER_CONTRACT.md` and `/home/donk/yz-skills/research-knowledge/templates/INDEX.md`
 before selecting, adding, or changing a shared asset. Read the current working
 tree on every new lookup and never read or search `candidates/` as a consumer.
 If the repository or formal template is unavailable or malformed, warn and

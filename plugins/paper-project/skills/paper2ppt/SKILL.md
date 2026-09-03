@@ -14,7 +14,7 @@ sibling `$ppt-master`; it does not render slides itself.
 
 1. Read [manifest.yaml](manifest.yaml).
 2. Read `references/knowledge-source.yaml`, resolve
-   `/home/donk/plugins/research-knowledge`, and read its
+   `/home/donk/yz-skills/research-knowledge`, and read its
    `CONSUMER_CONTRACT.md`, then `cards/INDEX.md` and the formal
    `cards/atoms/write-terminology-ledger.md`. On every new lookup read the
    current working tree; never read or search `candidates/`. If shared

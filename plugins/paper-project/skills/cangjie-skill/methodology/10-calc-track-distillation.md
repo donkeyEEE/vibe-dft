@@ -31,7 +31,7 @@ conflict and its limits rather than synthesizing an unsupported rule.
 ## Candidate write
 
 Write or update only
-`/home/donk/plugins/research-knowledge/candidates/cards/calc-project/` and its
+`/home/donk/yz-skills/research-knowledge/candidates/cards/calc-project/` and its
 `INDEX.md`. Use candidate frontmatter with `name`,
 `type: calc-experience-candidate`, `source_plugin: calc-project`,
 `status: candidate`, and `updated_at`. Candidate frontmatter is not the formal

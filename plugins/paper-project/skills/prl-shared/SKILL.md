@@ -14,7 +14,7 @@ workflow. Cangjie is the supported formal promotion workflow.
 Before reading or writing shared content:
 
 1. Read `references/knowledge-source.yaml`.
-2. Resolve its fixed repository path (`/home/donk/plugins/research-knowledge`).
+2. Resolve its fixed repository path (`/home/donk/yz-skills/research-knowledge`).
 3. Read `references/consumer-contract.md`, then the repository's
    `CONSUMER_CONTRACT.md`.
 4. For admission, also read `references/admission-contract.md`.
@@ -37,7 +37,7 @@ human confirmation, a formal file write, the matching formal index update, and
 successful validation with:
 
 ```bash
-python scripts/validate_knowledge_repository.py /home/donk/plugins/research-knowledge
+python scripts/validate_knowledge_repository.py /home/donk/yz-skills/research-knowledge
 ```
 
 Calculation templates additionally require recorded `calc-project`
