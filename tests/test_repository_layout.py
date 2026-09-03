@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 
@@ -51,6 +52,15 @@ def test_migrated_tree_excludes_repository_metadata_and_caches() -> None:
             if path.is_dir() and (path.name == ".git" or path.name in FORBIDDEN_DIRS)
         ]
         assert offenders == []
+
+
+def test_repository_does_not_track_generated_caches() -> None:
+    tracked = subprocess.run(
+        ["git", "ls-files"], cwd=ROOT, check=True, capture_output=True, text=True
+    ).stdout.splitlines()
+    forbidden = {".pytest_cache", "__pycache__", ".worktrees", ".scratch"}
+    offenders = [path for path in tracked if forbidden.intersection(Path(path).parts)]
+    assert offenders == []
 
 
 def test_context_map_covers_units_sources_and_dependencies() -> None:
