@@ -1,0 +1,25 @@
+#!/bin/bash
+# Run on the server after uploading the key input snapshot.
+#
+# Replace __UPSTREAM_DIR__ only after confirming the task's actual server
+# source. Initial layout guesses are: VASP/Wannier pre-run ../scf/<tag>,
+# Wannier90 ../wannier-prerun/<tag>, TB2J ../wannier90/<tag>, and VAMPIRE
+# ../tb2j/<tag>/TB2J_results/Vampire. These comments are not path authority.
+
+RUN_TAG="$1"
+TASK_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)" || exit 1
+RUN_DIR="$TASK_ROOT/$RUN_TAG"
+INPUTS_DIR="$TASK_ROOT/inputs"
+UPSTREAM_DIR="__UPSTREAM_DIR__"
+KEY_INPUT="__KEY_INPUT__"
+UPSTREAM_FILES="__UPSTREAM_FILES__"
+
+[ -n "$RUN_TAG" ] || { echo "usage: $0 <run-tag>" >&2; exit 1; }
+[ -d "$INPUTS_DIR" ] || { echo "missing task inputs: $INPUTS_DIR" >&2; exit 1; }
+[ -f "$INPUTS_DIR/$KEY_INPUT" ] || { echo "missing uploaded key input: $KEY_INPUT" >&2; exit 1; }
+[ -d "$UPSTREAM_DIR" ] || { echo "missing upstream source: $UPSTREAM_DIR" >&2; exit 1; }
+
+for input_file in $UPSTREAM_FILES; do
+    [ -f "$UPSTREAM_DIR/$input_file" ] || { echo "missing upstream input: $input_file" >&2; exit 1; }
+    cp -n "$UPSTREAM_DIR/$input_file" "$RUN_DIR/" || exit 1
+done

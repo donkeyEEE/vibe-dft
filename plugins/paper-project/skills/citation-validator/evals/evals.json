@@ -1,0 +1,23 @@
+{
+  "skill_name": "citation-validator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "检查 paper.docx 第 3 段的引用是否合理，引用格式是 [1][2][3] 的数字编号",
+      "expected_output": "Parses paragraph 3, extracts numeric citations, looks up each in Zotero, retrieves abstracts, evaluates support grades, and produces a markdown report.",
+      "files": ["paper.docx"]
+    },
+    {
+      "id": 2,
+      "prompt": "Verify whether (Smith et al., 2020) and (Zhang, 2019) in paragraph 2 genuinely support the claims they are attached to.",
+      "expected_output": "Extracts author-year citations, searches Zotero for Smith 2020 and Zhang 2019, evaluates support grades for each, and reports mismatches.",
+      "files": ["paper.docx"]
+    },
+    {
+      "id": 3,
+      "prompt": "深度检查 introduction 段落，所有引用都要用全文核对",
+      "expected_output": "Retrieves full-text snippets in addition to abstracts for every citation in the introduction and re-evaluates support grades.",
+      "files": ["paper.docx"]
+    }
+  ]
+}

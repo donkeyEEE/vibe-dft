@@ -1,0 +1,4 @@
+interface:
+  display_name: "物理学投稿图件"
+  short_description: "围绕可辩护的证据链创建、修改和审计高质量投稿级科学图件"
+  default_prompt: "使用 $prl-figure 创建一幅能够呈现主张、验证、控制、边界和后果的投稿级科学图件。"

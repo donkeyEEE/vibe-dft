@@ -1,0 +1,36 @@
+#!/bin/bash
+#PBS -N vasp-job
+#PBS -q manycores
+#PBS -l nodes=1:ppn=32
+#PBS -l walltime=144:00:00
+#PBS -S /bin/bash
+#PBS -V
+
+RUN_TAG="${RUN_TAG:-}"
+TASK_ROOT="${PBS_O_WORKDIR:-}"
+RUN_DIR="$TASK_ROOT/$RUN_TAG"
+INPUTS_DIR="$TASK_ROOT/inputs"
+OUTPUT_FILE="$RUN_DIR/output"
+GENERATE_KPOINTS="__GENERATE_KPOINTS__"
+
+[ -n "$TASK_ROOT" ] && [ -d "$TASK_ROOT" ] && [ -n "$RUN_TAG" ] || exit 1
+[ -d "$INPUTS_DIR" ] || exit 1
+cd "$RUN_DIR" || exit 1
+: > "$OUTPUT_FILE"
+ulimit -s unlimited
+[ -f "$INPUTS_DIR/cluster-env.sh" ] || exit 1
+source "$INPUTS_DIR/cluster-env.sh" || exit 1
+[ -x "$VASP_EXE" ] && [ -x "$VASPKIT_EXE" ] || exit 1
+
+cp -f "$INPUTS_DIR/INCAR" "$INPUTS_DIR/POSCAR" "$INPUTS_DIR/KPOINTS" . || exit 1
+case "$GENERATE_KPOINTS" in
+    0|false|FALSE|no|NO) ;;
+    1|true|TRUE|yes|YES)
+        (echo 102; echo 2; echo 0.04) | "$VASPKIT_EXE" >> vaspkit_output 2>&1 || exit 1
+        ;;
+    *) echo "invalid GENERATE_KPOINTS value: $GENERATE_KPOINTS" >&2; exit 1 ;;
+esac
+(echo 103) | "$VASPKIT_EXE" >> vaspkit_output 2>&1 || exit 1
+mpirun -machinefile "$PBS_NODEFILE" -np "$(wc -l < "$PBS_NODEFILE")" "$VASP_EXE" >> "$OUTPUT_FILE" 2>&1 || exit 1
+[ -s OUTCAR ] || { echo "missing or empty VASP OUTCAR" >> "$OUTPUT_FILE"; exit 1; }
+echo "handoff complete: VASP OUTCAR" >> "$OUTPUT_FILE"

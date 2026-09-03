@@ -1,0 +1,30 @@
+{
+  "name": "osm-project",
+  "version": "0.2.0",
+  "description": "Create confirmed, conversation-derived project logs in an Obsidian vault.",
+  "author": {
+    "name": "donk"
+  },
+  "license": "MIT",
+  "keywords": [
+    "obsidian",
+    "project-logs",
+    "conversation-summary",
+    "daily-notes"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Obsidian Self-Management",
+    "shortDescription": "Confirm project-state logs for Obsidian",
+    "longDescription": "Distill the current conversation into a concise project-state draft, confirm it, and safely write it to today's Obsidian Daily Note.",
+    "developerName": "donk",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "$log2ob Summarize this conversation and confirm its project log before writing to Obsidian."
+    ]
+  }
+}

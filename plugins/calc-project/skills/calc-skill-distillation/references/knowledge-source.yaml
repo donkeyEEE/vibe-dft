@@ -1,0 +1,8 @@
+schema_version: 1
+repository:
+  name: research-knowledge
+  path: /home/donk/plugins/research-knowledge
+contract: CONSUMER_CONTRACT.md
+formal_cards: cards/INDEX.md
+candidate_cards: candidates/cards/calc-project/INDEX.md
+missing_behavior: warn-and-stop-maintenance

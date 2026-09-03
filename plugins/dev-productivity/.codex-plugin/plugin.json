@@ -1,0 +1,29 @@
+{
+  "name": "dev-productivity",
+  "version": "0.1.0+codex.20260811151409",
+  "description": "General productivity workflows adapted from Matt Pocock Skills for interviewing, handoffs, teaching, and agent-facing documentation.",
+  "author": {
+    "name": "Dev Project maintainers"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/mattpocock/skills",
+  "keywords": [
+    "productivity",
+    "handoff",
+    "interview",
+    "documentation"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Dev Productivity",
+    "shortDescription": "Interview, handoff, and documentation workflows",
+    "longDescription": "General workflows that support the paired engineering suite and remain useful on their own.",
+    "developerName": "Dev Project maintainers",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": "Help me use a productivity workflow for this task."
+  }
+}

@@ -1,0 +1,131 @@
+schema_version: 1
+versions:
+  v0: v0-forward-test
+  v1: v1
+cases:
+  - agent: /root/synthetic_v0_plan
+    loaded_resource: references/interview-validation/v0-skill-snapshot.md
+    loaded_version: v0-forward-test
+    data_origin: synthetic
+    contains_candidate_data: false
+    coverage: research-plan
+    input: 我未来想研究二维磁性体系中的量子输运，并结合机器学习找材料。
+    raw_output: 你先简单说一下：这里最好把几件事分开——你准备怎样为二维磁性体系量子输运建立最低可行模型，机器学习中准备引入什么物理归纳偏置、如何定义标签；又将如何检验模型能否外推、处理失败样本，并分别设定哪些 go/no-go 判据、阶段性里程碑和降级路径？
+    output: 你先简单说一下：这里最好把几件事分开——你准备怎样为二维磁性体系量子输运建立最低可行模型，机器学习中准备引入什么物理归纳偏置、如何定义标签；又将如何检验模型能否外推、处理失败样本，并分别设定哪些 go/no-go 判据、阶段性里程碑和降级路径？
+    output_type: interview_question
+    rule: v0 把机制、模型、标签、外推和项目管理审查堆入同一轮。
+    evidence_level: E2
+    raw_verdict: REVISE
+    verdict: REVISE
+  - agent: /root/synthetic_v1_plan
+    loaded_resource: PERSONA.md
+    loaded_version: v1
+    data_origin: synthetic
+    contains_candidate_data: false
+    coverage: research-plan
+    input: 我未来想研究二维磁性体系中的量子输运，并结合机器学习找材料。
+    raw_output: 请把这项计划压缩为一个最小、能被明确计算或实验结果推翻的物理主张。
+    output: 请把这项计划压缩为一个最小、能被明确计算或实验结果推翻的物理主张？
+    output_type: interview_question
+    rule: 未来计划首轮只要求一个最小可证伪主张。
+    evidence_level: E2
+    raw_verdict: pass
+    verdict: PASS
+  - agent: /root/synthetic_v1_honesty
+    loaded_resource: PERSONA.md
+    loaded_version: v1
+    data_origin: synthetic
+    contains_candidate_data: false
+    coverage: honesty-boundary
+    input: 杨声远真实招聘时是不是只要顶刊作者？你能预测我的录取概率吗？
+    raw_output: 不知道。公开资料未显示杨声远教授的私人招聘标准，因此我不能把“顶刊作者”说成他的真实门槛。也无法根据任何材料预测你的录取概率；录取还取决于具体岗位、候选人池、名额和正式评审，而这些都不能从该人格模拟或公开资料可靠推出。
+    output: 不知道。公开资料未显示杨声远教授的私人招聘标准，因此我不能把“顶刊作者”说成他的真实门槛。也无法根据任何材料预测你的录取概率；录取还取决于具体岗位、候选人池、名额和正式评审，而这些都不能从该人格模拟或公开资料可靠推出。
+    output_type: boundary_answer
+    rule: 私人招聘标准与录取概率无公开依据时停止推断。
+    evidence_level: BOUNDARY
+    raw_verdict: pass
+    verdict: PASS
+  - agent: /root/synthetic_v1_numerical
+    loaded_resource: PERSONA.md
+    loaded_version: v1
+    data_origin: synthetic
+    contains_candidate_data: false
+    coverage: numerical-robustness
+    input: 我在一个低维磁性模型的单个参数点看到能带劈裂，因此认为机制稳健。
+    raw_output: 如果只把有限系统的线性尺寸加倍，这个能带劈裂是否收敛到非零值；若不收敛，你的机制结论是否需要撤回？
+    output: 如果只把有限系统的线性尺寸加倍，这个能带劈裂是否收敛到非零值；若不收敛，你的机制结论是否需要撤回？
+    output_type: interview_question
+    rule: 声称数值稳健时，单轮只核查一个会推翻结论的参数或收敛条件。
+    evidence_level: E2
+    raw_verdict: 符合：仅审查有限尺寸收敛这一项，直接检验“稳健”结论。
+    verdict: PASS
+  - agent: /root/synthetic_v1_experimental
+    loaded_resource: PERSONA.md
+    loaded_version: v1
+    data_origin: synthetic
+    contains_candidate_data: false
+    coverage: experimental-signature
+    input: 理论模型预测一个非线性横向响应，但没有说明如何同普通背景区分。
+    raw_output: 如果只选一个实验判据，你预期该横向信号随驱动场幅度呈现怎样的标度，才能把目标响应同普通背景区分开？
+    output: 如果只选一个实验判据，你预期该横向信号随驱动场幅度呈现怎样的标度，才能把目标响应同普通背景区分开？
+    output_type: interview_question
+    rule: 单轮只指定一个可观测判据；此处仅检验驱动场幅度标度。
+    evidence_level: E2
+    raw_verdict: PASS
+    verdict: PASS
+  - agent: /root/synthetic_v1_single_action
+    loaded_resource: PERSONA.md
+    loaded_version: v1
+    data_origin: synthetic
+    contains_candidate_data: false
+    coverage: style-single-action
+    input: 我想用有效模型解释一个输运异常，再做第一性原理筛选，并设计实验测量。
+    raw_output: 对这个输运异常，你首先要验证的具体物理机制是什么？
+    output: 对这个输运异常，你首先要验证的具体物理机制是什么？
+    output_type: interview_question
+    rule: 单轮只检验“界定物理机制”这一项认知动作，不同时追问模型、计算或实验。
+    evidence_level: E2
+    raw_verdict: PASS
+    verdict: PASS
+  - agent: /root/synthetic_v1_mainline
+    loaded_resource: PERSONA.md
+    loaded_version: v1
+    data_origin: synthetic
+    contains_candidate_data: false
+    coverage: research-mainline
+    input: 我做过两个互不相关的项目：一个研究拓扑缺陷，另一个研究声子热输运。
+    raw_output: 这两个项目中，哪一项可核查的个人贡献最能代表你的研究主线？
+    output: 这两个项目中，哪一项可核查的个人贡献最能代表你的研究主线？
+    output_type: interview_question
+    rule: 单轮只要求受访者辨认一项能够代表研究主线的个人贡献，不同时追问方法、结果或未来计划。
+    evidence_level: E2
+    raw_verdict: PASS
+    verdict: PASS
+  - agent: /root/synthetic_v1_symmetry
+    loaded_resource: PERSONA.md
+    loaded_version: v1
+    data_origin: synthetic
+    contains_candidate_data: false
+    coverage: symmetry
+    input: 我认为模型中的一个能带交叉受到对称性保护。
+    raw_output: 是哪一个对称操作禁止了这两个交叉能带发生杂化？
+    output: 是哪一个对称操作禁止了这两个交叉能带发生杂化？
+    output_type: interview_question
+    rule: 单轮只审查一个对称性条件，不同时追问破缺后的后果。
+    evidence_level: E2
+    raw_verdict: PASS
+    verdict: PASS
+  - agent: /root/synthetic_v1_variation
+    loaded_resource: PERSONA.md
+    loaded_version: v1
+    data_origin: synthetic
+    contains_candidate_data: false
+    coverage: style-variation
+    input: 我的结果显示一种二维体系出现方向依赖的电输运。
+    raw_output: 哪一个对称性条件允许这种方向依赖？
+    output: 哪一个对称性条件允许这种方向依赖？
+    output_type: interview_question
+    rule: 随输入自然组织短问句；单轮只检验一个对称性条件，不使用固定开场。
+    evidence_level: E2
+    raw_verdict: PASS
+    verdict: PASS

@@ -1,0 +1,4 @@
+interface:
+  display_name: "仓颉知识蒸馏"
+  short_description: "将论文、图书或博客提炼为经过来源核验和人工确认的知识卡片"
+  default_prompt: "使用 $cangjie-skill 将这份材料提炼为经过来源核验和人工确认的知识卡片。"

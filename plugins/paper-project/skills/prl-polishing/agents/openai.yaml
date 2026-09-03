@@ -1,0 +1,4 @@
+interface:
+  display_name: "物理论文润色"
+  short_description: "按主张、证据、边界和后果逻辑逐段审阅与润色物理论文"
+  default_prompt: "使用 $prl-polishing 检索素材库并应用已确认的写作习惯，逐段修改我的论文工作稿。"

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+RUN_TAG="$1"
+TASK_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)" || exit 1
+RUN_DIR="$TASK_ROOT/$RUN_TAG"
+INPUTS_DIR="$TASK_ROOT/inputs"
+REQUIRED_INPUTS="__REQUIRED_INPUTS__"
+UPSTREAM_INCAR="__UPSTREAM_INCAR__"
+INCAR_EXCEPTIONS="__INCAR_EXCEPTIONS__"
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)" || exit 1
+
+[ -n "$RUN_TAG" ] || { echo "usage: $0 <run-tag>" >&2; exit 1; }
+[ -d "$INPUTS_DIR" ] || { echo "missing task inputs: $INPUTS_DIR" >&2; exit 1; }
+
+for input_file in $REQUIRED_INPUTS; do
+    [ -f "$INPUTS_DIR/$input_file" ] || { echo "missing required input: $input_file" >&2; exit 1; }
+done
+
+[ "$UPSTREAM_INCAR" != "__UPSTREAM_INCAR__" ] || { echo "missing declared upstream INCAR path" >&2; exit 1; }
+[ -f "$UPSTREAM_INCAR" ] || { echo "missing upstream INCAR: $UPSTREAM_INCAR" >&2; exit 1; }
+bash "$INPUTS_DIR/compare_incar_parameters.sh" "$UPSTREAM_INCAR" "$INPUTS_DIR/INCAR" "$INCAR_EXCEPTIONS" || exit 1

@@ -1,0 +1,4 @@
+interface:
+  display_name: "系统文献综述"
+  short_description: "开展多数据库文献检索、系统综述、研究综合和引用核验"
+  default_prompt: "使用 $literature-review 围绕这个研究问题开展系统文献检索与综合。"

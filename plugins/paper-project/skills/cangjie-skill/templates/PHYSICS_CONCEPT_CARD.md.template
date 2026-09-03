@@ -1,0 +1,37 @@
+---
+name: {{phys-kebab-case-name}}
+type: concept
+tags:
+  - {{registered-single-level-tag}}
+updated_at: {{YYYY-MM-DD}}
+---
+
+## Core statement
+
+{{由已核对来源支持、可独立成立的最小概念陈述；关键概念首次出现写作“中文名称（规范英文术语）”。}}
+
+## Definition and distinctions
+
+{{说明该物理对象是什么，并与容易混淆的相邻概念区分。}}
+
+## Conditions and boundaries
+
+{{说明定义所依赖的理论框架、条件、近似与失效边界。}}
+
+{{存在来源特有或相互竞争的解释时保留以下章节；否则删除整个章节。}}
+
+## Interpretations
+
+{{并列记录解释及各自条件，不把来源特有理解写成共同核心。}}
+
+## Relations
+
+{{只列实际存在的前置、解释、特例、推广、对比或其他卡片关系。}}
+
+## Sources
+
+### {{简短来源名称}}
+
+- Reference: {{足以重新识别来源的作者、题名、年份、DOI、URL 或书籍信息}}
+- Locator: {{页码、章节、公式号、图号、段落；无稳定定位时说明已从可访问内容核对}}
+- Supports: {{该来源支持本卡片中的具体内容；规范术语与来源原措辞不同时，附最短原文短语}}

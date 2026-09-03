@@ -1,0 +1,24 @@
+name: citation-validator
+version: 1.0.0
+description: >
+  Declarative manifest for the static/dynamic split. SKILL.md uses this to
+  decide which fragments to load for a citation validation request. The main
+  workflow is linear: extract → lookup → evaluate → report. Variation comes
+  from runtime parameters (paragraph range, citation style, evaluation depth),
+  handled by inline rules and the citation_validator.py script.
+
+always_load:
+  - static/core/principles.md
+  - static/core/workflow.md
+  - static/core/support-grading.md
+
+references:
+  on_demand:
+    - condition: running citation_validator.py — full flag list, JSON schema, batch mode
+      path: references/script-usage.md
+    - condition: identifying citation patterns in text — regex catalog, edge cases, mixed styles
+      path: references/citation-patterns.md
+    - condition: querying Zotero for citation metadata, abstracts, or full text
+      path: references/zotero-integration.md
+    - condition: making a final judgment when abstract is ambiguous or insufficient
+      path: references/judgment-guidelines.md

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Calc Skill Distillation"
+  short_description: "Turn selected knowledge cards into confirmed skill changes"
+  default_prompt: "Use $calc-project:calc-skill-distillation to turn user-selected formal or calc candidate cards into reviewable, user-confirmed Calc Project skill change proposals."
+policy:
+  allow_implicit_invocation: false

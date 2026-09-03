@@ -1,0 +1,4 @@
+interface:
+  display_name: "Writing for Agents"
+  short_description: "Write predictable documents for Codex agents"
+  default_prompt: "$writing-for-agents Review and improve this agent-facing document for reliable Codex behavior."

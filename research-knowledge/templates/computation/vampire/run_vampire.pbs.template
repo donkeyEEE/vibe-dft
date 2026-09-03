@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -N vampire
+#PBS -q manycores
+#PBS -l nodes=1:ppn=32
+#PBS -l walltime=144:00:00
+
+RUN_TAG="${RUN_TAG:-}"
+TASK_ROOT="${PBS_O_WORKDIR:-}"
+RUN_DIR="$TASK_ROOT/$RUN_TAG"
+INPUTS_DIR="$TASK_ROOT/inputs"
+OUTPUT_FILE="$RUN_DIR/output"
+
+[ -n "$TASK_ROOT" ] && [ -d "$TASK_ROOT" ] && [ -n "$RUN_TAG" ] || exit 1
+[ -d "$INPUTS_DIR" ] || exit 1
+[ -f "$INPUTS_DIR/input" ] || exit 1
+[ -f "$INPUTS_DIR/cluster-env.sh" ] || exit 1
+source "$INPUTS_DIR/cluster-env.sh" || exit 1
+[ -x "$VAMPIRE_EXE" ] || exit 1
+cd "$RUN_DIR" || exit 1
+
+rm -f output M_vs_T.png input vampire.UCF vampire.mat model-copy.sha256 || exit 1
+cp -f "$INPUTS_DIR"/* . || exit 1
+sha256sum vampire.UCF vampire.mat > model-copy.sha256 || exit 1
+"$VAMPIRE_EXE" >> "$OUTPUT_FILE" 2>&1 || exit 1
+python3 "$INPUTS_DIR/plot.py" --input output >> "$OUTPUT_FILE" 2>&1 || exit 1
+[ -s output ] && [ -s M_vs_T.png ] || {
+    echo "missing or empty VAMPIRE outputs" >> "$OUTPUT_FILE"
+    exit 1
+}
+echo "handoff complete: VAMPIRE outputs" >> "$OUTPUT_FILE"

@@ -1,0 +1,23 @@
+{
+  "name": "paper-project",
+  "version": "0.1.0+codex.20260831061732",
+  "description": "Research-paper workflows plus evidence-aware persona deliberation.",
+  "author": {
+    "name": "Local developer"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Paper Project",
+    "shortDescription": "Research-paper workflows for reading, writing, and figures.",
+    "longDescription": "Paper Project provides research-paper and dissertation planning, evidence-aware writing, citation validation, scientific figure creation, Zotero note workflows, and presentations. It also provides moderated, Nuwa-derived persona roundtables for comparing reasoning frameworks.",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": [
+      "Research",
+      "Writing",
+      "Figures",
+      "Deliberation"
+    ],
+    "defaultPrompt": "Help me choose and use the right Paper Project skill for this research task."
+  }
+}

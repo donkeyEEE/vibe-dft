@@ -1,0 +1,36 @@
+#!/bin/bash
+#PBS -N vasp-band
+#PBS -q manycores
+#PBS -l nodes=1:ppn=32
+#PBS -l walltime=144:00:00
+#PBS -S /bin/bash
+#PBS -V
+
+RUN_TAG="${RUN_TAG:-}"
+TASK_ROOT="${PBS_O_WORKDIR:-}"
+RUN_DIR="$TASK_ROOT/$RUN_TAG"
+INPUTS_DIR="$TASK_ROOT/inputs"
+OUTPUT_FILE="$RUN_DIR/output"
+
+[ -n "$TASK_ROOT" ] && [ -d "$TASK_ROOT" ] && [ -n "$RUN_TAG" ] || exit 1
+[ -d "$INPUTS_DIR" ] || exit 1
+cd "$RUN_DIR" || exit 1
+: > "$OUTPUT_FILE"
+ulimit -s unlimited
+[ -f "$INPUTS_DIR/cluster-env.sh" ] || exit 1
+[ -f "$TASK_ROOT/band/vest2.py" ] || exit 1
+source "$INPUTS_DIR/cluster-env.sh" || exit 1
+[ -x "$VASP_EXE" ] && [ -x "$VASPKIT_EXE" ] || exit 1
+
+cp -f "$INPUTS_DIR/INCAR" "$INPUTS_DIR/POSCAR" "$INPUTS_DIR/KPOINTS" . || exit 1
+(echo 103) | "$VASPKIT_EXE" >> vaspkit_output 2>&1 || exit 1
+mpirun -machinefile "$PBS_NODEFILE" -np "$(wc -l < "$PBS_NODEFILE")" "$VASP_EXE" >> "$OUTPUT_FILE" 2>&1 || exit 1
+(echo 21; echo 211; echo 1)|"$VASPKIT_EXE" >> vaspkit_output 2>&1 || exit 1
+cp -f "$TASK_ROOT/band/vest2.py" ./vest2.py || exit 1
+rm -f bandrange_spin0.dat bandrange_spin1.dat || exit 1
+printf '5\ny\n8\n' | python3 ./vest2.py >> "$OUTPUT_FILE" 2>&1 || exit 1
+[ -s bandrange_spin0.dat ] && [ -s bandrange_spin1.dat ] || {
+    echo "missing or empty spin-resolved VEST band ranges" >> "$OUTPUT_FILE"
+    exit 1
+}
+echo "handoff complete: spin-resolved VEST band ranges" >> "$OUTPUT_FILE"

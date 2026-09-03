@@ -1,0 +1,4 @@
+interface:
+  display_name: "引用核验"
+  short_description: "核验论文指定段落中的引用是否真正支撑对应的学术主张"
+  default_prompt: "使用 $citation-validator 检查这个 DOCX 指定段落中的引用是否真正支撑对应主张。"

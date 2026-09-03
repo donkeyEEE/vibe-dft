@@ -1,0 +1,9 @@
+schema_version: 1
+repository:
+  name: research-knowledge
+  path: /home/donk/plugins/research-knowledge
+contract: CONSUMER_CONTRACT.md
+cards_index: cards/INDEX.md
+templates_index: templates/INDEX.md
+missing_behavior: warn-and-continue
+

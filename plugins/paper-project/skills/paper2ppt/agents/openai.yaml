@@ -1,0 +1,4 @@
+interface:
+  display_name: "论文转演示文稿"
+  short_description: "将科研论文组织为证据驱动、图件可靠的完整中文演示文稿"
+  default_prompt: "使用 $paper2ppt 将这份科研论文制作成包含可靠图件、讲稿和质量报告的中文演示文稿。"

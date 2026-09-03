@@ -1,0 +1,7 @@
+interface:
+  display_name: "项目日志入库"
+  short_description: "将本次开发状态提炼并确认写入 Obsidian"
+  default_prompt: "$log2ob 总结本次开发并将确认后的项目日志写入 Obsidian。"
+
+policy:
+  allow_implicit_invocation: true

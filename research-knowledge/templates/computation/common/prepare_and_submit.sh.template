@@ -1,0 +1,33 @@
+#!/bin/bash
+# Run manually on the cluster login node, from any directory:
+#   bash /path/to/task/inputs/prepare_and_submit.sh <run-tag>
+#
+# Replace run_TASK.pbs and add the task's required input-preparation commands
+# below.  Do not put scheduler directives in this file; they belong in the
+# task-root PBS script.
+
+TASK_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)" || exit 1
+RUN_TAG="${1:-}"
+PBS_SCRIPT="$TASK_ROOT/run_TASK.pbs"
+
+[ -n "$RUN_TAG" ] || { echo "usage: $0 <run-tag>" >&2; exit 1; }
+
+source /etc/profile || exit 1
+command -v qsub >/dev/null 2>&1 || {
+    echo "qsub is unavailable after loading /etc/profile" >&2
+    exit 1
+}
+
+prepare_inputs() {
+    # Add task-specific preparation commands here, each ending in: || exit 1
+    :
+}
+
+[ -f "$PBS_SCRIPT" ] || {
+    echo "missing PBS script: $PBS_SCRIPT" >&2
+    exit 1
+}
+
+prepare_inputs || exit 1
+cd "$TASK_ROOT" || exit 1
+qsub -v "RUN_TAG=$RUN_TAG" "$PBS_SCRIPT" || exit 1

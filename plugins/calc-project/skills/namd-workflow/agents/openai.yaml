@@ -1,0 +1,4 @@
+interface:
+  display_name: "NAMD Workflow"
+  short_description: "Prepare and debug VASP to NAMDwithSOC workflows"
+  default_prompt: "Use $calc-project:namd-workflow to prepare or diagnose a VASP to NAMDwithSOC calculation workflow."

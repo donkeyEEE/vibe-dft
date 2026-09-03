@@ -1,0 +1,29 @@
+{
+  "name": "dev-engineering",
+  "version": "0.1.0+codex.20260812013620",
+  "description": "Engineering workflows adapted from Matt Pocock Skills for planning, implementation, testing, review, and maintenance.",
+  "author": {
+    "name": "Dev Project maintainers"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/mattpocock/skills",
+  "keywords": [
+    "engineering",
+    "development",
+    "testing",
+    "code-review"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Dev Engineering",
+    "shortDescription": "Engineering planning and delivery workflows",
+    "longDescription": "A paired engineering workflow suite for planning, implementation, testing, review, and maintenance.",
+    "developerName": "Dev Project maintainers",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": "Help me choose and apply an engineering workflow."
+  }
+}

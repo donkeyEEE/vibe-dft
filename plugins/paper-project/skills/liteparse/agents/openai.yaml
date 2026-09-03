@@ -1,0 +1,4 @@
+interface:
+  display_name: "本地文档解析"
+  short_description: "在本地解析文档和图片并保留文字、版面坐标及页面渲染结果"
+  default_prompt: "使用 $liteparse 在本地解析这个文档，并保留可用的文字与版面信息。"

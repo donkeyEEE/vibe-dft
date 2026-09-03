@@ -1,0 +1,4 @@
+interface:
+  display_name: "圆桌人格讨论"
+  short_description: "召唤一个或多个人格独立分析、相互质询，并由主持人逐轮综合关键分歧"
+  default_prompt: "使用 $yuanzhuo-skill 召唤合适的人格，围绕这个问题开展可控制的圆桌讨论。"
