@@ -36,6 +36,10 @@
 
 已更新 27 个 `calc-project` 与 `paper-project` 的有效技能、配置、脚本索引、方法说明和配套 README。全仓剩余旧路径只出现在 `CONTEXT-MAP.md`、本迁移日志、迁移规格、实施计划及用于防止回归的测试常量中；这些命中均承担迁移追溯或测试用途，不参与运行时解析。
 
+## Context 后续调整
+
+2026-09-04 根据维护规模将五份 `docs/contexts/*.md` 合并为根目录 `CONTEXT.md`。`AGENTS.md` 直接指向合并正文；`CONTEXT-MAP.md` 继续作为维护单元、依赖和迁移来源的映射，不再承担分散 context 的加载路由。原迁移规格与实施计划保留当时的拆分设计，作为历史决策记录。
+
 ## 验证记录
 
 - 路径迁移阶段 `pytest -q tests/test_repository_layout.py`：6 passed；加入缓存防护后最终为 7 passed。

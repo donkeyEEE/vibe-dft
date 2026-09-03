@@ -1,11 +1,11 @@
 # 仓库协作说明
 
-本仓库集中维护 Codex 插件及其共享研究知识。开始工作时，先按任务类型查阅 [CONTEXT-MAP.md](CONTEXT-MAP.md)，只加载命中的 context。
+本仓库集中维护 Codex 插件及其共享研究知识。开始相关维护前读取根目录 [CONTEXT.md](CONTEXT.md)；需要确认维护单元、依赖或迁移来源时查阅 [CONTEXT-MAP.md](CONTEXT-MAP.md)。
 
 ## 工作入口
 
-- 修改任一插件、插件清单、skill 或发布资源时，读取地图中该插件对应的 context。
-- 修改共享知识库、知识卡片、计算模板、索引或其消费路径时，读取 `docs/contexts/research-knowledge.md`，并同时读取受影响消费者的 context。
+- 修改任一插件、插件清单、skill 或发布资源时，读取 `CONTEXT.md` 中对应章节。
+- 修改共享知识库、知识卡片、计算模板、索引或其消费路径时，读取 `CONTEXT.md` 的 Paper Project、Calc Project 和 Research Knowledge 章节。
 - 核对迁移路径、旧目录、排除项或迁移状态时，读取 `docs/migrations/2026-09-04-plugin-consolidation.md`；迁移映射只在 `CONTEXT-MAP.md` 和该日志维护。
 
 ## 仓库规则
