@@ -38,13 +38,14 @@ infer unconfirmed scientific settings.
 When interpreting a calculation note or troubleshooting record whose stopping
 condition is met, do not expand the calculation question; route any scope
 expansion to `calc-workflows`.
-For every stage, read `references/knowledge-source.yaml`, the plugin-local consumer
-contract and `templates/INDEX.md`, then use either an accepted formal plugin template or a copied project
-`calculation_templates/` baseline, then make only confirmed task changes. The
-plugin source is under `templates/computation/`; read the current working tree
-on each new lookup, never read or search `candidates/`, and use only the
-smallest relevant formal set. If it is unavailable or malformed, warn and
-continue without a plugin template; do not fall back to another knowledge location. The
+For every stage, use either an approved plugin template or a copied project
+`calculation_templates/` baseline, then make only confirmed task changes.
+Common and VASP sources live under
+`../../resources/calculation-templates/{common,vasp}/`; Wannier90, TB2J, and
+VAMPIRE sources live under `assets/templates/`. Read the exact source from the
+current plugin tree on each lookup. If a required plugin template is unavailable
+or malformed, disable that template option; an independently approved project
+template remains valid. The
 template source is validated by `script-management`; this skill writes task
 `inputs/`, removes `.template` from task-copy names, checks them,
 and returns source, changes, generated

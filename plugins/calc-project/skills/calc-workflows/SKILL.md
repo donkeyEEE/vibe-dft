@@ -13,9 +13,10 @@ only when the project file is absent.
 
 ## Orchestration contract
 
-1. Before any new task copy, read `references/knowledge-source.yaml`, the
-   plugin-local `CONSUMER_CONTRACT.md`, `templates/INDEX.md`, and the [template copy and conversation
-   preflight](references/template-copy-preflight.md) contract. Confirm task IDs,
+1. Before any new task copy, read the [template copy and conversation
+   preflight](references/template-copy-preflight.md). Shared preparation helpers
+   live under `../../resources/calculation-templates/common/`; the owning
+   downstream workflow selects exact method templates. Confirm task IDs,
    order, dependencies, source and target assets, template
    source, target `inputs/` path, and acceptance check.
 2. Route each stage to its owning workflow. Software workflows own VASP, NAMD, or
@@ -60,10 +61,9 @@ explicit user confirmation.
   scripts from approved templates.
 - When a downstream workflow writes any `*.template` asset into a task, it removes
   the `.template` suffix from the task-copy name.
-- On every new template lookup, read the plugin-local working-tree index and only
-  the smallest relevant formal set. Never read or search `candidates/`. If the
-  repository or formal template is unavailable or malformed, warn and continue
-  without a plugin template; never fall back to another knowledge location.
+- On every new template lookup, read the exact declared source from the current
+  plugin tree. If it is unavailable or malformed, disable the plugin-template
+  option; an independently approved project template remains valid.
 - Do not create tasks, alter task YAML, or directly write method inputs or scripts.
 - The root `WORKFLOW.md` is human-maintained documentation, not a machine-parsed
   format or a source of global scientific defaults.

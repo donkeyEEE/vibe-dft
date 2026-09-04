@@ -2,7 +2,8 @@
 
 This catalog covers bundled executable helpers only. Reusable `*.template`
 assets are formal content in
-`plugins/calc-project/knowledge/templates/INDEX.md`; `script-management`
+`plugins/calc-project/resources/calculation-templates/README.md` and the owning
+workflow's `assets/templates/`; `script-management`
 validates them and the named downstream workflow decides whether and how a
 formal template is copied into a task.
 

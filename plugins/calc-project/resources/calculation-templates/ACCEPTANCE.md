@@ -2,8 +2,8 @@
 
 - calc-project source revision: `5676de321777c90474b6efb69893311e157cd889`
 - Owner: `calc-project`
-- Scope: the fourteen formal `*.template` assets registered in
-  `templates/INDEX.md`
+- Scope: the seven shared `*.template` assets in this directory and the seven
+  magnetic-workflow-owned assets under `skills/magnetic-workflow/assets/templates/`
 
 The migrated templates passed their preparation, handoff, and immutable-input
 boundary assertions with:
@@ -14,5 +14,5 @@ pytest -q tests/test_calculation_templates.py -k 'pbs_templates or magnetic_temp
 
 The same behavioral contracts originate from calc-project
 `tests/test_pbs_input_layout.py` and `tests/test_magnetic_workflow.py`. After
-consumer cutover, those full regression tests read this external template root.
-
+consumer cutover, those full regression tests read the explicit shared and
+skill-owned template roots.

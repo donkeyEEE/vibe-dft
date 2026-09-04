@@ -1,8 +1,9 @@
 # Template Copy and Conversation Preflight
 
 Use this shared contract before preparing a new task copy. Template files are
-declared inputs, submission/PBS scripts, and approved helper scripts; their only
-permitted copy sources are plugin-local `knowledge/templates/computation/` and project
+declared inputs, submission/PBS scripts, and approved helper scripts. Permitted
+plugin sources are `../../resources/calculation-templates/` and the owning
+workflow's `assets/templates/`; approved project sources live under
 `calculation_templates/`. Existing task directories, historical reference
 cases, completed-run outputs, logs, job identifiers, caches, and remote paths
 are not template sources. Template files must not include outputs, logs,
@@ -12,7 +13,7 @@ Large upstream files are HDF5 files, `CHGCAR`, and `WAVECAR`. They are not
 template assets: a user explicitly confirms an existing task or remote-result
 path, then the submission script copies them only on the server into the
 prepared run location. They never enter Git, the local project, `calc-sync`, or
-either template library; `candidates/` is never a copy source, and PBS only reads the prepared files.
+either template source; PBS only reads the prepared files.
 
 Select the permitted template layer and copy its approved assets to the
 task-local `inputs/` layout. Change only parameters the user has

@@ -21,17 +21,15 @@ expansion to `calc-workflows`.
 
 ## Template modes
 
-- **Plugin template:** read `references/knowledge-source.yaml`, the plugin-local
-  consumer contract and `templates/INDEX.md`, then select an accepted VASP or
-  PBS source from `templates/computation/`,
+- **Plugin template:** select the exact approved VASP or PBS source from
+  `../../resources/calculation-templates/vasp/`,
   then write the task copy in `inputs/` with confirmed substitutions.
 - **Project template:** copy an approved VASP baseline from
   `calculation_templates/`, then make only confirmed task-specific changes.
 
-On every new lookup read the current plugin-local working tree, never read or
-search `candidates/`, and load only the smallest relevant formal template set.
-If optional plugin knowledge is unavailable or malformed, warn and continue without a
-  plugin template; do not fall back to another knowledge location. `script-management`
+On every new lookup read the exact source from the current plugin tree. If a
+required plugin template is unavailable or malformed, disable that template
+option; an independently approved project template remains valid. `script-management`
 validates both template layers; this skill creates the task
 copies and removes `.template` from their task-copy names. Record the source,
 task-level changes, generated files, and checks for

@@ -7,8 +7,8 @@ from one historical run.
 
 1. Obtain user confirmation, source task paths, verified inputs/scripts, and the
    downstream workflow's reusable-boundary decision.
-2. Choose plugin-local `knowledge/candidates/templates/` for proposed
-   cross-project assets; use project
+2. Propose a shared plugin target only for assets used by multiple workflows;
+   otherwise use the owning workflow's `assets/templates/`. Use project
    `calculation_templates/` for project- or material-specific baselines.
 3. Copy only approved input and script sources. Exclude outputs, logs, job IDs,
    absolute cluster paths, HDF5, large data, generated results, and credentials.
