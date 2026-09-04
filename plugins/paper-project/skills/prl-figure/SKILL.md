@@ -34,15 +34,13 @@ Only continue to the Python/R backend gate for plotting, charting, data visualiz
 
 Read [manifest.yaml](manifest.yaml). It declares the `backend` axis, the allowed values, and the file paths each value maps to.
 
-Also read every file listed under `always_load`. From
-`references/knowledge-source.yaml`, resolve its `path` relative to that file,
-read its `CONSUMER_CONTRACT.md`, then read `cards/INDEX.md` and the smallest
-applicable formal card set under `task/figure`. Read the current working tree
-on every new lookup and never read or search `candidates/`. If the configured
-repository or selected formal content is unavailable or malformed, warn and
-continue the figure task without plugin knowledge; do not fall back to another
-location. The local `static/core/prl-evidence-logic.md` integrates the reusable
-figure workflow; individual cards retain their evidence and caveats.
+Read every exact skill-owned and plugin-shared resource listed under
+`always_load`. Read shared resources from the current plugin tree on each
+invocation. If an optional shared resource is unavailable or malformed, warn
+and continue without substituting another resource source. A missing
+skill-owned reference is a plugin packaging defect. The local
+`static/core/prl-evidence-logic.md` integrates the reusable figure workflow;
+individual references retain their evidence and caveats.
 
 ### 2. Resolve the backend — a blocking gate
 

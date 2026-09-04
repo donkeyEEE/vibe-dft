@@ -5,8 +5,13 @@ description: >
   decide which fragments to load for a given polishing request.
 
 always_load:
-  # External shared-knowledge source; its contract precedes index/card reads.
-  - references/knowledge-source.yaml
+  - references/knowledge/write-reader-question-sequence.md
+  - references/knowledge/write-paper-type-taxonomy.md
+  - references/knowledge/write-attribute-intellectual-debt.md
+  - references/knowledge/write-cite-primary-source.md
+  - references/knowledge/write-citation-scope.md
+  - references/knowledge/meta-ai-writing-boundaries.md
+  - ../../resources/paper-writing/write-terminology-ledger.md
   # Skill-local core
   - static/core/stance.md
   - static/core/prl-argument-logic.md
@@ -72,6 +77,36 @@ axes:
 
 references:
   on_demand:
+    - condition: Physical Review Letters format, evidence logic, reference obligations, or data-availability requirements
+      path: references/knowledge/journal-prl-letter-length.md
+    - condition: Physical Review Letters abstract requirements
+      path: references/knowledge/journal-prl-abstract.md
+    - condition: Physical Review Letters title requirements
+      path: references/knowledge/journal-prl-title-style.md
+    - condition: Physical Review Letters run-in heading requirements
+      path: references/knowledge/journal-prl-run-in-headings.md
+    - condition: Physical Review reference obligations
+      path: references/knowledge/journal-physical-review-reference-obligations.md
+    - condition: Physical Review data-availability requirements
+      path: references/knowledge/journal-physical-review-data-availability.md
+    - condition: PRL claim-evidence-consequence sequencing
+      path: references/knowledge/write-prl-claim-evidence-consequence-sequence.md
+    - condition: effective-model assumption boundaries
+      path: references/knowledge/write-prl-effective-model-assumption-boundary.md
+    - condition: PRL model-to-validation pairing
+      path: ../../resources/paper-writing/write-prl-model-to-validation-pairing.md
+    - condition: PRL figure prerequisite-signature-consequence logic
+      path: ../../resources/paper-writing/write-prl-figure-prerequisite-signature-consequence.md
+    - condition: PRL quantitative claims and criteria
+      path: ../../resources/paper-writing/write-prl-quantitative-claim-with-criterion.md
+    - condition: PRL main-text and supplement evidence allocation
+      path: ../../resources/paper-writing/write-prl-main-text-supplement-evidence-allocation.md
+    - condition: PRL prediction-condition-observable bridges
+      path: ../../resources/paper-writing/write-prl-prediction-condition-observable-bridge.md
+    - condition: PRL mechanism-control comparators
+      path: ../../resources/paper-writing/write-prl-mechanism-control-comparator.md
+    - condition: PRL computational sensitivity as a result
+      path: ../../resources/paper-writing/write-prl-computational-sensitivity-as-result.md
     - condition: needs Nature/Nature Communications article-level patterns for abstracts, intros, Results openings, Discussion, conclusions, titles
       path: references/published-article-patterns.md
     - condition: empirical 2025 Nat Commun diction calibration — connector frequencies, the significantly red line, hedge/booster/tense word choices

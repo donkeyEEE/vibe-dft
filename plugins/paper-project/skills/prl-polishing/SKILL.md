@@ -23,24 +23,16 @@ Follow these five steps every time the skill is invoked.
 
 Read [manifest.yaml](manifest.yaml). It declares the axes (`paper_type`, `section`, `language`, `journal`), the allowed values, and the file paths each value maps to.
 
-Also read every file listed under `always_load`. From
-`references/knowledge-source.yaml`, resolve its `path` relative to that file,
-then read its `CONSUMER_CONTRACT.md` before `cards/INDEX.md` or any card. On
-every new lookup, read the current working tree and load the smallest relevant
-formal card set. Never read or search `candidates/`.
+Read every file listed under `always_load`. For PRL work, load each applicable
+evidence reference declared under `references.on_demand`; those entries name
+the exact skill-owned or plugin-shared file. The local
+`static/core/prl-argument-logic.md` integrates the reusable workflow, while the
+references retain the evidence and caveats for each rule.
 
-Every polishing job needs the cards
-`write-reader-question-sequence`, `write-paper-type-taxonomy`,
-`write-terminology-ledger`, `write-attribute-intellectual-debt`,
-`write-cite-primary-source`, `write-citation-scope`, and
-`meta-ai-writing-boundaries`; PRL jobs also load the smallest applicable set
-under `task/prl-polishing`. The local `static/core/prl-argument-logic.md`
-integrates their reusable workflow, but the cards remain the evidence-bearing
-source of each rule.
-
-If the configured repository, contract, index, or card is unavailable or
-malformed, warn and continue the polishing task without plugin knowledge. Do
-not fall back to another knowledge location.
+Read shared resources from the current plugin tree on each invocation. If an
+optional shared resource is unavailable or malformed, warn and continue the
+polishing task without substituting another resource source. A missing
+skill-owned reference is a plugin packaging defect.
 
 For a managed manuscript or section revision, the always-loaded writing-workspace protocol is a readiness gate: use the managed draft, ensure `zo2notes` has built the user-selected material library, and search relevant material plus active user habits before proposing each paragraph.
 
