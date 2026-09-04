@@ -1,29 +1,30 @@
 {
   "name": "dev-productivity",
   "version": "0.1.0+codex.20260811151409",
-  "description": "General productivity workflows adapted from Matt Pocock Skills for interviewing, handoffs, teaching, and agent-facing documentation.",
+  "description": "Software product definition and solution-design workflows for discovery, modeling, research, prototyping, specifications, and work decomposition.",
   "author": {
     "name": "Dev Project maintainers"
   },
   "license": "MIT",
   "repository": "https://github.com/mattpocock/skills",
   "keywords": [
-    "productivity",
-    "handoff",
-    "interview",
-    "documentation"
+    "product-design",
+    "requirements",
+    "domain-modeling",
+    "specification",
+    "prototyping"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Dev Productivity",
-    "shortDescription": "Interview, handoff, and documentation workflows",
-    "longDescription": "General workflows that support the paired engineering suite and remain useful on their own.",
+    "shortDescription": "Software product definition and solution design",
+    "longDescription": "Dev Productivity shapes software work before delivery through interviews, clarification, domain modeling, primary-source research, prototypes, specifications, and task decomposition. Handoffs, teaching, questionnaires, and agent-facing documentation support that collaborative design work and remain independently useful.",
     "developerName": "Dev Project maintainers",
     "category": "Productivity",
     "capabilities": [
       "Read",
       "Write"
     ],
-    "defaultPrompt": "Help me use a productivity workflow for this task."
+    "defaultPrompt": "Help me define, research, prototype, specify, or decompose this software product work."
   }
 }

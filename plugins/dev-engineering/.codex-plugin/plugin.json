@@ -1,7 +1,7 @@
 {
   "name": "dev-engineering",
   "version": "0.1.0+codex.20260812013620",
-  "description": "Engineering workflows adapted from Matt Pocock Skills for planning, implementation, testing, review, and maintenance.",
+  "description": "Software engineering delivery workflows for implementation, testing, debugging, review, request triage, architecture, and maintenance.",
   "author": {
     "name": "Dev Project maintainers"
   },
@@ -9,21 +9,22 @@
   "repository": "https://github.com/mattpocock/skills",
   "keywords": [
     "engineering",
-    "development",
+    "implementation",
     "testing",
-    "code-review"
+    "code-review",
+    "maintenance"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Dev Engineering",
-    "shortDescription": "Engineering planning and delivery workflows",
-    "longDescription": "A paired engineering workflow suite for planning, implementation, testing, review, and maintenance.",
+    "shortDescription": "Software implementation, verification, and maintenance",
+    "longDescription": "Dev Engineering delivers defined software work through implementation, test-driven development, debugging, code review, request triage, implementation-facing architecture, and codebase maintenance. Its router can hand product-definition and solution-design work to the independently installable Dev Productivity plugin.",
     "developerName": "Dev Project maintainers",
     "category": "Productivity",
     "capabilities": [
       "Read",
       "Write"
     ],
-    "defaultPrompt": "Help me choose and apply an engineering workflow."
+    "defaultPrompt": "Help me implement, verify, debug, review, or maintain this software work."
   }
 }
