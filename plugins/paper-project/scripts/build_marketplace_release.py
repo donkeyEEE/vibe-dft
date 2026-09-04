@@ -36,14 +36,13 @@ EXPECTED_SKILLS = frozenset(
         "ppt-master",
         "prl-figure",
         "prl-polishing",
-        "prl-shared",
         "scholar-evaluation",
         "scientific-critical-thinking",
         "yuanzhuo-skill",
         "zo2notes",
     }
 )
-PUBLIC_SKILLS = EXPECTED_SKILLS - {"prl-shared"}
+PUBLIC_SKILLS = EXPECTED_SKILLS
 
 
 def parse_args() -> argparse.Namespace:
@@ -223,13 +222,8 @@ def assert_bundle_contract(bundle_root: Path, version: str) -> None:
         bundled_plugin / "skills/ppt-master/SKILL.md",
         bundled_plugin / "skills/ppt-master/LICENSE",
         bundled_plugin / "skills/ppt-master/scripts/attribution_guard.py",
-        bundled_plugin / "skills/prl-shared/references/knowledge-source.yaml",
-        bundled_plugin / "skills/prl-shared/scripts/validate_knowledge_repository.py",
-        bundled_plugin / "knowledge/CONSUMER_CONTRACT.md",
-        bundled_plugin / "knowledge/cards/INDEX.md",
-        bundled_plugin / "skills/cangjie-skill/templates/PHYSICS_CONCEPT_CARD.md.template",
-        bundled_plugin / "skills/cangjie-skill/templates/PHYSICS_PHENOMENON_CARD.md.template",
-        bundled_plugin / "skills/cangjie-skill/templates/PHYSICS_THEORY_MODEL_CARD.md.template",
+        bundled_plugin / "skills/cangjie-skill/references/legacy/README.md",
+        bundled_plugin / "resources/paper-writing/README.md",
         bundled_plugin / "scripts/ppt_master_provenance.json",
         bundled_plugin / "templates/ppt-master-openai.yaml",
         bundle_root / "README.md",

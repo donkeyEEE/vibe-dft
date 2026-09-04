@@ -10,7 +10,7 @@ Codex 插件。插件中的技能通过 `paper-project:<skill-name>` 命名空�
 - `prl-figure`：创建、修改和审查投稿级科学图件。
 - `citation-validator`：检查 DOCX 稿件中的引用是否真正支持相邻主张。
 - `zo2notes`：把 Zotero 文献转成项目内中文阅读笔记。
-- `cangjie-skill`：把论文、图书或博客提炼为可复用的 ATOM CARD 知识。
+- `cangjie-skill`：保留待重设计的显式入口；当前暂停资源写入与治理。
 - `paper2ppt`：阅读论文、组织证据叙事、核验科学图，并把极简素材目录交给同插件内置的 PPT Master。
 - `ppt-master`：独立创建、填充、增强或修改可编辑 PPTX，也负责消费 `paper2ppt` 的素材交接。
 

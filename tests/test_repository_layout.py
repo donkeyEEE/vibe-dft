@@ -190,3 +190,19 @@ def test_active_plugin_sources_do_not_depend_on_retired_knowledge_protocol() -> 
             if any(fragment in text for fragment in forbidden_fragments):
                 offenders.append(path.relative_to(ROOT))
     assert offenders == []
+
+
+def test_cangjie_is_an_explicit_frozen_entry_point() -> None:
+    """Catch the suspended skill becoming implicitly runnable or retaining tools."""
+    skill = ROOT / "plugins" / "paper-project" / "skills" / "cangjie-skill"
+    interface = (skill / "agents" / "openai.yaml").read_text(encoding="utf-8")
+    assert "allow_implicit_invocation: false" in interface
+    assert (skill / "references" / "legacy" / "README.md").is_file()
+    active_executables = [
+        path.relative_to(skill)
+        for path in skill.rglob("*")
+        if path.is_file()
+        and "legacy" not in path.parts
+        and (path.suffix in {".py", ".sh"} or path.name.startswith("run_"))
+    ]
+    assert active_executables == []

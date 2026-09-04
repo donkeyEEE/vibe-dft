@@ -1,4 +1,7 @@
 interface:
-  display_name: "仓颉知识蒸馏"
-  short_description: "将论文、图书或博客提炼为经过来源核验和人工确认的知识卡片"
-  default_prompt: "使用 $cangjie-skill 将这份材料提炼为经过来源核验和人工确认的知识卡片。"
+  display_name: "仓颉（等待重设计）"
+  short_description: "保留的知识蒸馏入口，当前暂停资源写入"
+  default_prompt: "使用 $cangjie-skill 说明当前冻结状态和可用替代路径。"
+
+policy:
+  allow_implicit_invocation: false
