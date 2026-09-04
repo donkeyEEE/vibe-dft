@@ -1,12 +1,12 @@
 # 仓库协作说明
 
-本仓库集中维护 Codex 插件及其插件本地实验知识。开始相关维护前读取根目录 [CONTEXT.md](CONTEXT.md)；需要确认维护单元、依赖或迁移来源时查阅 [CONTEXT-MAP.md](CONTEXT-MAP.md)。
+本仓库集中维护 Codex 插件及其插件本地实验知识。开始相关维护前读取根目录 [CONTEXT.md](CONTEXT.md)。
 
 ## 工作入口
 
 - 修改任一插件、插件清单、skill 或发布资源时，读取 `CONTEXT.md` 中对应章节。
 - 修改插件知识、知识卡片、计算模板、索引或其消费路径时，读取 `CONTEXT.md` 的 Paper Project、Calc Project 和 Plugin Knowledge 章节。
-- 核对迁移路径、旧目录、排除项或迁移状态时，读取 `docs/migrations/2026-09-04-plugin-consolidation.md`；迁移映射只在 `CONTEXT-MAP.md` 和该日志维护。
+- 核对迁移路径、旧目录、排除项或迁移状态时，读取 `docs/migrations/2026-09-04-plugin-consolidation.md`；历史迁移映射只在该日志维护。
 
 ## 仓库规则
 

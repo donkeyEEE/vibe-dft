@@ -34,11 +34,11 @@
 
 实施阶段将运行时依赖 `/home/donk/plugins/research-knowledge` 改为 `/home/donk/yz-skills/research-knowledge`。历史规格、计划和归档中的旧路径保留为历史事实，并从运行时扫描中显式排除。
 
-已更新 27 个 `calc-project` 与 `paper-project` 的有效技能、配置、脚本索引、方法说明和配套 README。全仓剩余旧路径只出现在 `CONTEXT-MAP.md`、本迁移日志、迁移规格、实施计划及用于防止回归的测试常量中；这些命中均承担迁移追溯或测试用途，不参与运行时解析。
+已更新 27 个 `calc-project` 与 `paper-project` 的有效技能、配置、脚本索引、方法说明和配套 README。全仓剩余旧路径只出现在本迁移日志、迁移规格、实施计划及用于防止回归的测试常量中；这些命中均承担迁移追溯或测试用途，不参与运行时解析。
 
 ## Context 后续调整
 
-2026-09-04 根据维护规模将五份 `docs/contexts/*.md` 合并为根目录 `CONTEXT.md`。`AGENTS.md` 直接指向合并正文；`CONTEXT-MAP.md` 继续作为维护单元、依赖和迁移来源的映射，不再承担分散 context 的加载路由。原迁移规格与实施计划保留当时的拆分设计，作为历史决策记录。
+2026-09-04 根据维护规模将五份 `docs/contexts/*.md` 合并为根目录 `CONTEXT.md`。`AGENTS.md` 直接指向合并正文；维护单元和当前依赖收敛到 `CONTEXT.md`，历史迁移来源由本日志维护。原迁移规格与实施计划保留当时的拆分设计，作为历史决策记录。
 
 ## 验证记录
 
@@ -53,14 +53,18 @@
 - 七个插件逐一通过官方 `validate_plugin.py`。
 - `plugins/paper-project/tests`：28 passed。
 - 知识库验证器再次返回退出码 0。
-- 全仓旧路径扫描仅命中 `CONTEXT-MAP.md`、本迁移日志、迁移规格、实施计划和回归测试，均为追溯或测试用途。
+- 全仓旧路径扫描仅命中本迁移日志、迁移规格、实施计划和回归测试，均为追溯或测试用途。
 - 旧开发仓库的分支、revision 和 dirty 条目数与迁移前一致：calc-project `main@38ecb7d`（4）、dev-project `main@f8faf0c`（1）、osm-project-dev `feat/log2ob@978ba49`（0）、paper-project `main@36db45c`（111）、research-knowledge `main@c8a8b73`（0）。复制过程未修改源仓库。
 
 外层开发仓库中的历史测试、发布测试和参考素材测试未迁入统一仓库；它们依赖旧外层目录或明确属于首轮边界外。统一仓库使用根结构测试、插件 validator、知识库测试与插件内自带测试覆盖迁移后的发布边界。
 
 ## 后续移除
 
-2026-09-04，应维护请求从统一仓库移除 `dev-incubator` 与 `dev-misc` 两个插件发布单元。迁移范围表和历史规格、计划继续保留其最初迁入事实；当前维护单元以 `CONTEXT-MAP.md` 和根目录结构测试为准。
+2026-09-04，应维护请求从统一仓库移除 `dev-incubator` 与 `dev-misc` 两个插件发布单元。迁移范围表和历史规格、计划继续保留其最初迁入事实；当前维护单元以根 `CONTEXT.md` 和结构测试为准。
+
+## Context Map 移除
+
+2026-09-04，根目录只保留一份 `CONTEXT.md` 后，`CONTEXT-MAP.md` 不再提供有效的分层导航，因此予以删除。当前维护单元与依赖在 `CONTEXT.md` 维护；旧路径和迁移状态只在本日志维护。历史规格与计划中的 `CONTEXT-MAP.md` 引用保留为当时设计记录。
 
 ## 插件知识本地化
 

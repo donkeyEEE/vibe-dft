@@ -1,6 +1,16 @@
 # YZ Skills 开发上下文
 
-本仓库集中维护五个 Codex 插件。插件发布单元位于 `plugins/`，实验性知识随其所属插件维护；维护单元、旧路径和依赖关系由 `CONTEXT-MAP.md` 导航。
+本仓库集中维护五个 Codex 插件。插件发布单元位于 `plugins/`，实验性知识随其所属插件维护；旧路径与迁移状态记录在 `docs/migrations/2026-09-04-plugin-consolidation.md`。
+
+## 维护导航
+
+| 维护单元 | 当前路径 | 关键依赖 |
+|---|---|---|
+| calc-project | `plugins/calc-project` | `plugins/calc-project/knowledge/` 的模板、物理卡、候选卡与孵化内容 |
+| dev-engineering | `plugins/dev-engineering` | Dev Project 共享术语 |
+| dev-productivity | `plugins/dev-productivity` | Dev Project 共享术语 |
+| osm-project | `plugins/osm-project` | Obsidian 本地连接 |
+| paper-project | `plugins/paper-project` | `plugins/paper-project/knowledge/` 的论文写作与期刊卡片 |
 
 ## Calc Project 计算插件术语
 

@@ -19,7 +19,7 @@ FORBIDDEN_DIRS = {".pytest_cache", "__pycache__", ".worktrees", ".scratch", "dis
 def test_required_repository_layout_exists() -> None:
     assert (ROOT / "AGENTS.md").is_file()
     assert (ROOT / "CONTEXT.md").is_file()
-    assert (ROOT / "CONTEXT-MAP.md").is_file()
+    assert not (ROOT / "CONTEXT-MAP.md").exists()
     assert not (ROOT / "docs" / "contexts").exists()
     paper_knowledge = ROOT / "plugins" / "paper-project" / "knowledge"
     calc_knowledge = ROOT / "plugins" / "calc-project" / "knowledge"
@@ -61,28 +61,17 @@ def test_repository_does_not_track_generated_caches() -> None:
     assert offenders == []
 
 
-def test_context_map_covers_units_sources_and_dependencies() -> None:
-    context_map = (ROOT / "CONTEXT-MAP.md").read_text(encoding="utf-8")
+def test_root_context_covers_units_and_dependencies() -> None:
+    context = (ROOT / "CONTEXT.md").read_text(encoding="utf-8")
     for plugin in EXPECTED_PLUGINS:
-        assert f"plugins/{plugin}" in context_map
-    assert "CONTEXT.md" in context_map
-    assert "docs/contexts/" not in context_map
-    for source in (
-        "/home/donk/03FGT/.codex/plugins/calc-project/calc-project",
-        "/home/donk/plugins/dev-project/plugins/dev-engineering",
-        "/home/donk/plugins/dev-project/plugins/dev-productivity",
-        "/home/donk/plugins/osm-project-dev/osm-project",
-        "/home/donk/plugins/paper-project/paper-project",
-        "/home/donk/plugins/research-knowledge",
-    ):
-        assert source in context_map
-    assert "plugins/calc-project/knowledge" in context_map
-    assert "plugins/paper-project/knowledge" in context_map
+        assert f"plugins/{plugin}" in context
+    assert "docs/migrations/2026-09-04-plugin-consolidation.md" in context
+    assert "plugins/calc-project/knowledge" in context
+    assert "plugins/paper-project/knowledge" in context
 
 
 def test_agents_routes_context_reads_in_chinese() -> None:
     agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
-    assert "CONTEXT-MAP.md" in agents
     assert "CONTEXT.md" in agents
     for trigger in ("插件", "插件知识", "迁移路径"):
         assert trigger in agents
