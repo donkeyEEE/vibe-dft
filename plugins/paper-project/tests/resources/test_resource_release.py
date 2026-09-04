@@ -31,5 +31,14 @@ def test_release_contains_resources_without_retired_knowledge(tmp_path: Path) ->
     assert prefix + "resources/paper-writing/README.md" in names
     assert prefix + "skills/prl-polishing/references/paper-writing/write-reader-question-sequence.md" in names
     assert prefix + "skills/cangjie-skill/SKILL.md" in names
+    for relative in (
+        "skills/zo2notes/scripts/runtime_config.py",
+        "skills/zo2notes/scripts/attachment_paths.py",
+        "skills/zo2notes/scripts/zotero.py",
+        "skills/zo2notes/references/configuration.md",
+        "skills/zo2notes/references/troubleshooting.md",
+    ):
+        assert prefix + relative in names
+    assert prefix + "skills/zo2notes/scripts/zotero_wsl_bridge.py" not in names
     assert not any(name.startswith(prefix + "knowledge/") for name in names)
     assert not any(name.startswith(prefix + "skills/prl-shared/") for name in names)
