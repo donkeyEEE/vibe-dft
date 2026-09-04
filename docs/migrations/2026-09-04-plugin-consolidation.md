@@ -57,3 +57,29 @@
 - 旧开发仓库的分支、revision 和 dirty 条目数与迁移前一致：calc-project `main@38ecb7d`（4）、dev-project `main@f8faf0c`（1）、osm-project-dev `feat/log2ob@978ba49`（0）、paper-project `main@36db45c`（111）、research-knowledge `main@c8a8b73`（0）。复制过程未修改源仓库。
 
 外层开发仓库中的历史测试、发布测试和参考素材测试未迁入统一仓库；它们依赖旧外层目录或明确属于首轮边界外。统一仓库使用根结构测试、插件 validator、知识库测试与插件内自带测试覆盖迁移后的发布边界。
+
+## 后续移除
+
+2026-09-04，应维护请求从统一仓库移除 `dev-incubator` 与 `dev-misc` 两个插件发布单元。迁移范围表和历史规格、计划继续保留其最初迁入事实；当前维护单元以 `CONTEXT-MAP.md` 和根目录结构测试为准。
+
+## 插件知识本地化
+
+2026-09-04，根据 [ADR 0001](../adr/0001-localize-experimental-plugin-knowledge.md) 将尚处测试阶段、没有实际跨插件正式消费者的顶层 `research-knowledge/` 拆回插件发布边界：
+
+- `cards/atoms/` 与空的 paper 候选入口迁入 `plugins/paper-project/knowledge/`；
+- `templates/`、`cards/physics/`、calc-project 候选卡和模板候选迁入 `plugins/calc-project/knowledge/`；
+- ontology 正式卡与候选卡迁入 `plugins/calc-project/knowledge/incubating/ontology/`，不进入 calc 正式索引；
+- 原知识库测试按内容所有者迁入两个插件的 `tests/knowledge/`；
+- 消费端 `knowledge-source.yaml` 改为相对描述符自身解析 `../../../knowledge`，不再依赖宿主机绝对路径；
+- 顶层 `research-knowledge/` 在迁移完成后删除，不保留副本或运行时回退。
+
+Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不决定未来的写入、准入、晋升或治理模型。
+
+本地化验证结果：
+
+- 根结构与两个插件知识测试：`24 passed`；
+- paper-project 本地知识验证器：退出码 0；
+- calc-project 与 paper-project 官方插件验证器：均通过；
+- paper-project marketplace 发布构建通过，归档包含本地消费契约、卡片索引与卡片正文；
+- 迁移清点为 paper atoms 31、physics 39、ontology 正式卡 40、ontology 候选 24、计算模板 14、calc 候选卡 12；
+- 顶层 `research-knowledge/` 不再存在，两个插件的活动文件均无旧绝对路径命中。
