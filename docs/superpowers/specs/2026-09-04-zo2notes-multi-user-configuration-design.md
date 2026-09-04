@@ -136,7 +136,7 @@ local_prefix = "/mnt/z/ZoteroStorage"
 - Zotero 本地 API 是否可用；
 - 下一步修复建议。
 
-删除 `enable`、`disable` 和 `restart` 命令，并删除只为这些命令服务的 profile 发现、`profiles.ini` 读取、`prefs.js` 修改、备份和进程重启代码。文档改为指导用户在 Zotero 界面中手动启用本地 API。
+删除 `enable`、`disable`、`restart`、`import-bibtex` 和 `import-ris` 命令，并删除只为这些命令服务的 profile 发现、`profiles.ini` 读取、`prefs.js` 修改、备份、进程重启和 Zotero Connector 导入代码。文档改为指导用户在 Zotero 界面中手动启用本地 API。
 
 Zo2Notes 可以写入以下位置：
 
@@ -195,7 +195,7 @@ Zotero indexed full text 仍是默认正文来源。只有确实需要核验原�
 - 显式 host 禁止静默回退；
 - Windows 盘符、UNC、自定义映射、最长前缀歧义和不存在文件；
 - doctor 与错误输出不泄露完整附件路径；
-- CLI 中不存在 `enable`、`disable` 和 `restart`；
+- CLI 中不存在 `enable`、`disable`、`restart`、`import-bibtex` 和 `import-ris`；
 - 既有只读查询与项目存储逻辑的回归行为。
 
 发布包测试必须确认新增模块和参考文档都包含在 paper-project 插件发布单元中，且没有旧固定地址或已删除命令的活动引用。
