@@ -128,15 +128,32 @@ def test_root_context_covers_units_and_dependencies() -> None:
     for plugin in EXPECTED_PLUGINS:
         assert f"plugins/{plugin}" in context
     assert "docs/migrations/2026-09-04-plugin-consolidation.md" in context
-    assert "plugins/calc-project/knowledge" in context
-    assert "plugins/paper-project/knowledge" in context
+    assert "skill-owned resource" in context
+    assert "plugin-shared resource" in context
+    assert "plugins/calc-project/resources" in context
+    assert "plugins/paper-project/resources" in context
+    assert "plugins/calc-project/knowledge" not in context
+    assert "plugins/paper-project/knowledge" not in context
 
 
 def test_agents_routes_context_reads_in_chinese() -> None:
     agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
     assert "CONTEXT.md" in agents
-    for trigger in ("插件", "插件知识", "迁移路径"):
+    for trigger in ("插件", "skill 所属资源", "插件共享资源", "迁移路径"):
         assert trigger in agents
+
+
+def test_resource_ownership_decision_and_migration_are_recorded() -> None:
+    """Catch current resource paths changing without ownership history."""
+    adr = ROOT / "docs" / "adr" / "0003-localize-resources-to-owning-skills.md"
+    assert adr.is_file()
+    text = adr.read_text(encoding="utf-8")
+    assert "Supersedes: ADR 0001" in text
+    migration = (
+        ROOT / "docs" / "migrations" / "2026-09-04-plugin-consolidation.md"
+    ).read_text(encoding="utf-8")
+    assert "Skill 资源本地化" in migration
+    assert "refactor/localize-skill-resources" in migration
 
 
 def test_active_files_do_not_use_legacy_research_knowledge_path() -> None:

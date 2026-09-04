@@ -103,3 +103,27 @@ Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不
 - `dev-engineering` 与 `dev-productivity` 分别通过官方 `validate_plugin.py`；
 - 新增的 Dev skill 所有权和命名空间测试：`2 passed`；
 - 删除已经失效、要求根 `CONTEXT.md` 重复 Calc Project 中英双语术语正文的测试后，全仓结构测试：`10 passed`。
+
+## Skill 资源本地化
+
+2026-09-04，在分支 `refactor/localize-skill-resources` 上根据
+[ADR 0003](../adr/0003-localize-resources-to-owning-skills.md) 取消插件级知识仓库机制：
+
+- Paper Project 保留 24 个实际消费的写作资源：8 个多 skill 资源迁入
+  `plugins/paper-project/resources/paper-writing/`，14 个迁入
+  `prl-polishing/references/paper-writing/`，2 个迁入
+  `prl-figure/references/paper-writing/`；7 个无人消费的 Nature
+  Communications 卡片删除。
+- Calc Project 的 7 个 common/VASP 模板迁入
+  `plugins/calc-project/resources/calculation-templates/`；7 个 Wannier90、
+  TB2J、VAMPIRE 模板迁入 `magnetic-workflow/assets/templates/`。
+- 删除 39 个无人消费的 physics cards、12 个 calc 候选卡、40 个 ontology
+  cards 和 24 个 ontology candidates；24 个 ontology candidates 与同名
+  cards 逐字重复。
+- 删除两个 `knowledge/` 树、所有 `knowledge-source.yaml`、统一消费者合同、
+  formal/candidate/incubating 状态与相关验证测试。
+- 删除 `prl-shared` 和 `calc-skill-distillation`。保留 `cangjie-skill`，将其
+  设为 explicit-only 冻结入口，旧方法论归档为非执行历史参考。
+- Paper 发布构建改为验证 skill 所属资源与插件共享资源，并拒绝退休目录。
+
+最终验证结果在本分支完成测试和插件校验后补记。

@@ -1,14 +1,14 @@
 # YZ Skills 开发上下文
 
-本仓库集中维护五个 Codex 插件。插件发布单元位于 `plugins/`，实验性知识随其所属插件维护；旧路径与迁移状态记录在 `docs/migrations/2026-09-04-plugin-consolidation.md`。
+本仓库集中维护五个 Codex 插件。插件发布单元位于 `plugins/`；资源优先与 owning skill 共置，只有多 skill 实际消费的资源进入插件级 `resources/`。旧路径与迁移状态记录在 `docs/migrations/2026-09-04-plugin-consolidation.md`。
 
 ## 插件导航
 
 **[calc-project](plugins/calc-project)**:
-面向科研计算项目及其可执行工作流，管理项目结构、任务事实、受限同步、[插件本地计算知识](plugins/calc-project/knowledge/)和方法专属计算流程。
+面向科研计算项目及其可执行工作流，管理项目结构、任务事实、受限同步、[共享计算模板](plugins/calc-project/resources/)和方法专属计算流程。
 
 **[paper-project](plugins/paper-project)**:
-面向研究论文与学位论文生产，组织文献证据、[插件本地论文知识](plugins/paper-project/knowledge/)、学术写作、引用核验、科学图件和汇报材料。
+面向研究论文与学位论文生产，组织文献证据、[共享写作资源](plugins/paper-project/resources/)、学术写作、引用核验、科学图件和汇报材料。Cangjie 保留为显式调用的冻结入口，等待未来重新设计。
 
 **[dev-productivity](plugins/dev-productivity)**:
 面向软件产品定义、需求与方案设计，提供访谈澄清、领域建模、规格与任务分解、设计调研和原型验证等协作能力。
@@ -28,11 +28,19 @@
 计算项目中可复用的可执行工具资产，用于辅助计算工作，但不作为生成任务输入的来源。
 _Avoid_: 计算模板，任务专用脚本
 
-关键索引词，完整定义仍以[领域术语](plugins/calc-project/skills/calc-project-structure/references/project-context.md)。为准：计算项目、计算项目结构、数据根、计算线、工作流、计算任务、运行、计算模板、项目计算模板、插件计算模板、候选经验卡。
+关键索引词，完整定义仍以[领域术语](plugins/calc-project/skills/calc-project-structure/references/project-context.md)。为准：计算项目、计算项目结构、数据根、计算线、工作流、计算任务、运行、计算模板、项目计算模板、插件计算模板。
 
 ## Paper Project
 
-`plugins/paper-project` 面向学术研究与论文工作；可选的论文写作与期刊知识位于插件内 `knowledge/`。Cangjie 暂为开发者专用，其长期写入与治理模型尚未确定。
+`plugins/paper-project` 面向学术研究与论文工作；多个活动 skill 共用的写作资源位于插件内 `resources/`。Cangjie 当前冻结且仅允许显式调用，未来另行设计。
+
+## Plugin Resources
+
+**skill 所属资源（skill-owned resource）**只服务一个 skill 并与其共置。agent 阅读的说明进入 `references/`；会复制到任务中的文件进入 `assets/`。其接口是 consuming skill 声明的精确相对路径。
+
+**插件共享资源（plugin-shared resource）**由同一插件内至少两个活动 skill 实际消费，位于 `plugins/<plugin>/resources/`。共享目录 README 记录消费者，但不提供运行时发现索引。
+
+当前没有 formal、candidate 或 incubating 资源状态，也没有通用知识消费协议或项目初始化机制。历史材料只可留在历史文档或 Cangjie 明确标记为非执行的 `references/legacy/`。
 
 
 ## Dev Project 插件组
