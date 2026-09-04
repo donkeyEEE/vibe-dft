@@ -5,6 +5,8 @@
 ## 工作入口
 
 - 修改任一插件、插件清单、skill 或发布资源时，读取 `CONTEXT.md` 中对应章节。
+- 修改 skill 生命周期状态时，读取 `CONTEXT.md` 的技能生命周期章节，更新所属插件的 `skill-lifecycle.json`，同步 `agents/openai.yaml` 调用策略，并在迁移日志记录转换。
+- 审查 skill 生命周期变更时，将清单与基线 revision 对比，只接受“开发中 → 已发布 ⇄ 停用”；删除项的基线状态必须为停用。当前快照测试不替代这项历史审查。
 - 修改 skill 所属资源、插件共享资源、计算模板或其消费路径时，读取 `CONTEXT.md` 的 Paper Project、Calc Project 和 Plugin Resources 章节。
 - 核对迁移路径、旧目录、排除项或迁移状态时，读取 `docs/migrations/2026-09-04-plugin-consolidation.md`；历史迁移映射只在该日志维护。
 

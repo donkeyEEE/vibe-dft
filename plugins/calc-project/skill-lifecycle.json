@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skills": {
+    "calc-project-structure": "published",
+    "calc-sync": "published",
+    "calc-task": "published",
+    "calc-workflows": "published",
+    "dmft-workflow": "published",
+    "magnetic-workflow": "published",
+    "namd-workflow": "published",
+    "script-management": "published",
+    "vasp-workflow": "published"
+  }
+}

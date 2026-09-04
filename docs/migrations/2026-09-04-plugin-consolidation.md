@@ -123,7 +123,7 @@ Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不
 - 删除两个 `knowledge/` 树、所有 `knowledge-source.yaml`、统一消费者合同、
   formal/candidate/incubating 状态与相关验证测试。
 - 删除 `prl-shared` 和 `calc-skill-distillation`。保留 `cangjie-skill`，将其
-  设为 explicit-only 冻结入口，旧方法论归档为非执行历史参考。
+  设为 explicit-only 停用入口，旧方法论归档为非执行历史参考。
 - Paper 发布构建改为验证 skill 所属资源与插件共享资源，并拒绝退休目录。
 
 最终验证结果：
@@ -135,6 +135,34 @@ Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不
 - 活动插件源码不存在 `knowledge-source.yaml`、退休知识目录或消费者合同引用，
   两个插件也不存在断裂符号链接；旧路径只保留在历史文档和 Cangjie 的
   `references/legacy/`。
+
+## Skill 生命周期登记
+
+2026-09-04，为五个插件建立 Skill 生命周期当前状态事实源：
+
+- 生命周期主体是 Skill 本身，不设置独立版本；状态为 `development`、
+  `published` 或 `explicit-only`，沿“开发中 → 已发布 ⇄ 停用”转换；
+- `plugins/calc-project/skill-lifecycle.json`、
+  `plugins/dev-engineering/skill-lifecycle.json`、
+  `plugins/dev-productivity/skill-lifecycle.json`、
+  `plugins/osm-project/skill-lifecycle.json` 与
+  `plugins/paper-project/skill-lifecycle.json` 分别记录所属插件的当前状态；
+- 首次登记时，`agents/openai.yaml` 含
+  `allow_implicit_invocation: false` 的 Skill 记为 `explicit-only`，其余现有
+  Skill 记为 `published`；没有为了覆盖状态而虚构 `development` 条目；
+- 根结构测试校验清单 schema、Skill roster 和 Codex 调用策略一致性；Paper
+  marketplace 发布构建从生命周期清单读取 roster，拒绝 `development`、非法状态
+  和调用策略不一致，并要求归档包含该清单；
+- 删除不作为第四种状态；Skill 只能从停用状态删除，旧路径和原因继续在本日志
+  记录。转换合法性和删除前置状态需要审查清单相对基线 revision 的变化，不能从
+  单个当前快照推断。
+
+首次登记验证结果：
+
+- 根结构测试：`14 passed`；
+- Paper 发布资源测试：`5 passed`；
+- Paper marketplace 源插件和临时 bundle 均通过官方插件 validator，归档包含
+  `plugins/paper-project/skill-lifecycle.json`。
 
 ## Zo2Notes 多用户运行时路径
 

@@ -37,6 +37,17 @@ ENGINEERING_SKILLS = {
     "triage",
     "wizard",
 }
+SKILL_STATES = {"development", "published", "explicit-only"}
+
+
+def load_skill_lifecycle(plugin_root: Path) -> dict[str, str]:
+    path = plugin_root / "skill-lifecycle.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    assert data["schema_version"] == 1
+    skills = data["skills"]
+    assert isinstance(skills, dict)
+    assert set(skills.values()) <= SKILL_STATES
+    return skills
 
 
 def test_required_repository_layout_exists() -> None:
@@ -74,6 +85,37 @@ def test_each_plugin_has_a_valid_manifest() -> None:
         manifest = ROOT / "plugins" / plugin / ".codex-plugin" / "plugin.json"
         data = json.loads(manifest.read_text(encoding="utf-8"))
         assert data["name"] == plugin
+
+
+def test_each_plugin_has_a_complete_skill_lifecycle_registry() -> None:
+    for plugin in EXPECTED_PLUGINS:
+        plugin_root = ROOT / "plugins" / plugin
+        actual_skills = {
+            path.parent.name for path in (plugin_root / "skills").glob("*/SKILL.md")
+        }
+        assert set(load_skill_lifecycle(plugin_root)) == actual_skills
+
+
+def test_skill_lifecycle_matches_codex_invocation_policy() -> None:
+    for plugin in EXPECTED_PLUGINS:
+        plugin_root = ROOT / "plugins" / plugin
+        for skill_name, state in load_skill_lifecycle(plugin_root).items():
+            interface = (
+                plugin_root / "skills" / skill_name / "agents" / "openai.yaml"
+            )
+            is_explicit_only = (
+                interface.is_file()
+                and re.search(
+                    r"(?m)^\s*allow_implicit_invocation:\s*false\s*$",
+                    interface.read_text(encoding="utf-8"),
+                )
+                is not None
+            )
+            assert is_explicit_only == (state == "explicit-only"), (
+                plugin,
+                skill_name,
+                state,
+            )
 
 
 def test_dev_skill_ownership_matches_plugin_responsibilities() -> None:

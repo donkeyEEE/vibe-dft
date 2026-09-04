@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "skills": {
+    "domain-modeling": "published",
+    "grill-me": "explicit-only",
+    "grill-with-docs": "explicit-only",
+    "grilling": "published",
+    "handoff": "explicit-only",
+    "prototype": "published",
+    "research": "published",
+    "teach": "explicit-only",
+    "to-questionnaire": "explicit-only",
+    "to-spec": "explicit-only",
+    "to-tickets": "explicit-only",
+    "wait-what": "explicit-only",
+    "wayfinder": "explicit-only",
+    "writing-for-agents": "published"
+  }
+}
