@@ -5,12 +5,12 @@ description: >
   decide which fragments to load for a given polishing request.
 
 always_load:
-  - references/knowledge/write-reader-question-sequence.md
-  - references/knowledge/write-paper-type-taxonomy.md
-  - references/knowledge/write-attribute-intellectual-debt.md
-  - references/knowledge/write-cite-primary-source.md
-  - references/knowledge/write-citation-scope.md
-  - references/knowledge/meta-ai-writing-boundaries.md
+  - references/paper-writing/write-reader-question-sequence.md
+  - references/paper-writing/write-paper-type-taxonomy.md
+  - references/paper-writing/write-attribute-intellectual-debt.md
+  - references/paper-writing/write-cite-primary-source.md
+  - references/paper-writing/write-citation-scope.md
+  - references/paper-writing/meta-ai-writing-boundaries.md
   - ../../resources/paper-writing/write-terminology-ledger.md
   # Skill-local core
   - static/core/stance.md
@@ -78,21 +78,21 @@ axes:
 references:
   on_demand:
     - condition: Physical Review Letters format, evidence logic, reference obligations, or data-availability requirements
-      path: references/knowledge/journal-prl-letter-length.md
+      path: references/paper-writing/journal-prl-letter-length.md
     - condition: Physical Review Letters abstract requirements
-      path: references/knowledge/journal-prl-abstract.md
+      path: references/paper-writing/journal-prl-abstract.md
     - condition: Physical Review Letters title requirements
-      path: references/knowledge/journal-prl-title-style.md
+      path: references/paper-writing/journal-prl-title-style.md
     - condition: Physical Review Letters run-in heading requirements
-      path: references/knowledge/journal-prl-run-in-headings.md
+      path: references/paper-writing/journal-prl-run-in-headings.md
     - condition: Physical Review reference obligations
-      path: references/knowledge/journal-physical-review-reference-obligations.md
+      path: references/paper-writing/journal-physical-review-reference-obligations.md
     - condition: Physical Review data-availability requirements
-      path: references/knowledge/journal-physical-review-data-availability.md
+      path: references/paper-writing/journal-physical-review-data-availability.md
     - condition: PRL claim-evidence-consequence sequencing
-      path: references/knowledge/write-prl-claim-evidence-consequence-sequence.md
+      path: references/paper-writing/write-prl-claim-evidence-consequence-sequence.md
     - condition: effective-model assumption boundaries
-      path: references/knowledge/write-prl-effective-model-assumption-boundary.md
+      path: references/paper-writing/write-prl-effective-model-assumption-boundary.md
     - condition: PRL model-to-validation pairing
       path: ../../resources/paper-writing/write-prl-model-to-validation-pairing.md
     - condition: PRL figure prerequisite-signature-consequence logic

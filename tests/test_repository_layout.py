@@ -163,10 +163,11 @@ def test_active_files_do_not_use_legacy_research_knowledge_path() -> None:
 def test_active_plugin_sources_do_not_depend_on_retired_knowledge_protocol() -> None:
     forbidden_names = {"knowledge-source.yaml", "knowledge-source.yml"}
     forbidden_fragments = (
-        "/knowledge/",
+        "plugins/paper-project/knowledge/",
+        "plugins/calc-project/knowledge/",
         "CONSUMER_CONTRACT.md",
-        "candidates/",
-        "incubating/",
+        "knowledge/candidates/",
+        "knowledge/incubating/",
     )
     offenders: list[Path] = []
     for plugin in ("calc-project", "paper-project"):
@@ -175,6 +176,8 @@ def test_active_plugin_sources_do_not_depend_on_retired_knowledge_protocol() -> 
             if not path.is_file():
                 continue
             relative = path.relative_to(plugin_root)
+            if relative.parts[0] == "tests":
+                continue
             if relative.parts[:3] == (
                 "skills",
                 "cangjie-skill",

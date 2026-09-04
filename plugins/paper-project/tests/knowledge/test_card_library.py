@@ -3,8 +3,8 @@ from pathlib import Path
 
 PLUGIN = Path(__file__).resolve().parents[2]
 SHARED = PLUGIN / "resources" / "paper-writing"
-POLISHING = PLUGIN / "skills" / "prl-polishing" / "references" / "knowledge"
-FIGURE = PLUGIN / "skills" / "prl-figure" / "references" / "knowledge"
+POLISHING = PLUGIN / "skills" / "prl-polishing" / "references" / "paper-writing"
+FIGURE = PLUGIN / "skills" / "prl-figure" / "references" / "paper-writing"
 
 EXPECTED_SHARED = {
     "write-terminology-ledger.md",
