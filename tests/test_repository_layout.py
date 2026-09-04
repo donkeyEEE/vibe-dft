@@ -44,14 +44,26 @@ def test_required_repository_layout_exists() -> None:
     assert (ROOT / "CONTEXT.md").is_file()
     assert not (ROOT / "CONTEXT-MAP.md").exists()
     assert not (ROOT / "docs" / "contexts").exists()
-    paper_knowledge = ROOT / "plugins" / "paper-project" / "knowledge"
-    calc_knowledge = ROOT / "plugins" / "calc-project" / "knowledge"
-    assert (paper_knowledge / "CONSUMER_CONTRACT.md").is_file()
-    assert (paper_knowledge / "cards" / "INDEX.md").is_file()
-    assert (calc_knowledge / "CONSUMER_CONTRACT.md").is_file()
-    assert (calc_knowledge / "cards" / "physics" / "PHYSICS_INDEX.md").is_file()
-    assert (calc_knowledge / "templates" / "INDEX.md").is_file()
-    assert (calc_knowledge / "incubating" / "ontology" / "cards" / "INDEX.md").is_file()
+    paper = ROOT / "plugins" / "paper-project"
+    calc = ROOT / "plugins" / "calc-project"
+    assert not (paper / "knowledge").exists()
+    assert not (calc / "knowledge").exists()
+    assert (paper / "resources" / "paper-writing" / "README.md").is_file()
+    assert (
+        calc / "resources" / "calculation-templates" / "common" / "prepare_run.sh.template"
+    ).is_file()
+    assert (
+        calc
+        / "skills"
+        / "magnetic-workflow"
+        / "assets"
+        / "templates"
+        / "wannier"
+        / "run_wannier90.pbs.template"
+    ).is_file()
+    assert not (paper / "skills" / "prl-shared").exists()
+    assert not (calc / "skills" / "calc-skill-distillation").exists()
+    assert (paper / "skills" / "cangjie-skill" / "SKILL.md").is_file()
     assert not (ROOT / "research-knowledge").exists()
 
 
@@ -148,23 +160,33 @@ def test_active_files_do_not_use_legacy_research_knowledge_path() -> None:
     assert offenders == []
 
 
-def test_plugin_knowledge_sources_resolve_from_their_descriptor() -> None:
-    descriptors = sorted(
-        path
-        for plugin in ("calc-project", "paper-project")
-        for path in (ROOT / "plugins" / plugin / "skills").glob(
-            "*/references/knowledge-source.yaml"
-        )
+def test_active_plugin_sources_do_not_depend_on_retired_knowledge_protocol() -> None:
+    forbidden_names = {"knowledge-source.yaml", "knowledge-source.yml"}
+    forbidden_fragments = (
+        "/knowledge/",
+        "CONSUMER_CONTRACT.md",
+        "candidates/",
+        "incubating/",
     )
-    assert descriptors
-    for descriptor in descriptors:
-        fields = dict(
-            line.strip().split(":", 1)
-            for line in descriptor.read_text(encoding="utf-8").splitlines()
-            if line.strip() and ":" in line
-        )
-        assert fields.get("relative_to", "").strip() == "this_file"
-        knowledge = (descriptor.parent / fields["path"].strip()).resolve()
-        assert knowledge.parent == descriptor.parents[3]
-        assert (knowledge / "CONSUMER_CONTRACT.md").is_file()
-        assert (knowledge / "cards" / "INDEX.md").is_file()
+    offenders: list[Path] = []
+    for plugin in ("calc-project", "paper-project"):
+        plugin_root = ROOT / "plugins" / plugin
+        for path in plugin_root.rglob("*"):
+            if not path.is_file():
+                continue
+            relative = path.relative_to(plugin_root)
+            if relative.parts[:3] == (
+                "skills",
+                "cangjie-skill",
+                "references",
+            ) and "legacy" in relative.parts:
+                continue
+            if path.name in forbidden_names:
+                offenders.append(path.relative_to(ROOT))
+                continue
+            if path.suffix not in {".md", ".yaml", ".yml", ".py"}:
+                continue
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            if any(fragment in text for fragment in forbidden_fragments):
+                offenders.append(path.relative_to(ROOT))
+    assert offenders == []
