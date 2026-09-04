@@ -12,7 +12,7 @@ SCRIPTS = (
 sys.path.insert(0, str(SCRIPTS))
 
 import zotero  # noqa: E402
-from runtime_config import Endpoint, RuntimeConfig  # noqa: E402
+from runtime_config import ConfigError, Endpoint, RuntimeConfig  # noqa: E402
 
 
 def subcommand_names(parser: argparse.ArgumentParser) -> set[str]:
@@ -135,6 +135,18 @@ def test_explicit_host_failure_has_one_attempt() -> None:
     with pytest.raises(zotero.ZoteroConnectionError, match="explicit host"):
         client.select_endpoint()
     assert attempts == ["http://192.0.2.10:24000/api/"]
+
+
+def test_wsl_gateway_failure_keeps_loopback_candidate() -> None:
+    def unavailable_gateway():
+        raise ConfigError("no gateway")
+
+    endpoints, gateway_error = zotero.runtime_endpoints(
+        runtime(), gateway_loader=unavailable_gateway
+    )
+
+    assert [endpoint.url for endpoint in endpoints] == ["http://127.0.0.1:24000"]
+    assert gateway_error == "no gateway"
 
 
 def test_doctor_reports_sources_without_local_paths() -> None:
