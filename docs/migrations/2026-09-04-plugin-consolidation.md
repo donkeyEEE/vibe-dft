@@ -126,4 +126,12 @@ Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不
   设为 explicit-only 冻结入口，旧方法论归档为非执行历史参考。
 - Paper 发布构建改为验证 skill 所属资源与插件共享资源，并拒绝退休目录。
 
-最终验证结果在本分支完成测试和插件校验后补记。
+最终验证结果：
+
+- 根结构、Paper Project 和 Calc Project 联合测试：`21 passed`；
+- `paper-project` 与 `calc-project` 均通过官方插件 validator；
+- Paper marketplace 源插件与构建后的 bundle 均通过官方 validator，归档及
+  SHA-256 sidecar 成功生成；
+- 活动插件源码不存在 `knowledge-source.yaml`、退休知识目录或消费者合同引用，
+  两个插件也不存在断裂符号链接；旧路径只保留在历史文档和 Cangjie 的
+  `references/legacy/`。
