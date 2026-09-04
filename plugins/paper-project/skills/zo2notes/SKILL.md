@@ -23,14 +23,15 @@ Zotero 是只读文献来源；本技能将一篇已选 Zotero 文献转为现�
 
 ## Zotero 访问
 
-Zotero Desktop 必须运行并启用本地 API。所有只读请求使用 Windows-to-WSL bridge：
+Zotero Desktop 必须运行，用户须在 Zotero 界面中启用本地 API。先运行只读诊断：
 
 ```bash
-curl -sS \
-  -H 'Host: 127.0.0.1:23119' \
-  -H 'Zotero-API-Version: 3' \
-  'http://172.30.128.1:23119/api/users/0/...'
+python3 <plugin-root>/skills/zo2notes/scripts/zotero.py doctor --json
 ```
+
+自动探测成功时直接使用，不创建配置。需要自定义 host、port、mode 或附件映射时，完整读取 `references/configuration.md`：只询问无法自动判断的值，向用户展示配置路径与完整拟写内容，得到确认后才创建或修改用户配置，然后再次运行 `doctor`。连接或附件访问失败时读取 `references/troubleshooting.md`。
+
+支持 Windows 原生、Windows Zotero + WSL Codex、macOS/Linux 原生。Zo2Notes 不修改 Zotero 设置、profile、条目或附件，也不重启 Zotero 或导入记录。
 
 可使用随附的只读辅助命令诊断或定向取证：
 
@@ -45,13 +46,13 @@ python3 <plugin-root>/skills/zo2notes/scripts/zotero.py fulltext <attachmentKey>
 
 ### VS Code 中的 PDF 证据链接
 
-在 VS Code Remote WSL 中生成可点击的 Zotero PDF 页码链接时，使用已安装在 VS Code Server 侧的 `donk.zotero-wsl` 扩展：
+仅在 VS Code Remote WSL 且已安装 `donk.zotero-wsl` 扩展时生成可点击的 Zotero PDF 页码链接：
 
 ```markdown
 [证据说明](vscode://donk.zotero-wsl/open-pdf?item=<attachmentKey>&page=<page>)
 ```
 
-`item` 必须是八位大写字母或数字组成的 Zotero **附件 key**，不得使用父条目 key；`page` 是从 1 开始的 PDF 页码。扩展会把链接交给 WSL 启动器和 Windows Zotero。不要在 VS Code Markdown 中生成原始 Zotero PDF URI；若该适配不可用，则保留附件 key 与页码作为纯文本证据定位信息。
+`item` 必须是八位大写字母或数字组成的 Zotero **附件 key**，不得使用父条目 key；`page` 是从 1 开始的 PDF 页码。其他编辑器、原生 Windows、macOS、Linux或扩展不可用时，保留附件 key 与页码作为纯文本证据定位信息。
 
 ## 项目内存储契约
 

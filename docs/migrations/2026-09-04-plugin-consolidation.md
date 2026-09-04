@@ -135,3 +135,18 @@ Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不
 - 活动插件源码不存在 `knowledge-source.yaml`、退休知识目录或消费者合同引用，
   两个插件也不存在断裂符号链接；旧路径只保留在历史文档和 Cangjie 的
   `references/legacy/`。
+
+## Zo2Notes 多用户运行时路径
+
+2026-09-04，Zo2Notes 将机器专属的 Windows-to-WSL 访问路径替换为多用户运行时配置：
+
+- 删除固定的 `172.30.128.1:23119` 与独立 `zotero_wsl_bridge.py`；
+- `runtime_config.py` 统一处理 Windows 原生、Windows Zotero + WSL Codex、
+  macOS/Linux 原生环境的配置优先级、平台识别和端点发现；
+- `attachment_paths.py` 处理标准 Windows-to-WSL 盘符转换与用户确认的自定义映射；
+- 用户级配置位于 Windows `%APPDATA%\zo2notes\config.toml` 或 macOS、Linux、
+  WSL 的 `~/.config/zo2notes/config.toml`，不再查找 Zotero profile 或修改
+  `prefs.js`；
+- 删除启停、重启和导入 Zotero 的写操作入口；Zo2Notes 保持 Zotero 只读。
+
+该变更不改变 `zo2notes` 的已发布生命周期状态或隐式调用策略。

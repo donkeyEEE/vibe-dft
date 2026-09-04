@@ -1,16 +1,15 @@
 # Zotero local API and connector routes for Zo2Notes
 
-Base URL from this WSL workspace: `http://172.30.128.1:23119`.
+Base URL 由 `scripts/runtime_config.py` 解析。原生环境默认使用 `http://127.0.0.1:23119`；WSL 依次尝试 loopback 和动态发现的 Windows 主机地址。用户显式配置 host 时只使用该地址。
 
 Every request must include:
 
 ```text
-Host: 127.0.0.1:23119
+Host: 127.0.0.1:<configured-port>
 Zotero-API-Version: 3
 ```
 
-The Windows-side forwarding rule accepts the WSL connection at the fixed base
-URL, while Zotero validates the loopback Host header.
+Zotero 验证 loopback Host header，因此 header 中的端口必须与连接端口一致。
 
 ## Desktop local API
 
@@ -55,19 +54,14 @@ Safe read routes:
 /api/users/0/items/<attachmentKey>/file/view/url
 ```
 
-## Connector server
+## 只读 Connector 路由
 
-The Zotero Connector server shares port `23119` and is used for desktop writes/imports.
+Zotero Connector 与本地 API 共用端口。Zo2Notes 仅使用下列非修改性路由读取当前界面选择：
 
 Useful routes:
 
 ```text
-GET  /connector/ping
-POST /connector/ping
 POST /connector/getSelectedCollection
-POST /connector/import?session=<uuid>
-POST /connector/saveItems
-POST /connector/saveSnapshot
 ```
 
-Use `/connector/import` for importing BibTeX/RIS strings into the currently selected Zotero library or collection. Treat connector writes as Zotero library modifications and confirm with the user before doing them.
+其余 Connector 写入路由不属于 Zo2Notes 接口。
