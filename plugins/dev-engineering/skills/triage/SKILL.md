@@ -72,7 +72,7 @@ Show counts and a one-line summary per item. Let the maintainer pick.
 
 3. **Verify the claim.** Before any grilling, check that the claim holds up. For a bug, reproduce it from the reporter's steps. For a PR, confirm the diff does what it claims — check it out, run the relevant tests or commands. Report what happened: confirmed (with code path), failed, or insufficient detail (a strong `needs-info` signal). A confirmed verification makes a much stronger agent brief.
 
-4. **Grill (if needed).** Categorization and verification above have no productivity dependency. If the request needs fleshing out, the next step invokes `$dev-productivity:grilling` with `$dev-engineering:domain-modeling`; follow [cross-plugin-dependencies.md](../../references/cross-plugin-dependencies.md) here and preserve all triage findings if grilling is unavailable. Grill it into shape a round of questions at a time, sharpening domain terms and updating `CONTEXT.md`/ADRs inline as decisions land.
+4. **Grill (if needed).** Categorization and verification above have no productivity dependency. If the request needs fleshing out, the next step invokes `$dev-productivity:grilling` with `$dev-productivity:domain-modeling`; follow [cross-plugin-dependencies.md](../../references/cross-plugin-dependencies.md) here and preserve all triage findings if the productivity skills are unavailable. Grill it into shape a round of questions at a time, sharpening domain terms and updating `CONTEXT.md`/ADRs inline as decisions land.
 
 5. **Apply the outcome:**
    - `ready-for-agent` — post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)).

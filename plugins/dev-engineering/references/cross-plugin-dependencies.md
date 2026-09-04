@@ -5,7 +5,7 @@
 Check a cross-plugin dependency only when the next workflow step invokes it:
 
 1. Preserve all local work and artifacts completed so far.
-2. Name the target with its fully qualified Codex invocation, such as `$dev-productivity:grilling`.
+2. Name the target with its fully qualified Codex invocation, such as `$dev-productivity:grill-with-docs`.
 3. If the explicit invocation is available, continue the composed workflow normally.
 4. If it is unavailable, pause only that dependent step and report the exact skill and provider.
 

@@ -62,7 +62,7 @@ Do NOT propose interfaces yet. After the file is written, ask the user: "Which o
 
 Once the user picks a candidate, the next step invokes `$dev-productivity:grilling`. Follow [cross-plugin-dependencies.md](../../references/cross-plugin-dependencies.md) at this point; preserve the completed scan and HTML report if the invocation is unavailable. Run grilling to walk the decision tree with them — constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
 
-Side effects happen inline as decisions crystallize — run `$dev-engineering:domain-modeling` to keep the domain model current as you go:
+Side effects happen inline as decisions crystallize — run `$dev-productivity:domain-modeling` to keep the domain model current as you go:
 
 - **Naming a deepened module after a concept not in `CONTEXT.md`?** Add the term to `CONTEXT.md`. Create the file lazily if it doesn't exist.
 - **Sharpening a fuzzy term during the conversation?** Update `CONTEXT.md` right there.
