@@ -1,7 +1,7 @@
-# Ontology and Agent Governance Card Index
+# Incubating Ontology and Agent Governance Index
 
-本索引管理 `cards/ontology/` 中的正式卡片。卡片分为本体与推理、Agent 治理，
-以及两者的组合边界。所有卡片均须保留自身 References 与 Caveats；索引只提供导航。
+本索引只维护孵化区内部清单，不授予正式消费可见性。内容分为本体与推理、Agent
+治理及两者的组合边界；所有卡片保留自身 References 与 Caveats。
 
 ## Ontology, reasoning, and knowledge engineering
 

@@ -14,7 +14,7 @@ only when the project file is absent.
 ## Orchestration contract
 
 1. Before any new task copy, read `references/knowledge-source.yaml`, the
-   external `CONSUMER_CONTRACT.md`, `templates/INDEX.md`, and the shared [template copy and conversation
+   plugin-local `CONSUMER_CONTRACT.md`, `templates/INDEX.md`, and the [template copy and conversation
    preflight](references/template-copy-preflight.md) contract. Confirm task IDs,
    order, dependencies, source and target assets, template
    source, target `inputs/` path, and acceptance check.
@@ -55,17 +55,17 @@ explicit user confirmation.
 
 ## Boundaries
 
-- `script-management` validates external shared and project template assets. Downstream
+- `script-management` validates plugin-local and project template assets. Downstream
   workflows, not this skill or `script-management`, write task-local inputs and
   scripts from approved templates.
 - When a downstream workflow writes any `*.template` asset into a task, it removes
   the `.template` suffix from the task-copy name.
-- On every new template lookup, read the external working-tree index and only
+- On every new template lookup, read the plugin-local working-tree index and only
   the smallest relevant formal set. Never read or search `candidates/`. If the
   repository or formal template is unavailable or malformed, warn and continue
-  without a shared template; never use a bundled legacy copy.
+  without a plugin template; never fall back to another knowledge location.
 - Do not create tasks, alter task YAML, or directly write method inputs or scripts.
 - The root `WORKFLOW.md` is human-maintained documentation, not a machine-parsed
   format or a source of global scientific defaults.
-- Read [shared PBS rules](references/pbs.md) before defining a PBS-stage handoff.
+- Read [common PBS rules](references/pbs.md) before defining a PBS-stage handoff.
 - Do not perform remote synchronization. Do not submit jobs.

@@ -1,7 +1,7 @@
 # Physics Knowledge Index
 
 本索引是物理子库的唯一导航和卡片状态来源。读取物理卡片前，必须先读
-[../SKILL.md](../SKILL.md) 和 [../INDEX.md](../INDEX.md)，再按本索引选择最小相关集合。
+[../INDEX.md](../INDEX.md)，再按本索引选择最小相关集合。
 
 ## Card types
 

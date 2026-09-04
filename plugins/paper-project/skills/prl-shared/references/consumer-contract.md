@@ -1,7 +1,7 @@
 # 消费协议
 
-正式内容位于 `references/knowledge-source.yaml` 指向的外部
-`research-knowledge` 仓库。仓库根目录的 `CONSUMER_CONTRACT.md` 是消费行为的
+正式内容位于 `references/knowledge-source.yaml` 指向的插件本地
+`knowledge/` 目录。该目录的 `CONSUMER_CONTRACT.md` 是消费行为的
 正式规则；本文件只规定 paper-project 治理端与消费端之间的责任边界。
 
 ## 消费端声明
@@ -17,7 +17,7 @@
 ## 读取顺序
 
 1. 读取消费 skill 自己的 `references/knowledge-source.yaml`；
-2. 读取外部仓库 `CONSUMER_CONTRACT.md`；
+2. 读取插件本地知识目录的 `CONSUMER_CONTRACT.md`；
 3. 读取相关正式索引；
 4. 只读取完成当前任务所需的最小相关集合；
 5. 回到消费端自己的 Trigger、Selection 和 Application 流程。

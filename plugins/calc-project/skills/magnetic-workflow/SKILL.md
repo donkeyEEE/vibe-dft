@@ -32,19 +32,19 @@ task fact source.
 
 Read [the magnetic pipeline](references/magnetic-pipeline.md) and [the magnetic
 handoff preflight](references/magnetic-handoff-preflight.md) before generation.
-Before new task preparation, read [the shared template-copy preflight](../calc-workflows/references/template-copy-preflight.md).
+Before new task preparation, read [the plugin template-copy preflight](../calc-workflows/references/template-copy-preflight.md).
 The magnetic pipeline remains the method-specific parameter authority; do not
 infer unconfirmed scientific settings.
 When interpreting a calculation note or troubleshooting record whose stopping
 condition is met, do not expand the calculation question; route any scope
 expansion to `calc-workflows`.
-For every stage, read `references/knowledge-source.yaml`, the external consumer
-contract and `templates/INDEX.md`, then use either an accepted formal shared template or a copied project
+For every stage, read `references/knowledge-source.yaml`, the plugin-local consumer
+contract and `templates/INDEX.md`, then use either an accepted formal plugin template or a copied project
 `calculation_templates/` baseline, then make only confirmed task changes. The
-shared source is under `templates/computation/`; read the current working tree
+plugin source is under `templates/computation/`; read the current working tree
 on each new lookup, never read or search `candidates/`, and use only the
 smallest relevant formal set. If it is unavailable or malformed, warn and
-continue without a shared template; do not use a bundled legacy copy. The
+continue without a plugin template; do not fall back to another knowledge location. The
 template source is validated by `script-management`; this skill writes task
 `inputs/`, removes `.template` from task-copy names, checks them,
 and returns source, changes, generated

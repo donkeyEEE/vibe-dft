@@ -2,8 +2,8 @@ from pathlib import Path
 import re
 
 
-ROOT = Path(__file__).resolve().parents[1]
-ONTOLOGY = ROOT / "cards" / "ontology"
+ROOT = Path(__file__).resolve().parents[2] / "knowledge"
+ONTOLOGY = ROOT / "incubating" / "ontology" / "cards"
 EXPECTED_COUNT = 40
 FRONTMATTER_KEYS = {"name", "type", "tags", "updated_at"}
 
@@ -34,6 +34,6 @@ def test_ontology_cards_are_indexed_and_well_formed():
         assert len(re.findall(rf"\({re.escape(card.name)}\)", index_text)) == 1
 
 
-def test_primary_index_links_ontology_index():
+def test_formal_index_does_not_expose_incubating_ontology():
     primary = (ROOT / "cards" / "INDEX.md").read_text(encoding="utf-8")
-    assert "[ontology/INDEX.md](ontology/INDEX.md)" in primary
+    assert "ontology" not in primary.lower()

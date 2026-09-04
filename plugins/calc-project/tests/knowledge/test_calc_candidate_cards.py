@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 
 
-ROOT = Path(__file__).parents[1]
+ROOT = Path(__file__).parents[2] / "knowledge"
 CANDIDATES = ROOT / "candidates/cards/calc-project"
 
 

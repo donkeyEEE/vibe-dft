@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-ROOT = Path(__file__).parents[1]
+ROOT = Path(__file__).parents[2] / "knowledge"
 TEMPLATES = ROOT / "templates/computation"
 EXPECTED = {
     "common/prepare_and_submit.sh.template",

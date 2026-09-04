@@ -12,7 +12,7 @@ before a VASPKIT operation.
 For directional SOC magnetocrystalline-anisotropy-energy (MAE) tasks, read [the
 MAE workflow](references/mae-workflow.md).
 
-Before new task preparation, read [the shared template-copy preflight](../calc-workflows/references/template-copy-preflight.md).
+Before new task preparation, read [the plugin template-copy preflight](../calc-workflows/references/template-copy-preflight.md).
 The VASP checklist remains the method-specific parameter authority; do not infer
 material or physical settings that the user has not confirmed.
 When interpreting a calculation note or troubleshooting record whose stopping
@@ -21,17 +21,17 @@ expansion to `calc-workflows`.
 
 ## Template modes
 
-- **Shared template:** read `references/knowledge-source.yaml`, the external
+- **Plugin template:** read `references/knowledge-source.yaml`, the plugin-local
   consumer contract and `templates/INDEX.md`, then select an accepted VASP or
   PBS source from `templates/computation/`,
   then write the task copy in `inputs/` with confirmed substitutions.
 - **Project template:** copy an approved VASP baseline from
   `calculation_templates/`, then make only confirmed task-specific changes.
 
-On every new lookup read the current external working tree, never read or
+On every new lookup read the current plugin-local working tree, never read or
 search `candidates/`, and load only the smallest relevant formal template set.
-If shared knowledge is unavailable or malformed, warn and continue without a
-shared template; do not use a bundled legacy copy. `script-management`
+If optional plugin knowledge is unavailable or malformed, warn and continue without a
+  plugin template; do not fall back to another knowledge location. `script-management`
 validates both template layers; this skill creates the task
 copies and removes `.template` from their task-copy names. Record the source,
 task-level changes, generated files, and checks for
@@ -48,7 +48,7 @@ task-level changes, generated files, and checks for
 3. Run VASPKIT only beside the intended `POSCAR`. Task 102 requires explicit
    `GENERATE_KPOINTS=1`; task 103 preserves prepared KPOINTS and is required for
    band calculations and Wannier pre-runs.
-4. Check generated files remain in the task `inputs/`; apply shared
+4. Check generated files remain in the task `inputs/`; apply common
    PBS rules and run `bash -n` for generated PBS or shell scripts.
 
 Use `scripts/vasp/plot_vasp_band.py` only for unprojected, blank-separated

@@ -1,52 +1,49 @@
 ---
 name: prl-shared
-description: Internal governance for formal research-knowledge cards and templates. Do not invoke as a standalone user workflow. Cangjie uses it for admission, validation, index maintenance, and formal writes to the configured external repository.
+description: Internal developer support for paper-project knowledge cards. Do not invoke as a standalone user workflow. Long-term admission, promotion, and governance remain intentionally open.
 ---
 
 # PRL Shared Knowledge Governance
 
-This internal skill governs the external `research-knowledge` content
-repository. It is not the content library and is not a standalone user
-workflow. Cangjie is the supported formal promotion workflow.
+This internal skill supports the plugin-local `paper-project/knowledge`
+directory. It is not a standalone user workflow. Cangjie is currently a
+developer-only workflow; its long-term write and governance model is open.
 
 ## Repository configuration
 
-Before reading or writing shared content:
+Before reading or writing paper knowledge during development:
 
 1. Read `references/knowledge-source.yaml`.
-2. Resolve its fixed repository path (`/home/donk/yz-skills/research-knowledge`).
+2. Resolve its `path` relative to `references/knowledge-source.yaml`.
 3. Read `references/consumer-contract.md`, then the repository's
    `CONSUMER_CONTRACT.md`.
 4. For admission, also read `references/admission-contract.md`.
-5. Read `cards/INDEX.md`; for physics cards also read
-   `cards/physics/PHYSICS_INDEX.md`; for calculation templates read
-   `templates/INDEX.md`.
+5. Read `cards/INDEX.md`.
 
 If the repository or a formal resource is unavailable or malformed, warn and
-continue the requesting task without shared knowledge. Do not use a bundled
-legacy copy and do not read or search `candidates/` during consumption.
+continue the requesting task without plugin knowledge. Do not fall back to
+another location and do not read or search `candidates/` during consumption.
 
 ## Governance responsibilities
 
-`prl-shared` owns schemas, admission and evolution rules, index rules,
-validation, and formal-write boundaries. It does not own consumer task routing
-or output quality.
+For the current developer workflow, `prl-shared` preserves the existing paper
+card schema, index checks, and validation. It does not settle the future
+admission, promotion, or governance model and does not own consumer task
+routing or output quality.
 
-Only Cangjie may promote a candidate into formal content. Promotion requires
-human confirmation, a formal file write, the matching formal index update, and
-successful validation with:
+Cangjie development writes still require human confirmation, a card write, the
+matching paper index update, and successful validation with:
 
 ```bash
-python scripts/validate_knowledge_repository.py /home/donk/yz-skills/research-knowledge
+python scripts/validate_knowledge_repository.py ../../../knowledge
 ```
 
-Calculation templates additionally require recorded `calc-project`
-acceptance. Cangjie reports the knowledge repository's Git revision and dirty
-state after a formal write but never commits automatically.
+Cangjie reports the plugin repository's Git revision and dirty state after a
+development write but never commits automatically.
 
 ## Formal visibility
 
-A resource is formal only when it exists under `cards/` or `templates/` and is
-registered by the relevant formal index. Files under `candidates/`, or formal
+A resource is formal only when it exists under `cards/` and is registered by
+the paper card index. Files under `candidates/`, or formal
 files not yet indexed, are not consumable. `updated_at` records the latest
 human-maintained knowledge change rather than mechanical formatting.

@@ -2,7 +2,7 @@
 
 Use this shared contract before preparing a new task copy. Template files are
 declared inputs, submission/PBS scripts, and approved helper scripts; their only
-permitted copy sources are external `research-knowledge templates/computation/` and project
+permitted copy sources are plugin-local `knowledge/templates/computation/` and project
 `calculation_templates/`. Existing task directories, historical reference
 cases, completed-run outputs, logs, job identifiers, caches, and remote paths
 are not template sources. Template files must not include outputs, logs,

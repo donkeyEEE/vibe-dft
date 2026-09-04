@@ -1,42 +1,20 @@
-# Research Knowledge Card Index
+# Paper Project Knowledge Card Index
 
-本索引是共享知识库的一级导航。`atoms/` 平铺存放通用卡片；本体与 Agent
-治理卡片由[本体索引](ontology/INDEX.md)独立导航；物理卡片由
-[物理索引](physics/PHYSICS_INDEX.md)独立导航。读取任何卡片前，必须先读
-[SKILL.md](SKILL.md)。
+本索引导航 `paper-project` 随插件发布的可选论文写作与期刊知识。
+`atoms/` 平铺存放正式卡片；消费者只按本索引选择完成任务所需的最小集合。
 
 ## Name prefixes
 
 | Prefix | Scope |
 |---|---|
-| `phys-` | 由[物理索引](physics/PHYSICS_INDEX.md)管理的物理卡片 |
-| `comp-` | 计算方法、参数、诊断与约束 |
 | `write-` | 论文写作、阅读、论证与引文实践 |
 | `journal-` | 期刊特定要求与投稿约束 |
-| `meta-` | 跨任务治理、安全与知识库维护规则 |
-
-## Physics knowledge
-
-物理知识采用独立的分类、状态与纳入规则。需要物理知识时，继续读取
-[physics/PHYSICS_INDEX.md](physics/PHYSICS_INDEX.md)，不要从本索引推测具体物理卡片。
-
-## Ontology and Agent governance
-
-本体工程、OWL/SHACL、开放世界推理和 Agent 治理由独立的
-[ontology/INDEX.md](ontology/INDEX.md)管理。主要标签包括
-`domain/knowledge-engineering`、`domain/agent-governance`、
-`task/ontology-design`、`task/reasoning`、`task/agent-design` 与
-`task/agent-validation`。
+| `meta-` | 论文工作中的安全与使用边界 |
 
 ## Types
 
 | Type | Meaning |
 |---|---|
-| `concept` | 概念定义、分类或关键区分 |
-| `mechanism` | 物理、因果或逻辑机制 |
-| `method-constraint` | 方法前提、限制或报告要求 |
-| `procedure` | 可复用操作或诊断步骤 |
-| `evidence` | 可复用研究事实或观察 |
 | `writing-pattern` | 写作、阅读、论证或引文规则 |
 | `journal-guideline` | 特定期刊的格式、投稿或合规要求 |
 | `constraint` | 伦理、安全或使用边界 |

@@ -11,7 +11,7 @@ formal knowledge admission; this skill only maintains calc plugin behavior from
 cards the user selects.
 
 1. Read [knowledge-source.yaml](references/knowledge-source.yaml), then the
-   external consumer contract and [proposal contract](references/proposal-contract.md).
+   plugin-local consumer contract and [proposal contract](references/proposal-contract.md).
 2. Read only the formal cards or
    `candidates/cards/calc-project/` cards explicitly selected by the user. This
    candidate access is a governance exception for this skill; do not scan the

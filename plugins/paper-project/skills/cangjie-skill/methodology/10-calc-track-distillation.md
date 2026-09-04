@@ -31,7 +31,7 @@ conflict and its limits rather than synthesizing an unsupported rule.
 ## Candidate write
 
 Write or update only
-`/home/donk/yz-skills/research-knowledge/candidates/cards/calc-project/` and its
+`plugins/calc-project/knowledge/candidates/cards/calc-project/` and its
 `INDEX.md`. Use candidate frontmatter with `name`,
 `type: calc-experience-candidate`, `source_plugin: calc-project`,
 `status: candidate`, and `updated_at`. Candidate frontmatter is not the formal
@@ -41,12 +41,9 @@ Candidate writes require human confirmation of the proposed record. They do
 not update `cards/INDEX.md` and do not make the record available to ordinary
 consumers.
 
-## Formal admission
+## Future admission
 
-When the user asks to preserve the distilled result as shared knowledge, start
-the normal Cangjie admission flow. Re-evaluate the knowledge object, evidence,
-atomicity, applicability, conflicts, type, and tags. Show the proposed formal
-card and obtain human confirmation. Only then write a formal card and formal
-index entry through `prl-shared` governance. Do not rename a candidate into a
-formal card mechanically and do not auto-commit either repository.
-
+Formal admission is not defined while calc-project knowledge management remains
+experimental. Re-evaluate the knowledge object, evidence, atomicity,
+applicability, conflicts, type, and tags, then deliver a reviewable proposal.
+Do not turn a candidate into a formal card or update a formal index.

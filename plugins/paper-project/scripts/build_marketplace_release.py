@@ -225,6 +225,8 @@ def assert_bundle_contract(bundle_root: Path, version: str) -> None:
         bundled_plugin / "skills/ppt-master/scripts/attribution_guard.py",
         bundled_plugin / "skills/prl-shared/references/knowledge-source.yaml",
         bundled_plugin / "skills/prl-shared/scripts/validate_knowledge_repository.py",
+        bundled_plugin / "knowledge/CONSUMER_CONTRACT.md",
+        bundled_plugin / "knowledge/cards/INDEX.md",
         bundled_plugin / "skills/cangjie-skill/templates/PHYSICS_CONCEPT_CARD.md.template",
         bundled_plugin / "skills/cangjie-skill/templates/PHYSICS_PHENOMENON_CARD.md.template",
         bundled_plugin / "skills/cangjie-skill/templates/PHYSICS_THEORY_MODEL_CARD.md.template",

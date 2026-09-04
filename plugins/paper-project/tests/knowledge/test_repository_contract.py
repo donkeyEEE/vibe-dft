@@ -1,15 +1,13 @@
 from pathlib import Path
 
 
-ROOT = Path(__file__).parents[1]
+ROOT = Path(__file__).parents[2] / "knowledge"
 
 
-def test_repository_is_content_only_and_exposes_formal_entrypoints() -> None:
-    """Catch packaging this content store as a plugin or dropping entrypoints."""
-    assert not (ROOT / ".codex-plugin").exists()
+def test_paper_knowledge_exposes_formal_entrypoints() -> None:
+    """Catch dropping plugin-local paper knowledge entrypoints."""
     assert (ROOT / "CONSUMER_CONTRACT.md").is_file()
     assert (ROOT / "cards/INDEX.md").is_file()
-    assert (ROOT / "templates/INDEX.md").is_file()
 
 
 def test_consumer_contract_excludes_candidates_and_requires_index_discovery() -> None:

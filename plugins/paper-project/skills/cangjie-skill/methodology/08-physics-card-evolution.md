@@ -1,8 +1,10 @@
 # 物理卡片演化协议
 
+当前仅用于生成和审查物理知识提案；在 calc-project 的知识治理模型确定前，不执行正式卡写入或索引更新。
+
 本协议只处理已经通过来源支持、知识价值、原子性和一致性检查的物理候选。开始前先读
-`../../prl-shared/SKILL.md`、`/home/donk/yz-skills/research-knowledge/cards/INDEX.md` 和
-`/home/donk/yz-skills/research-knowledge/cards/physics/PHYSICS_INDEX.md`。
+`../../prl-shared/SKILL.md`、`plugins/paper-project/knowledge/cards/INDEX.md` 和
+`plugins/calc-project/knowledge/cards/physics/PHYSICS_INDEX.md`。
 
 ## 来源边界
 

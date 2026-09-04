@@ -2,7 +2,7 @@
 
 ## Read the shared facts first
 
-After following the external consumer contract, consult `cards/INDEX.md` and load the smallest relevant set of formal cards tagged `journal/nature-communications`. These cards contain the authoritative formatting facts: word limits, abstract rules, figure specifications, reference style, mandatory statements, and common desk-rejection patterns.
+After following the plugin-local consumer contract, consult `cards/INDEX.md` and load the smallest relevant set of formal cards tagged `journal/nature-communications`. These cards contain the authoritative formatting facts: word limits, abstract rules, figure specifications, reference style, mandatory statements, and common desk-rejection patterns.
 
 The notes below are the **polishing action layer** on top of those facts.
 

@@ -13,13 +13,13 @@ sibling `$ppt-master`; it does not render slides itself.
 ## Required load order
 
 1. Read [manifest.yaml](manifest.yaml).
-2. Read `references/knowledge-source.yaml`, resolve
-   `/home/donk/yz-skills/research-knowledge`, and read its
+2. Read `references/knowledge-source.yaml`, resolve its `path` relative to that
+   file, and read the plugin-local knowledge directory's
    `CONSUMER_CONTRACT.md`, then `cards/INDEX.md` and the formal
    `cards/atoms/write-terminology-ledger.md`. On every new lookup read the
-   current working tree; never read or search `candidates/`. If shared
+   current working tree; never read or search `candidates/`. If optional
    knowledge is unavailable or malformed, warn and continue without it rather
-   than using a bundled legacy copy.
+   than falling back to another location.
 3. Read every skill-local file under `always_load` in manifest order.
 4. Classify `paper_type` as `discovery`, `methods`, `resource`, `clinical`,
    `materials`, or `review`; use the user's framing first and `discovery` as

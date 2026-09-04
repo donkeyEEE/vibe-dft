@@ -9,8 +9,6 @@ ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_PLUGINS = (
     "calc-project",
     "dev-engineering",
-    "dev-incubator",
-    "dev-misc",
     "dev-productivity",
     "osm-project",
     "paper-project",
@@ -23,8 +21,15 @@ def test_required_repository_layout_exists() -> None:
     assert (ROOT / "CONTEXT.md").is_file()
     assert (ROOT / "CONTEXT-MAP.md").is_file()
     assert not (ROOT / "docs" / "contexts").exists()
-    assert (ROOT / "research-knowledge" / "cards" / "INDEX.md").is_file()
-    assert (ROOT / "research-knowledge" / "templates" / "INDEX.md").is_file()
+    paper_knowledge = ROOT / "plugins" / "paper-project" / "knowledge"
+    calc_knowledge = ROOT / "plugins" / "calc-project" / "knowledge"
+    assert (paper_knowledge / "CONSUMER_CONTRACT.md").is_file()
+    assert (paper_knowledge / "cards" / "INDEX.md").is_file()
+    assert (calc_knowledge / "CONSUMER_CONTRACT.md").is_file()
+    assert (calc_knowledge / "cards" / "physics" / "PHYSICS_INDEX.md").is_file()
+    assert (calc_knowledge / "templates" / "INDEX.md").is_file()
+    assert (calc_knowledge / "incubating" / "ontology" / "cards" / "INDEX.md").is_file()
+    assert not (ROOT / "research-knowledge").exists()
 
 
 def test_each_plugin_has_a_valid_manifest() -> None:
@@ -37,7 +42,7 @@ def test_each_plugin_has_a_valid_manifest() -> None:
 
 
 def test_migrated_tree_excludes_repository_metadata_and_caches() -> None:
-    for tree in (ROOT / "plugins", ROOT / "research-knowledge"):
+    for tree in (ROOT / "plugins",):
         assert tree.is_dir()
         offenders = [
             path.relative_to(ROOT)
@@ -65,28 +70,53 @@ def test_context_map_covers_units_sources_and_dependencies() -> None:
     for source in (
         "/home/donk/03FGT/.codex/plugins/calc-project/calc-project",
         "/home/donk/plugins/dev-project/plugins/dev-engineering",
-        "/home/donk/plugins/dev-project/plugins/dev-incubator",
-        "/home/donk/plugins/dev-project/plugins/dev-misc",
         "/home/donk/plugins/dev-project/plugins/dev-productivity",
         "/home/donk/plugins/osm-project-dev/osm-project",
         "/home/donk/plugins/paper-project/paper-project",
         "/home/donk/plugins/research-knowledge",
     ):
         assert source in context_map
-    assert "calc-project" in context_map and "research-knowledge" in context_map
-    assert "paper-project" in context_map and "research-knowledge" in context_map
+    assert "plugins/calc-project/knowledge" in context_map
+    assert "plugins/paper-project/knowledge" in context_map
 
 
 def test_agents_routes_context_reads_in_chinese() -> None:
     agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
     assert "CONTEXT-MAP.md" in agents
     assert "CONTEXT.md" in agents
-    for trigger in ("插件", "共享知识库", "迁移路径"):
+    for trigger in ("插件", "插件知识", "迁移路径"):
         assert trigger in agents
 
 
+def test_root_context_indexes_calc_project_boundary_terms() -> None:
+    context = (ROOT / "CONTEXT.md").read_text(encoding="utf-8")
+    calc_context = (
+        ROOT
+        / "plugins"
+        / "calc-project"
+        / "skills"
+        / "calc-project-structure"
+        / "references"
+        / "project-context.md"
+    ).read_text(encoding="utf-8")
+    for term in (
+        "计算项目（Calculation Project）",
+        "数据根（Data Root）",
+        "计算任务（Calculation Task）",
+        "运行（Run）",
+        "项目计算模板（Project Calculation Template）",
+        "插件计算模板（Plugin Calculation Template）",
+        "候选经验卡（Candidate Experience Card）",
+    ):
+        assert term in context
+        assert term in calc_context
+
+
 def test_active_files_do_not_use_legacy_research_knowledge_path() -> None:
-    legacy = "/home/donk/plugins/research-knowledge"
+    obsolete = (
+        "/home/donk/plugins/research-knowledge",
+        "/home/donk/yz-skills/research-knowledge",
+    )
     suffixes = {".py", ".sh", ".json", ".yaml", ".yml"}
     offenders: list[Path] = []
     for plugin in ("calc-project", "paper-project"):
@@ -97,6 +127,29 @@ def test_active_files_do_not_use_legacy_research_knowledge_path() -> None:
             is_runtime_markdown = path.name == "SKILL.md" or "references" in path.parts
             if path.suffix not in suffixes and not is_runtime_markdown:
                 continue
-            if legacy in path.read_text(encoding="utf-8", errors="ignore"):
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            if any(path_text in text for path_text in obsolete):
                 offenders.append(path.relative_to(ROOT))
     assert offenders == []
+
+
+def test_plugin_knowledge_sources_resolve_from_their_descriptor() -> None:
+    descriptors = sorted(
+        path
+        for plugin in ("calc-project", "paper-project")
+        for path in (ROOT / "plugins" / plugin / "skills").glob(
+            "*/references/knowledge-source.yaml"
+        )
+    )
+    assert descriptors
+    for descriptor in descriptors:
+        fields = dict(
+            line.strip().split(":", 1)
+            for line in descriptor.read_text(encoding="utf-8").splitlines()
+            if line.strip() and ":" in line
+        )
+        assert fields.get("relative_to", "").strip() == "this_file"
+        knowledge = (descriptor.parent / fields["path"].strip()).resolve()
+        assert knowledge.parent == descriptor.parents[3]
+        assert (knowledge / "CONSUMER_CONTRACT.md").is_file()
+        assert (knowledge / "cards" / "INDEX.md").is_file()

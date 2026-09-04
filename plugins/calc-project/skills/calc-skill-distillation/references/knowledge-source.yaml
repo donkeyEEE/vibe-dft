@@ -1,7 +1,8 @@
 schema_version: 1
 repository:
-  name: research-knowledge
-  path: /home/donk/yz-skills/research-knowledge
+  name: calc-project-knowledge
+  path: ../../../knowledge
+  relative_to: this_file
 contract: CONSUMER_CONTRACT.md
 formal_cards: cards/INDEX.md
 candidate_cards: candidates/cards/calc-project/INDEX.md
