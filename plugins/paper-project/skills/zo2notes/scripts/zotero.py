@@ -1,38 +1,34 @@
 #!/usr/bin/env python3
-"""Operate Zotero Desktop's local API and connector server for Zo2Notes.
-
-This helper is dependency-free on purpose: it runs with Python 3 stdlib only,
-and all Zotero calls go through the fixed Windows--WSL bridge to Desktop HTTP
-surfaces at http://172.30.128.1:23119.
-"""
+"""Read Zotero Desktop data through a portable local API client."""
 
 from __future__ import annotations
 
 import argparse
-import configparser
 import json
 import os
 import platform
 import re
-import shutil
-import subprocess
 import sys
-import time
 import urllib.error
 import urllib.parse
 import urllib.request
-import uuid
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, Sequence
 
-DEFAULT_BASE_URL = "http://172.30.128.1:23119"
-LOCAL_API_PREF = "extensions.zotero.httpServer.localAPI.enabled"
+from attachment_paths import resolve_attachment_path
+from runtime_config import (
+    ConfigError,
+    Endpoint,
+    RuntimeConfig,
+    candidate_endpoints,
+    config_path,
+    load_runtime_config,
+    wsl_default_gateway,
+)
+
+
 LOCAL_USER = "/api/users/0"
-BRIDGE_HEADERS = {
-    "Host": "127.0.0.1:23119",
-    "Zotero-API-Version": "3",
-}
 API_VERSION_HEADERS = {"Zotero-API-Version": "3"}
 CONNECTOR_HEADERS = {"X-Zotero-Connector-API-Version": "3"}
 TEXT_LIMIT = 300
@@ -55,167 +51,107 @@ class Response:
         return self.headers.get("Content-Type", "")
 
 
+class ZoteroConnectionError(ConnectionError):
+    """Raised when none of the permitted Zotero endpoints is reachable."""
+
+
+class ZoteroClient:
+    """GET-only client for the Zotero Desktop local API."""
+
+    def __init__(
+        self,
+        config: RuntimeConfig,
+        endpoints: Sequence[Endpoint],
+        opener: Callable[..., Any] = urllib.request.urlopen,
+    ) -> None:
+        self.config = config
+        self.endpoints = tuple(endpoints)
+        self.opener = opener
+        self.selected_endpoint: Endpoint | None = None
+
+    def _request_at(
+        self, endpoint: Endpoint, path: str, timeout: float | None = None
+    ) -> Response:
+        headers = {
+            "Host": endpoint.host_header,
+            "Zotero-API-Version": "3",
+        }
+        try:
+            request = urllib.request.Request(
+                endpoint.url.rstrip("/") + path,
+                method="GET",
+                headers=headers,
+            )
+            with self.opener(
+                request,
+                timeout=self.config.timeout_seconds if timeout is None else timeout,
+            ) as response:
+                return Response(
+                    status=response.status,
+                    headers=dict(response.headers.items()),
+                    text=response.read().decode("utf-8", errors="replace"),
+                )
+        except urllib.error.HTTPError as error:
+            return Response(
+                status=error.code,
+                headers=dict(error.headers.items()),
+                text=error.read().decode("utf-8", errors="replace"),
+                error=str(error),
+            )
+        except Exception as error:
+            return Response(status=None, headers={}, text="", error=str(error))
+
+    def select_endpoint(self) -> Endpoint:
+        if self.selected_endpoint is not None:
+            return self.selected_endpoint
+        attempts: list[Response] = []
+        for endpoint in self.endpoints:
+            response = self._request_at(endpoint, "/api/")
+            attempts.append(response)
+            if response.ok:
+                self.selected_endpoint = endpoint
+                return endpoint
+        target = "explicit host" if self.config.host else "automatic Zotero endpoints"
+        detail = attempts[-1].error if attempts else "no candidate endpoints"
+        raise ZoteroConnectionError(f"Could not reach {target}: {detail}")
+
+    def request(self, path: str, timeout: float | None = None) -> Response:
+        endpoint = self.select_endpoint()
+        return self._request_at(endpoint, path, timeout)
+
+    def selected_target(self) -> Response:
+        """Read the Zotero UI selection through its non-mutating Connector route."""
+        endpoint = self.select_endpoint()
+        headers = {
+            "Host": endpoint.host_header,
+            "Content-Type": "application/json",
+            **CONNECTOR_HEADERS,
+        }
+        try:
+            request = urllib.request.Request(
+                endpoint.url.rstrip("/") + "/connector/getSelectedCollection",
+                data=b"{}",
+                method="POST",
+                headers=headers,
+            )
+            with self.opener(
+                request, timeout=self.config.timeout_seconds
+            ) as response:
+                return Response(
+                    status=response.status,
+                    headers=dict(response.headers.items()),
+                    text=response.read().decode("utf-8", errors="replace"),
+                )
+        except Exception as error:
+            return Response(status=None, headers={}, text="", error=str(error))
+
+
 def dump_json(value: Any) -> None:
     print(json.dumps(value, indent=2, sort_keys=False))
 
 
 def exit_with(message: str) -> None:
     raise SystemExit(message)
-
-
-def zotero_roots() -> list[Path]:
-    home = Path.home()
-    system = platform.system()
-    roots: list[Path] = []
-
-    if system == "Darwin":
-        roots.append(home / "Library/Application Support/Zotero")
-    elif system == "Windows":
-        appdata = os.environ.get("APPDATA")
-        if appdata:
-            roots.extend([Path(appdata) / "Zotero/Zotero", Path(appdata) / "Zotero"])
-    else:
-        roots.extend(
-            [
-                home / ".zotero/zotero",
-                home / ".var/app/org.zotero.Zotero/data/zotero",
-            ]
-        )
-
-    # Useful fallback when scripts run under shells whose platform config is odd.
-    roots.append(home / "Library/Application Support/Zotero")
-    return list(dict.fromkeys(roots))
-
-
-def profiles_ini_path() -> Path | None:
-    for root in zotero_roots():
-        candidate = root / "profiles.ini"
-        if candidate.exists():
-            return candidate
-    return None
-
-
-def profile_dir() -> Path | None:
-    ini = profiles_ini_path()
-    if ini is None:
-        return None
-
-    parser = configparser.RawConfigParser()
-    parser.read(ini)
-    root = ini.parent
-    candidates: list[tuple[int, Path]] = []
-
-    for section in parser.sections():
-        if not section.lower().startswith("profile") or not parser.has_option(section, "Path"):
-            continue
-        raw_path = parser.get(section, "Path")
-        path = (
-            root / raw_path
-            if parser.get(section, "IsRelative", fallback="1") == "1"
-            else Path(raw_path)
-        )
-        score = 0
-        if parser.get(section, "Default", fallback="0") == "1":
-            score += 10
-        if (path / "prefs.js").exists():
-            score += 5
-        candidates.append((score, path))
-
-    if candidates:
-        return max(candidates, key=lambda item: item[0])[1]
-
-    profiles = sorted((root / "Profiles").glob("*.default*"))
-    return profiles[0] if profiles else None
-
-
-def prefs_file() -> Path | None:
-    profile = profile_dir()
-    if profile is None:
-        return None
-    candidate = profile / "prefs.js"
-    return candidate if candidate.exists() else None
-
-
-def pref_pattern() -> re.Pattern[str]:
-    return re.compile(r'user_pref\("' + re.escape(LOCAL_API_PREF) + r'",\s*(true|false)\s*\);')
-
-
-def read_local_api_pref() -> bool | None:
-    prefs = prefs_file()
-    if prefs is None:
-        return None
-    match = pref_pattern().search(prefs.read_text(encoding="utf-8", errors="replace"))
-    if match is None:
-        return None
-    return match.group(1) == "true"
-
-
-def set_local_api_pref(enabled: bool) -> Path:
-    prefs = prefs_file()
-    if prefs is None:
-        exit_with("Could not find Zotero prefs.js. Start Zotero once, then retry.")
-
-    backup = prefs.with_suffix(prefs.suffix + f".zotero-skill-backup-{int(time.time())}")
-    shutil.copy2(prefs, backup)
-
-    text = prefs.read_text(encoding="utf-8", errors="replace")
-    new_line = f'user_pref("{LOCAL_API_PREF}", {str(enabled).lower()});'
-    pattern = pref_pattern()
-    if pattern.search(text):
-        text = pattern.sub(new_line, text, count=1)
-    else:
-        text = text.rstrip("\n") + "\n" + new_line + "\n"
-    prefs.write_text(text, encoding="utf-8")
-    return backup
-
-
-def url_for(path: str, base_url: str = DEFAULT_BASE_URL) -> str:
-    return base_url.rstrip("/") + path
-
-
-def request(
-    path: str,
-    *,
-    method: str = "GET",
-    data: Any = None,
-    headers: dict[str, str] | None = None,
-    timeout: float = 5.0,
-) -> Response:
-    req_headers = dict(headers or {})
-    req_headers.update(BRIDGE_HEADERS)
-    body: bytes | None = None
-
-    if path.startswith("/api"):
-        req_headers.update({k: v for k, v in API_VERSION_HEADERS.items() if k not in req_headers})
-    if path.startswith("/connector"):
-        req_headers.update({k: v for k, v in CONNECTOR_HEADERS.items() if k not in req_headers})
-
-    if data is not None:
-        if isinstance(data, (dict, list)):
-            body = json.dumps(data).encode("utf-8")
-            req_headers.setdefault("Content-Type", "application/json")
-        elif isinstance(data, bytes):
-            body = data
-        else:
-            body = str(data).encode("utf-8")
-
-    try:
-        req = urllib.request.Request(url_for(path), data=body, method=method, headers=req_headers)
-        with urllib.request.urlopen(req, timeout=timeout) as response:
-            return Response(
-                status=response.status,
-                headers=dict(response.headers.items()),
-                text=response.read().decode("utf-8", errors="replace"),
-            )
-    except urllib.error.HTTPError as exc:
-        return Response(
-            status=exc.code,
-            headers=dict(exc.headers.items()),
-            text=exc.read().decode("utf-8", errors="replace"),
-            error=str(exc),
-        )
-    except Exception as exc:  # local server down, Zotero closed, malformed URL, etc.
-        return Response(status=None, headers={}, text="", error=str(exc))
 
 
 def parse_body(response: Response) -> Any:
@@ -235,61 +171,18 @@ def require_ok(response: Response, action: str) -> Response:
     raise AssertionError("unreachable")
 
 
-def api_response(path: str) -> Response:
+def api_response(client: ZoteroClient, path: str) -> Response:
     api_path = path if path.startswith("/api") else "/api" + path
-    return require_ok(request(api_path), f"GET {api_path}")
+    return require_ok(client.request(api_path), f"GET {api_path}")
 
 
-def api_get(path: str) -> Any:
-    return parse_body(api_response(path))
+def api_get(client: ZoteroClient, path: str) -> Any:
+    return parse_body(api_response(client, path))
 
 
 def query(params: dict[str, str | int | bool | None]) -> str:
     clean = {key: value for key, value in params.items() if value is not None}
     return urllib.parse.urlencode(clean)
-
-
-def restart_zotero(wait_for_api: bool = True) -> bool:
-    system = platform.system()
-    try:
-        if system == "Darwin":
-            subprocess.run(
-                ["osascript", "-e", 'tell application "Zotero" to quit'],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                timeout=5,
-                check=False,
-            )
-            time.sleep(1)
-            subprocess.run(["open", "-a", "Zotero"], check=False)
-        elif system == "Windows":
-            subprocess.run(
-                ["taskkill", "/IM", "zotero.exe", "/F"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                check=False,
-            )
-            time.sleep(1)
-            subprocess.Popen(["zotero.exe"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        else:
-            subprocess.run(
-                ["pkill", "-f", "zotero"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                check=False,
-            )
-            time.sleep(1)
-            subprocess.Popen(["zotero"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except Exception:
-        return False
-
-    if not wait_for_api:
-        return True
-    for _ in range(30):
-        if request("/api/", timeout=1).ok:
-            return True
-        time.sleep(0.5)
-    return False
 
 
 def creators_from_item(data: dict[str, Any]) -> list[str]:
@@ -368,10 +261,15 @@ def total_results(response: Response) -> int | None:
     return int(raw) if raw and raw.isdigit() else None
 
 
-def export_bibtex(item_key: str | None = None, *, include_children: bool = False) -> str:
+def export_bibtex(
+    client: ZoteroClient,
+    item_key: str | None = None,
+    *,
+    include_children: bool = False,
+) -> str:
     if item_key:
         params = query({"itemKey": item_key, "format": "bibtex", "limit": API_PAGE_LIMIT})
-        return api_response(f"{LOCAL_USER}/items?{params}").text
+        return api_response(client, f"{LOCAL_USER}/items?{params}").text
 
     endpoint = "items" if include_children else "items/top"
     start = 0
@@ -386,7 +284,7 @@ def export_bibtex(item_key: str | None = None, *, include_children: bool = False
                 "start": start,
             }
         )
-        response = api_response(f"{LOCAL_USER}/{endpoint}?{params}")
+        response = api_response(client, f"{LOCAL_USER}/{endpoint}?{params}")
         if response.text.strip():
             chunks.append(response.text.strip())
 
@@ -447,14 +345,16 @@ def insert_citation(target: Path, citation: str, marker: str | None) -> None:
     target.write_text(text + suffix + citation + "\n", encoding="utf-8")
 
 
-def find_item(*, item_key: str | None, query_text: str | None) -> dict[str, Any]:
+def find_item(
+    client: ZoteroClient, *, item_key: str | None, query_text: str | None
+) -> dict[str, Any]:
     if item_key:
-        return api_get(f"{LOCAL_USER}/items/{urllib.parse.quote(item_key)}")
+        return api_get(client, f"{LOCAL_USER}/items/{urllib.parse.quote(item_key)}")
     if not query_text:
         exit_with("Provide --item-key or --query")
 
     params = query({"q": query_text})
-    matches = api_get(f"{LOCAL_USER}/items/top?{params}")
+    matches = api_get(client, f"{LOCAL_USER}/items/top?{params}")
     if not matches:
         exit_with(f"No top-level Zotero items matched query: {query_text}")
     if len(matches) > 1:
@@ -465,61 +365,72 @@ def find_item(*, item_key: str | None, query_text: str | None) -> dict[str, Any]
     return matches[0]
 
 
-def status_payload() -> dict[str, Any]:
-    root = request("/api/", timeout=2)
-    connector = request("/connector/ping", timeout=2)
-    profile = profile_dir()
-    prefs = prefs_file()
+def doctor_payload(
+    config: RuntimeConfig,
+    endpoints: Sequence[Endpoint],
+    client: ZoteroClient,
+    *,
+    config_exists: bool,
+) -> dict[str, Any]:
+    try:
+        selected = client.select_endpoint()
+        root = client.request("/api/")
+        api = {
+            "running": root.ok,
+            "status": root.status,
+            "error_code": None if root.ok else "local-api-unavailable",
+            "next_step": None
+            if root.ok
+            else "Enable the local API in the Zotero interface, then run doctor again.",
+            "zotero_version": root.headers.get("X-Zotero-Version"),
+            "api_version": root.headers.get("Zotero-API-Version"),
+            "selected_endpoint_source": selected.source,
+        }
+    except ZoteroConnectionError:
+        explicit = config.host is not None
+        api = {
+            "running": False,
+            "status": None,
+            "error_code": "explicit-host-unreachable"
+            if explicit
+            else "zotero-unreachable",
+            "next_step": "Check the configured host and port, then run doctor again."
+            if explicit
+            else "Start Zotero and enable its local API in the Zotero interface.",
+            "zotero_version": None,
+            "api_version": None,
+            "selected_endpoint_source": None,
+        }
     return {
-        "profile": str(profile) if profile else None,
-        "prefs_file": str(prefs) if prefs else None,
-        "local_api_enabled_pref": read_local_api_pref(),
-        "api_running": root.ok,
-        "api_status": root.status,
-        "api_error": root.error,
-        "zotero_version": root.headers.get("X-Zotero-Version")
-        or connector.headers.get("X-Zotero-Version"),
-        "api_version": root.headers.get("Zotero-API-Version"),
-        "schema_version": root.headers.get("Zotero-Schema-Version"),
-        "connector_running": connector.ok,
-        "connector_status": connector.status,
-        "connector_error": connector.error,
-        "base_url": DEFAULT_BASE_URL,
+        "platform": platform.system(),
+        "config_exists": config_exists,
+        "runtime": {
+            key: {"value": getattr(config, key), "source": config.sources[key]}
+            for key in ("mode", "host", "port", "timeout_seconds")
+        },
+        "candidate_sources": [endpoint.source for endpoint in endpoints],
+        "api": api,
     }
 
 
-def cmd_status(args: argparse.Namespace) -> None:
-    payload = status_payload()
+def cmd_doctor(args: argparse.Namespace, client: ZoteroClient) -> None:
+    payload = doctor_payload(
+        client.config,
+        client.endpoints,
+        client,
+        config_exists=args.config_exists,
+    )
     if args.json:
         dump_json(payload)
         return
-    print(f"Zotero local API pref: {payload['local_api_enabled_pref']} ({payload['prefs_file']})")
-    print(
-        "API running: "
-        f"{payload['api_running']} status={payload['api_status']} "
-        f"version={payload['api_version']} zotero={payload['zotero_version']}"
-    )
-    print(f"Connector running: {payload['connector_running']} status={payload['connector_status']}")
+    print(f"Mode: {payload['runtime']['mode']['value']}")
+    print(f"Config file present: {payload['config_exists']}")
+    print(f"API running: {payload['api']['running']} status={payload['api']['status']}")
+    if payload["api"]["next_step"]:
+        print(f"Next step: {payload['api']['next_step']}")
 
 
-def cmd_set_pref(args: argparse.Namespace, enabled: bool) -> None:
-    backup = set_local_api_pref(enabled)
-    restarted = restart_zotero(wait_for_api=enabled) if args.restart else False
-    dump_json(
-        {
-            "enabled": enabled,
-            "backup": str(backup),
-            "restarted": restarted,
-            "status": status_payload(),
-        }
-    )
-
-
-def cmd_restart(_: argparse.Namespace) -> None:
-    dump_json({"restarted": restart_zotero(wait_for_api=True)})
-
-
-def cmd_probe(args: argparse.Namespace) -> None:
+def cmd_probe(args: argparse.Namespace, client: ZoteroClient) -> None:
     endpoints = [
         ("root", "/api/"),
         ("schema", "/api/schema"),
@@ -533,11 +444,10 @@ def cmd_probe(args: argparse.Namespace) -> None:
         ("searches", f"{LOCAL_USER}/searches"),
         ("groups", f"{LOCAL_USER}/groups"),
         ("fulltextVersions", f"{LOCAL_USER}/fulltext?since=0"),
-        ("connectorPing", "/connector/ping"),
     ]
     rows: list[dict[str, Any]] = []
     for label, path in endpoints:
-        response = request(path)
+        response = client.request(path)
         parsed = parse_body(response)
         if isinstance(parsed, list):
             summary: Any = {"type": "array", "len": len(parsed)}
@@ -565,15 +475,15 @@ def cmd_probe(args: argparse.Namespace) -> None:
         )
 
 
-def cmd_inventory(args: argparse.Namespace) -> None:
+def cmd_inventory(args: argparse.Namespace, client: ZoteroClient) -> None:
     endpoint = "items" if args.include_children else "items/top"
     params = query({"sort": "title", "direction": "asc"})
-    rows = [summarize_item(item) for item in api_get(f"{LOCAL_USER}/{endpoint}?{params}")]
+    rows = [summarize_item(item) for item in api_get(client, f"{LOCAL_USER}/{endpoint}?{params}")]
     dump_json(rows) if args.json else print_items(rows)
 
 
-def cmd_collections(args: argparse.Namespace) -> None:
-    rows = [summarize_collection(collection) for collection in api_get(f"{LOCAL_USER}/collections")]
+def cmd_collections(args: argparse.Namespace, client: ZoteroClient) -> None:
+    rows = [summarize_collection(collection) for collection in api_get(client, f"{LOCAL_USER}/collections")]
     if args.json:
         dump_json(rows)
         return
@@ -582,8 +492,8 @@ def cmd_collections(args: argparse.Namespace) -> None:
         print(f"{row.get('key') or '':10} {row.get('name') or ''}{parent}")
 
 
-def cmd_tags(args: argparse.Namespace) -> None:
-    rows = [summarize_tag(tag) for tag in api_get(f"{LOCAL_USER}/tags")]
+def cmd_tags(args: argparse.Namespace, client: ZoteroClient) -> None:
+    rows = [summarize_tag(tag) for tag in api_get(client, f"{LOCAL_USER}/tags")]
     if args.json:
         dump_json(rows)
         return
@@ -591,8 +501,8 @@ def cmd_tags(args: argparse.Namespace) -> None:
         print(f"{row.get('tag') or ''} ({row.get('numItems') or 0})")
 
 
-def cmd_groups(args: argparse.Namespace) -> None:
-    rows = [summarize_group(group) for group in api_get(f"{LOCAL_USER}/groups")]
+def cmd_groups(args: argparse.Namespace, client: ZoteroClient) -> None:
+    rows = [summarize_group(group) for group in api_get(client, f"{LOCAL_USER}/groups")]
     if args.json:
         dump_json(rows)
         return
@@ -600,35 +510,35 @@ def cmd_groups(args: argparse.Namespace) -> None:
         print(f"{row.get('id') or '':>10} {row.get('type') or '':12} {row.get('name') or ''}")
 
 
-def cmd_search(args: argparse.Namespace) -> None:
+def cmd_search(args: argparse.Namespace, client: ZoteroClient) -> None:
     params = query({"q": args.query})
-    rows = [summarize_item(item) for item in api_get(f"{LOCAL_USER}/items/top?{params}")]
+    rows = [summarize_item(item) for item in api_get(client, f"{LOCAL_USER}/items/top?{params}")]
     if args.with_bibtex_keys:
         for row in rows:
-            bibtex = export_bibtex(row.get("key")) if row.get("key") else ""
+            bibtex = export_bibtex(client, row.get("key")) if row.get("key") else ""
             keys = extract_bibtex_keys(bibtex)
             row["bibtexKey"] = keys[0] if keys else None
     dump_json(rows) if args.json else print_items(rows)
 
 
-def cmd_export_bibtex(args: argparse.Namespace) -> None:
+def cmd_export_bibtex(args: argparse.Namespace, client: ZoteroClient) -> None:
     write_text_output(
-        export_bibtex(args.item_key, include_children=args.include_children), args.out
+        export_bibtex(client, args.item_key, include_children=args.include_children), args.out
     )
 
 
-def cmd_sync_bib(args: argparse.Namespace) -> None:
-    text = export_bibtex(include_children=args.include_children)
+def cmd_sync_bib(args: argparse.Namespace, client: ZoteroClient) -> None:
+    text = export_bibtex(client, include_children=args.include_children)
     path = Path(args.out).expanduser().resolve()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
     dump_json({"path": str(path), "entries": count_bibtex_entries(text)})
 
 
-def cmd_citations(args: argparse.Namespace) -> None:
+def cmd_citations(args: argparse.Namespace, client: ZoteroClient) -> None:
     params = query({"include": "data,citation", "style": args.style})
     rows: list[dict[str, Any]] = []
-    for item in api_get(f"{LOCAL_USER}/items/top?{params}"):
+    for item in api_get(client, f"{LOCAL_USER}/items/top?{params}"):
         row = summarize_item(item)
         row["citation"] = item.get("citation")
         rows.append(row)
@@ -639,14 +549,14 @@ def cmd_citations(args: argparse.Namespace) -> None:
         print(f"{row.get('key')} {row.get('citation')}")
 
 
-def cmd_children(args: argparse.Namespace) -> None:
-    data = api_get(f"{LOCAL_USER}/items/{urllib.parse.quote(args.item_key)}/children")
+def cmd_children(args: argparse.Namespace, client: ZoteroClient) -> None:
+    data = api_get(client, f"{LOCAL_USER}/items/{urllib.parse.quote(args.item_key)}/children")
     rows = [summarize_item(item) for item in data]
     dump_json(rows) if args.json else print_items(rows)
 
 
-def cmd_fulltext(args: argparse.Namespace) -> None:
-    data = api_get(f"{LOCAL_USER}/items/{urllib.parse.quote(args.attachment_key)}/fulltext")
+def cmd_fulltext(args: argparse.Namespace, client: ZoteroClient) -> None:
+    data = api_get(client, f"{LOCAL_USER}/items/{urllib.parse.quote(args.attachment_key)}/fulltext")
     content = data.get("content", "") if isinstance(data, dict) else str(data)
     if args.out is None:
         print(content)
@@ -664,18 +574,25 @@ def cmd_fulltext(args: argparse.Namespace) -> None:
     )
 
 
-def cmd_file_url(args: argparse.Namespace) -> None:
-    print(api_get(f"{LOCAL_USER}/items/{urllib.parse.quote(args.attachment_key)}/file/view/url"))
+def cmd_file_url(args: argparse.Namespace, client: ZoteroClient) -> None:
+    raw = api_get(client, f"{LOCAL_USER}/items/{urllib.parse.quote(args.attachment_key)}/file/view/url")
+    if args.resolve:
+        resolved = resolve_attachment_path(
+            str(raw), client.config.mode, client.config.path_mappings
+        )
+        print(resolved.path)
+    else:
+        print(raw)
 
 
-def cmd_cite(args: argparse.Namespace) -> None:
-    item = find_item(item_key=args.item_key, query_text=args.query)
+def cmd_cite(args: argparse.Namespace, client: ZoteroClient) -> None:
+    item = find_item(client, item_key=args.item_key, query_text=args.query)
     item_key = item.get("key")
     if not item_key:
         exit_with("Matched Zotero item has no key")
 
     citekey, added = append_bib_entry(
-        Path(args.bib).expanduser().resolve(), export_bibtex(item_key)
+        Path(args.bib).expanduser().resolve(), export_bibtex(client, item_key)
     )
     citation = f"\\cite{{{citekey}}}" if args.tex else f"[@{citekey}]"
     target = Path(args.tex or args.markdown).expanduser().resolve()
@@ -693,33 +610,12 @@ def cmd_cite(args: argparse.Namespace) -> None:
     )
 
 
-def connector_post(path: str, payload: Any, *, content_type: str = "application/json") -> Response:
-    return request(path, method="POST", data=payload, headers={"Content-Type": content_type})
-
-
-def cmd_selected_target(args: argparse.Namespace) -> None:
+def cmd_selected_target(args: argparse.Namespace, client: ZoteroClient) -> None:
     response = require_ok(
-        connector_post("/connector/getSelectedCollection", {}),
-        "POST /connector/getSelectedCollection",
+        client.selected_target(), "Read selected Zotero library/collection"
     )
     payload = parse_body(response)
     print(json.dumps(payload, indent=2) if args.json else payload)
-
-
-def cmd_import_records(args: argparse.Namespace, kind: str) -> None:
-    if not args.yes:
-        exit_with(
-            f"Refusing to write to Zotero without --yes. "
-            f"This imports {kind} into the selected Zotero library/collection."
-        )
-    text = Path(args.file).expanduser().read_text(encoding="utf-8") if args.file else args.text
-    if not text:
-        exit_with("Provide --file or --text")
-
-    session = args.session or f"codex-{uuid.uuid4().hex}"
-    path = f"/connector/import?{query({'session': session})}"
-    response = require_ok(connector_post(path, text, content_type="text/plain"), f"POST {path}")
-    dump_json({"status": response.status, "session": session, "response": parse_body(response)})
 
 
 def add_json_flag(parser: argparse.ArgumentParser) -> None:
@@ -730,30 +626,21 @@ def add_json_flag(parser: argparse.ArgumentParser) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Operate Zotero Desktop local API and connector server."
+        description="Read Zotero Desktop through its local API."
     )
+    parser.add_argument("--mode", choices=("auto", "native", "wsl"))
+    parser.add_argument("--host")
+    parser.add_argument("--port", type=int)
+    parser.add_argument("--timeout-seconds", type=float)
     subcommands = parser.add_subparsers(dest="command", required=True)
 
-    status = subcommands.add_parser("status", help="Show Zotero local API and connector readiness")
+    doctor = subcommands.add_parser("doctor", help="Diagnose read-only Zotero access")
+    add_json_flag(doctor)
+    doctor.set_defaults(func=cmd_doctor)
+
+    status = subcommands.add_parser("status", help="Compatibility alias for doctor")
     add_json_flag(status)
-    status.set_defaults(func=cmd_status)
-
-    enable = subcommands.add_parser("enable", help="Enable Zotero's local Desktop API preference")
-    enable.add_argument(
-        "--restart", action="store_true", help="Restart Zotero after editing prefs.js"
-    )
-    enable.set_defaults(func=lambda args: cmd_set_pref(args, True))
-
-    disable = subcommands.add_parser(
-        "disable", help="Disable Zotero's local Desktop API preference"
-    )
-    disable.add_argument(
-        "--restart", action="store_true", help="Restart Zotero after editing prefs.js"
-    )
-    disable.set_defaults(func=lambda args: cmd_set_pref(args, False))
-
-    restart = subcommands.add_parser("restart", help="Restart Zotero and wait for the local API")
-    restart.set_defaults(func=cmd_restart)
+    status.set_defaults(func=cmd_doctor)
 
     probe = subcommands.add_parser("probe", help="Probe common safe local API routes")
     add_json_flag(probe)
@@ -825,6 +712,9 @@ def build_parser() -> argparse.ArgumentParser:
         "file-url", help="Print Zotero's local file URL for an attachment"
     )
     file_url.add_argument("attachment_key")
+    file_url.add_argument(
+        "--resolve", action="store_true", help="Resolve and verify the local platform path"
+    )
     file_url.set_defaults(func=cmd_file_url)
 
     cite = subcommands.add_parser(
@@ -848,21 +738,33 @@ def build_parser() -> argparse.ArgumentParser:
     add_json_flag(selected)
     selected.set_defaults(func=cmd_selected_target)
 
-    for command, kind in [("import-bibtex", "BibTeX"), ("import-ris", "RIS")]:
-        import_cmd = subcommands.add_parser(command, help=f"Import {kind} through Zotero Connector")
-        input_group = import_cmd.add_mutually_exclusive_group(required=True)
-        input_group.add_argument("--file")
-        input_group.add_argument("--text")
-        import_cmd.add_argument("--session")
-        import_cmd.add_argument("--yes", action="store_true", help="Confirm Zotero library write")
-        import_cmd.set_defaults(func=lambda args, kind=kind: cmd_import_records(args, kind))
-
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    args.func(args)
+    system = platform.system()
+    release = platform.release()
+    try:
+        proc_version = Path("/proc/version").read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        proc_version = ""
+    cli = {
+        "mode": args.mode,
+        "host": args.host,
+        "port": args.port,
+        "timeout_seconds": args.timeout_seconds,
+    }
+    try:
+        config = load_runtime_config(
+            cli, os.environ, system, release, proc_version, Path.home()
+        )
+        gateway = wsl_default_gateway() if config.mode == "wsl" and not config.host else None
+        endpoints = candidate_endpoints(config, gateway)
+        args.config_exists = config_path(system, os.environ, Path.home()).exists()
+        args.func(args, ZoteroClient(config, endpoints))
+    except (ConfigError, ZoteroConnectionError) as error:
+        exit_with(str(error))
     return 0
 
 
