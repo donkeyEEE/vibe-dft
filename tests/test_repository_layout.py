@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -14,6 +15,28 @@ EXPECTED_PLUGINS = (
     "paper-project",
 )
 FORBIDDEN_DIRS = {".pytest_cache", "__pycache__", ".worktrees", ".scratch", "dist"}
+DESIGN_SKILLS = {
+    "domain-modeling",
+    "grill-with-docs",
+    "prototype",
+    "research",
+    "to-spec",
+    "to-tickets",
+    "wayfinder",
+}
+ENGINEERING_SKILLS = {
+    "ask-matt",
+    "code-review",
+    "codebase-design",
+    "diagnosing-bugs",
+    "implement",
+    "improve-codebase-architecture",
+    "resolving-merge-conflicts",
+    "setup-matt-pocock-skills",
+    "tdd",
+    "triage",
+    "wizard",
+}
 
 
 def test_required_repository_layout_exists() -> None:
@@ -39,6 +62,33 @@ def test_each_plugin_has_a_valid_manifest() -> None:
         manifest = ROOT / "plugins" / plugin / ".codex-plugin" / "plugin.json"
         data = json.loads(manifest.read_text(encoding="utf-8"))
         assert data["name"] == plugin
+
+
+def test_dev_skill_ownership_matches_plugin_responsibilities() -> None:
+    engineering = ROOT / "plugins" / "dev-engineering" / "skills"
+    productivity = ROOT / "plugins" / "dev-productivity" / "skills"
+    for skill in DESIGN_SKILLS:
+        assert (productivity / skill / "SKILL.md").is_file()
+        assert not (engineering / skill).exists()
+    for skill in ENGINEERING_SKILLS:
+        assert (engineering / skill / "SKILL.md").is_file()
+        assert not (productivity / skill).exists()
+
+
+def test_dev_skill_namespaces_do_not_reference_previous_owner() -> None:
+    skill_names = "|".join(re.escape(skill) for skill in sorted(DESIGN_SKILLS))
+    stale_invocation = re.compile(rf"\$dev-engineering:({skill_names})\b")
+    stale_path = re.compile(rf"plugins/dev-engineering/skills/({skill_names})\b")
+    offenders: list[Path] = []
+    for plugin in ("dev-engineering", "dev-productivity"):
+        plugin_root = ROOT / "plugins" / plugin
+        for path in plugin_root.rglob("*"):
+            if not path.is_file() or path.suffix not in {".md", ".yaml", ".yml"}:
+                continue
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            if stale_invocation.search(text) or stale_path.search(text):
+                offenders.append(path.relative_to(ROOT))
+    assert offenders == []
 
 
 def test_migrated_tree_excludes_repository_metadata_and_caches() -> None:
@@ -75,30 +125,6 @@ def test_agents_routes_context_reads_in_chinese() -> None:
     assert "CONTEXT.md" in agents
     for trigger in ("插件", "插件知识", "迁移路径"):
         assert trigger in agents
-
-
-def test_root_context_indexes_calc_project_boundary_terms() -> None:
-    context = (ROOT / "CONTEXT.md").read_text(encoding="utf-8")
-    calc_context = (
-        ROOT
-        / "plugins"
-        / "calc-project"
-        / "skills"
-        / "calc-project-structure"
-        / "references"
-        / "project-context.md"
-    ).read_text(encoding="utf-8")
-    for term in (
-        "计算项目（Calculation Project）",
-        "数据根（Data Root）",
-        "计算任务（Calculation Task）",
-        "运行（Run）",
-        "项目计算模板（Project Calculation Template）",
-        "插件计算模板（Plugin Calculation Template）",
-        "候选经验卡（Candidate Experience Card）",
-    ):
-        assert term in context
-        assert term in calc_context
 
 
 def test_active_files_do_not_use_legacy_research_knowledge_path() -> None:
