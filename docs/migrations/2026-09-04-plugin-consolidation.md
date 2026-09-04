@@ -87,3 +87,19 @@ Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不
 - paper-project marketplace 发布构建通过，归档包含本地消费契约、卡片索引与卡片正文；
 - 迁移清点为 paper atoms 31、physics 39、ontology 正式卡 40、ontology 候选 24、计算模板 14、calc 候选卡 12；
 - 顶层 `research-knowledge/` 不再存在，两个插件的活动文件均无旧绝对路径命中。
+
+## Dev 插件职责重划分
+
+2026-09-04，根据 [ADR 0002](../adr/0002-separate-software-design-from-engineering-delivery.md) 将 Dev Project 插件按“软件产品定义与设计 / 工程交付”重划分：
+
+- `domain-modeling`、`grill-with-docs`、`prototype`、`research`、`to-spec`、`to-tickets` 和 `wayfinder` 从 `dev-engineering` 迁入 `dev-productivity`；
+- `triage`、`ask-matt`、`setup-matt-pocock-skills`、实现、测试、调试、审查与代码库维护 skills 保留在 `dev-engineering`，没有新增拆分或兼容 skill；
+- 两插件继续独立安装；保留的 engineering 工作流通过延迟检查调用 `$dev-productivity:*`，迁入 productivity 的规格、工单和 wayfinding 工作流通过对称规则调用 `$dev-engineering:setup-matt-pocock-skills`；
+- 两个 manifest 与 skills README 已按新的发布边界更新，活动文件中不再引用迁移前的七个 `$dev-engineering:*` 名称或旧目录。
+
+验证记录：
+
+- 七个迁移后的 skills 分别通过 `quick_validate.py`；
+- `dev-engineering` 与 `dev-productivity` 分别通过官方 `validate_plugin.py`；
+- 新增的 Dev skill 所有权和命名空间测试：`2 passed`；
+- 删除已经失效、要求根 `CONTEXT.md` 重复 Calc Project 中英双语术语正文的测试后，全仓结构测试：`10 passed`。
