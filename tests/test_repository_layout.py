@@ -22,14 +22,11 @@ DESIGN_SKILLS = {
 }
 ENGINEERING_SKILLS = {
     "ask-matt",
-    "code-review",
     "codebase-design",
     "diagnosing-bugs",
-    "implement",
     "improve-codebase-architecture",
     "resolving-merge-conflicts",
     "setup-matt-pocock-skills",
-    "tdd",
     "triage",
     "wizard",
 }

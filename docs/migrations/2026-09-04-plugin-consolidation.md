@@ -289,3 +289,48 @@ Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不
 中间基线验证：根结构测试 `15 passed, 1 failed`，唯一失败仍为此前记录的
 `ask-matt` 缺失路由。相对上次提交的清单审查确认：前三个删除项原状态均为停用，
 五项状态转换均合法；待删除的三个工程技能在此快照中全部存在且均为停用。
+
+## Matt Skills 个人精选：第三批删除完成
+
+2026-09-05，以停用提交 `10836ca6c4e60a47a865f4eb0883763864f26377` 为删除前基线，
+逐项确认 `implement`、`tdd`、`code-review` 均为 `explicit-only` 后删除：
+
+| 删除路径 | 基线状态 | 原因 |
+| --- | --- | --- |
+| `plugins/matt-skills/skills/implement/` | explicit-only | 用户决定移除实现、测试、审查编排流程 |
+| `plugins/matt-skills/skills/tdd/` | explicit-only | 用户决定移除该流程的测试驱动开发技能 |
+| `plugins/matt-skills/skills/code-review/` | explicit-only | 用户决定移除该流程的双轴审查技能 |
+
+所属资源随三个目录删除；同步生命周期清单、导航、调用示例和 roster 测试。
+`codebase-design` 与 `improve-codebase-architecture` 均为 `published`，
+后者已在上述基线中完成“停用 → 已发布”转换；两者正文保持不变。
+适用源码插件版本为 `matt-skills 0.2.0`；未安装或发布。
+
+`ask-matt` 依用户要求最后处理，新增的三个失效路由一并留待清理；完整性测试
+继续严格检查，不加入豁免。当前 19 个技能，12 个已发布、7 个停用。
+精选进度（按初始 25 项）：前三批 15 项已决定并实施（保留 9、删除 6）。
+第四批介绍 `diagnosing-bugs`、`resolving-merge-conflicts`、`triage`、
+`setup-matt-pocock-skills`、`wizard`，五项均待决定；剩余五项包含最后处理的 `ask-matt`。
+
+删除后验证：根结构测试 `15 passed, 1 failed`；完整扫描确认唯一失效引用文件
+仍为 `ask-matt/SKILL.md`，缺失目标为前两轮累计删除的六项。该文件相对精选前
+基线无改动。对停用提交逐项审查确认本阶段仅删除三个停用项，其余状态不变；
+两个架构技能均已发布。
+
+## Matt Skills 整体移除：停用基线
+
+2026-09-05，用户在学习 Matt 技能教程后决定：充分使用上游技能之前停止个人
+调整，`matt-skills` 不再纳入 YZ Skills。本决定取代此前继续分批精选及最后
+调整 `ask-matt` 的计划；所有未决精选项结束，不再重新设计路由。
+
+为满足生命周期删除前置条件，先将剩余 12 个已发布技能转为停用：
+`codebase-design`、`diagnosing-bugs`、`domain-modeling`、`grill-me`、`grill-with-docs`、`grilling`、`improve-codebase-architecture`、`prototype`、`research`、`resolving-merge-conflicts`、`wizard`、`writing-for-agents`。其余 7 项保持停用，19 个目录全部保留在此中间快照，
+生命周期清单、调用策略和插件导航同步；源码插件版本为 `0.2.0`，未安装或发布。
+
+此停用提交同时保存第三批已批准的三个工程技能删除；它们在父提交
+`10836ca6c4e60a47a865f4eb0883763864f26377` 中均已停用。
+后续整体删除将以本停用提交为基线，历史清单与源码可由 Git 恢复。
+
+停用基线验证：根结构测试 `15 passed, 1 failed`，唯一失败仍为已记录的
+`ask-matt` 缺失路由；生命周期与调用策略一致性检查通过。历史审查确认新增
+12 项转换均为“已发布 → 停用”，其余 7 项状态不变。

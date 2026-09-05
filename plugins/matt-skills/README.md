@@ -2,7 +2,7 @@
 
 基于 [mattpocock/skills](https://github.com/mattpocock/skills) 选用并为 Codex 适配的个人插件，覆盖需求设计、工程交付与协作辅助。这里的流程可以按个人习惯持续改写，上游更新作为候选逐项吸收。
 
-当前保留 22 个技能：12 个已发布、10 个停用且仅显式调用。个人精选已完成第一批五项，全部保留，其中 `grill-me` 与 `grill-with-docs` 恢复为已发布；第二批已删除三个技能，`research` 与 `prototype` 保留并维持已发布；其余批次继续确认，`ask-matt` 最后调整。
+当前 19 个技能均已停用，仅显式调用。用户决定在充分使用上游技能前停止个人精选，并将本插件从 YZ Skills 移除；此快照用于建立删除前的停用历史基线。
 
 ## 使用
 
@@ -10,7 +10,7 @@
 
 ```text
 $matt-skills:writing-for-agents 修改项目协作说明。
-$matt-skills:code-review 审查当前分支相对 main 的变更。
+$matt-skills:improve-codebase-architecture 寻找值得改进的模块接口。
 $matt-skills:ask-matt 帮我选择适合当前任务的工作流程。
 ```
 
