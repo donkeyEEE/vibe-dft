@@ -1,6 +1,6 @@
 # YZ Skills 开发上下文
 
-本仓库集中维护四个 Codex 插件。插件发布单元位于 `plugins/`；资源优先与 owning skill 共置，只有多 skill 实际消费的资源进入插件级 `resources/`。旧路径与迁移状态记录在 `docs/migrations/2026-09-04-plugin-consolidation.md`。
+本仓库集中维护三个 Codex 插件。插件发布单元位于 `plugins/`；资源优先与 owning skill 共置，只有多 skill 实际消费的资源进入插件级 `resources/`。旧路径与迁移状态记录在 `docs/migrations/2026-09-04-plugin-consolidation.md`。
 
 ## 插件导航
 
@@ -49,11 +49,6 @@ _Avoid_: 计算模板，任务专用脚本
 **插件共享资源（plugin-shared resource）**由同一插件内至少两个活动 skill 实际消费，位于 `plugins/<plugin>/resources/`。共享目录 README 记录消费者，但不提供运行时发现索引。
 
 当前没有 formal、candidate 或 incubating 资源状态，也没有通用知识消费协议或项目初始化机制。历史材料只可留在历史文档或 Cangjie 明确标记为非执行的 `references/legacy/`。
-
-
-## Matt Skills
-
-`plugins/matt-skills` 是个人精选与持续改写的 Codex 插件。选择需求设计、工程交付或协作辅助流程时，读取 [skill 导航](plugins/matt-skills/skills/README.md)；核对上游来源与本地适配边界时，读取 [插件说明](plugins/matt-skills/README.md)。新增、停用和删除技能遵循本文件的生命周期规则。
 
 ## OSM Project
 

@@ -1,5 +1,6 @@
 ---
-status: accepted
+status: superseded
+superseded_by: 0005-keep-upstream-engineering-skills-outside-yz-skills
 ---
 
 # Maintain a personal Matt Skills plugin

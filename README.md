@@ -1,6 +1,6 @@
 # YZ Skills
 
-面向科研计算、学术写作、软件开发与个人项目日志的 Codex 插件集合。本仓库集中维护四个插件及其 skill、脚本、模板和参考资料，每个 `plugins/<plugin-name>/` 目录都是独立的插件发布单元。
+面向科研计算、学术写作与个人项目日志的 Codex 插件集合。本仓库集中维护三个插件及其 skill、脚本、模板和参考资料，每个 `plugins/<plugin-name>/` 目录都是独立的插件发布单元。
 
 ## 插件一览
 
@@ -8,10 +8,7 @@
 | --- | --- | --- |
 | [calc-project](plugins/calc-project/) | 科研计算项目与方法工作流 | 建立计算任务、准备输入、同步数据、维护模板 |
 | [paper-project](plugins/paper-project/) | 文献证据、学术写作与研究展示 | 整理文献、核查引用、润色论文、绘图与制作 PPT |
-| [matt-skills](plugins/matt-skills/) | 基于 Matt Pocock skills 的个人精选 Codex 插件 | 需求设计、编码测试、调试审查、协作与 agent 文档 |
 | [osm-project](plugins/osm-project/) | 个人项目进展记录 | 将当前会话整理为 Obsidian 项目日志 |
-
-**来源说明：`matt-skills` 基于 [Matt Pocock 的 skills](https://github.com/mattpocock/skills) 进行 Codex 原生插件适配，并按个人习惯持续精选和改写流程，选择性吸收上游更新。** 它是本仓库维护的个人版本；上游来源、适配说明和许可证见 [插件说明](plugins/matt-skills/README.md)。
 
 ## 常用 skill
 
@@ -53,32 +50,6 @@
 
 [cangjie-skill](plugins/paper-project/skills/cangjie-skill/SKILL.md) 当前停用，仅保留显式入口，原资源蒸馏工作流等待重新设计。
 
-### matt-skills：需求设计与协作
-
-| Skill | 功能与适用场景 |
-| --- | --- |
-| [grilling](plugins/matt-skills/skills/grilling/SKILL.md) | 通过持续追问检验计划或设计，澄清假设、选择与未决问题。 |
-| [domain-modeling](plugins/matt-skills/skills/domain-modeling/SKILL.md) | 统一领域术语，维护 `CONTEXT.md` 和架构决策记录。 |
-| [research](plugins/matt-skills/skills/research/SKILL.md) | 基于一手资料调查设计或技术问题，在仓库中保存带来源的研究结论。 |
-| [prototype](plugins/matt-skills/skills/prototype/SKILL.md) | 构建用于回答设计问题的临时逻辑或界面原型。 |
-| [writing-for-agents](plugins/matt-skills/skills/writing-for-agents/SKILL.md) | 编写和审查 skill、AGENTS.md、插件元数据等 agent 文档，明确触发条件、信息层次和完成标准。 |
-| [handoff](plugins/matt-skills/skills/handoff/SKILL.md) | 将当前会话压缩为供后续 agent 接手的交接文档；仅显式调用。 |
-
-其余访谈、问卷及教学入口见 [完整 skill 导航](plugins/matt-skills/skills/README.md)。
-
-### matt-skills：实现与验证
-
-| Skill | 功能与适用场景 |
-| --- | --- |
-| [codebase-design](plugins/matt-skills/skills/codebase-design/SKILL.md) | 设计深模块、接口和可替换位置，改善复杂性封装与可测试性。 |
-| [diagnosing-bugs](plugins/matt-skills/skills/diagnosing-bugs/SKILL.md) | 围绕复现、假设和验证诊断疑难故障或性能回退。 |
-| [resolving-merge-conflicts](plugins/matt-skills/skills/resolving-merge-conflicts/SKILL.md) | 根据双方修改意图处理正在进行的 merge 或 rebase 冲突。 |
-| [wizard](plugins/matt-skills/skills/wizard/SKILL.md) | 为凭据配置、基础设施等必须由人完成的步骤生成交互式 Bash 向导。 |
-| [improve-codebase-architecture](plugins/matt-skills/skills/improve-codebase-architecture/SKILL.md) | 扫描模块深化机会，生成可视化报告并进一步讨论选定方案；仅显式调用。 |
-| [ask-matt](plugins/matt-skills/skills/ask-matt/SKILL.md) | 根据当前任务推荐合适的 skill 或工作流程；仅显式调用。 |
-
-配置与请求分流入口见 [完整 skill 导航](plugins/matt-skills/skills/README.md)。
-
 ### osm-project：项目日志
 
 [log2ob](plugins/osm-project/skills/log2ob/SKILL.md) 将当前会话中的任务、进展、结论、未决事项和恢复入口整理成项目状态草稿，经用户确认后写入 Obsidian Daily Note。适合完成一段工作后记录进展，或为下一次继续工作保留入口。
@@ -90,8 +61,6 @@
 ```text
 $calc-project:calc-task 为这次 VASP 计算登记任务元数据。
 $paper-project:prl-polishing 润色下面的论文段落，保留论断的适用条件。
-$matt-skills:writing-for-agents 精简这个项目的 AGENTS.md。
-$matt-skills:improve-codebase-architecture 寻找值得改进的模块接口。
 $osm-project:log2ob 记录本次项目进展。
 ```
 

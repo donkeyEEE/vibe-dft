@@ -334,3 +334,37 @@ Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不
 停用基线验证：根结构测试 `15 passed, 1 failed`，唯一失败仍为已记录的
 `ask-matt` 缺失路由；生命周期与调用策略一致性检查通过。历史审查确认新增
 12 项转换均为“已发布 → 停用”，其余 7 项状态不变。
+
+## Matt Skills 整体移除完成
+
+2026-09-05，根据用户明确要求，从 YZ Skills 删除整个 `plugins/matt-skills/`
+发布单元，含 manifest、生命周期清单、19 个技能及其全部所属资源。删除前基线
+为 `babb9d51fb2a20e870b1d66e15ebf53a657a91b7`；该提交中的全部 19 项均为
+`explicit-only`，删除前工作区与该基线一致，满足历史状态要求。
+
+删除的技能旧路径均为 `plugins/matt-skills/skills/<skill>/`，清单如下：
+`ask-matt`、`codebase-design`、`diagnosing-bugs`、`domain-modeling`、`grill-me`、`grill-with-docs`、`grilling`、`handoff`、`improve-codebase-architecture`、`prototype`、`research`、`resolving-merge-conflicts`、`setup-matt-pocock-skills`、`teach`、`to-questionnaire`、`triage`、`wait-what`、`wizard`、`writing-for-agents`。
+
+移除原因：用户希望先充分使用上游技能，暂不维护个人适配版本；本仓库不再
+纳入 Matt Skills，终止此前所有剩余精选与 `ask-matt` 重设计计划。源码删除
+适用原插件版本 `0.2.0`，没有安装、发布或修改外部插件环境。
+
+根 `AGENTS.md`、`CONTEXT.md` 和 README 收敛为 Calc Project、Paper Project、
+OSM Project 三个插件。ADR 0004 标记为已取代，ADR 0005 记录当前维护边界；
+历史迁移与精选记录保留。结构测试移除已删除插件的 roster/内部路由要求，
+改为检查退休插件目录不存在、活动源码无失效工程插件引用，保留通用清单、
+调用策略和导航验证。
+
+跨插件消费变更：`calc-project-structure/SKILL.md` 及
+`references/project-structure.md` 移除可选 `matt-skills:grill-me` 调用，
+改为直接澄清影响项目结构的术语，保留经确认的术语写入规则。该计算技能
+生命周期状态与调用策略不变，其余插件源文件保持不变。
+
+最终验证：
+
+- 根结构与 Calc Project 测试：`20 passed`，此前失效路由测试问题随插件整体移除结束；
+- `calc-project-structure` 通过 skill validator，Calc Project 通过 plugin validator；
+- 删除基线 19 项逐一核对均为停用且调用策略禁止隐式调用；
+- 三个保留插件的生命周期清单逐字不变，Paper Project 与 OSM Project 无源码差异；
+- 活动源码与根导航无 Matt Skills 残留引用，旧名称仅保留于历史文档和防回归测试；
+- `git diff --check` 通过。

@@ -10,12 +10,10 @@ description: Initialize or reorganize a calculation project's stable directory s
 1. Read existing project rules and architecture when present.
 2. For initialization or reorganization, read [project structure](references/project-structure.md)
    and the standard [project context](references/project-context.md).
-3. Ask whether the user wants to invoke `matt-skills:grill-me` to align
-   project-specific terms. Invoke it only after the user agrees. Confirmed
-   project terms may be inserted by topic into `CONTEXT.md`'s `Language` section
-   and may directly redefine the standard baseline without an override marker.
-   If the skill is unavailable or declined, ask only the direct questions needed
-   to resolve terms that affect the proposed structure.
+3. Ask only the direct questions needed to resolve project-specific terms that
+   affect the proposed structure. Confirmed project terms may be inserted by
+   topic into `CONTEXT.md`'s `Language` section and may directly redefine the
+   standard baseline without an override marker.
 4. Identify proposed project root, context, notes, data, structures, templates,
    and scripts paths; show them and obtain confirmation before writing.
 5. Create or update only the approved base structure and project documents;

@@ -9,27 +9,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_PLUGINS = (
     "calc-project",
-    "matt-skills",
     "osm-project",
     "paper-project",
 )
 FORBIDDEN_DIRS = {".pytest_cache", "__pycache__", ".worktrees", ".scratch", "dist"}
-DESIGN_SKILLS = {
-    "domain-modeling",
-    "grill-with-docs",
-    "prototype",
-    "research",
-}
-ENGINEERING_SKILLS = {
-    "ask-matt",
-    "codebase-design",
-    "diagnosing-bugs",
-    "improve-codebase-architecture",
-    "resolving-merge-conflicts",
-    "setup-matt-pocock-skills",
-    "triage",
-    "wizard",
-}
 SKILL_STATES = {"development", "published", "explicit-only"}
 
 
@@ -111,21 +94,13 @@ def test_skill_lifecycle_matches_codex_invocation_policy() -> None:
             )
 
 
-def test_matt_plugin_matches_the_selected_roster() -> None:
-    plugin = ROOT / "plugins" / "matt-skills"
-    expected = DESIGN_SKILLS | ENGINEERING_SKILLS | {
-        "grill-me", "grilling", "handoff", "teach", "to-questionnaire",
-        "wait-what", "writing-for-agents",
-    }
-    assert set(load_skill_lifecycle(plugin)) == expected
-    assert {path.parent.name for path in (plugin / "skills").glob("*/SKILL.md")} == expected
-    assert not (ROOT / "plugins" / "dev-engineering").exists()
-    assert not (ROOT / "plugins" / "dev-productivity").exists()
-    assert "Copyright (c) 2026 Matt Pocock" in (plugin / "LICENSE").read_text()
+def test_removed_engineering_plugins_are_absent() -> None:
+    for name in ("matt-skills", "dev-engineering", "dev-productivity"):
+        assert not (ROOT / "plugins" / name).exists()
 
 
-def test_active_sources_do_not_reference_previous_dev_plugins() -> None:
-    stale_reference = re.compile(r"dev-(?:engineering|productivity)|cross-plugin-dependencies\.md")
+def test_active_sources_do_not_reference_removed_engineering_plugins() -> None:
+    stale_reference = re.compile(r"matt-skills|dev-(?:engineering|productivity)|cross-plugin-dependencies\.md")
     offenders: list[Path] = []
     paths = [ROOT / name for name in ("AGENTS.md", "CONTEXT.md", "README.md")]
     paths.extend((ROOT / "plugins").rglob("*"))
@@ -138,19 +113,8 @@ def test_active_sources_do_not_reference_previous_dev_plugins() -> None:
     assert offenders == []
 
 
-def test_matt_skill_invocations_resolve_within_the_plugin() -> None:
-    plugin = ROOT / "plugins" / "matt-skills"
-    roster = load_skill_lifecycle(plugin)
-    for path in plugin.rglob("*"):
-        if not path.is_file() or path.suffix not in {".md", ".yaml", ".yml"}:
-            continue
-        for name in re.findall(r"\$matt-skills:([a-z][a-z0-9-]*)", path.read_text()):
-            assert name in roster, (path, name)
-
-
-def test_root_and_matt_navigation_links_resolve() -> None:
+def test_root_navigation_links_resolve() -> None:
     docs = [ROOT / name for name in ("AGENTS.md", "CONTEXT.md", "README.md")]
-    docs.extend(ROOT / "plugins" / "matt-skills" / name for name in ("README.md", "skills/README.md"))
     for doc in docs:
         for target in re.findall(r"\]\(([^)]+)\)", doc.read_text()):
             if target.startswith(("https://", "http://", "#")):
