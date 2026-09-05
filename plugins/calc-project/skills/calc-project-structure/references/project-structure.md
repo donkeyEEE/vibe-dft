@@ -28,7 +28,7 @@ container; `calc-task` owns its material, calculation-line, and run directories
 and its running-note updates.
 
 Create project-root `CONTEXT.md` from [the standard project context](project-context.md).
-Before writing, ask whether the user wants to invoke `dev-productivity:grill-me`
+Before writing, ask whether the user wants to invoke `matt-skills:grill-me`
 to align project-specific terms. Invoke it only after agreement. Insert confirmed
 project terms by topic into the single `Language` section; they may directly
 replace standard definitions without an override marker. If `CONTEXT.md` already

@@ -2,6 +2,15 @@
 
 本仓库集中维护 Codex 插件及其 skill 所属资源和插件共享资源。开始相关维护前读取根目录 [CONTEXT.md](CONTEXT.md)。
 
+## 插件导航
+
+- [calc-project](plugins/calc-project/)：科研计算项目结构、任务元数据、数据同步与 VASP、DMFT、NAMD、磁性计算工作流。计算输入与计算模板维护进入此插件。
+- [paper-project](plugins/paper-project/)：文献整理、论文与学位论文写作、引用核验、科学图件和演示文稿。研究证据与学术表达任务进入此插件。
+- [matt-skills](plugins/matt-skills/)：基于 Matt Pocock skills 的个人精选 Codex 插件，覆盖需求设计、工程交付和协作辅助。软件开发与 agent 文档任务进入此插件，流程按个人习惯维护，上游更新选择性吸收。
+- [osm-project](plugins/osm-project/)：将当前对话中的项目进展整理为草稿，经确认后写入 Obsidian Daily Note。用户要求记录项目日志时进入此插件。
+
+上游来源和常用 skill 功能见 [README.md](README.md)。选择具体 skill 时，核对所属插件的 `skill-lifecycle.json` 与该 skill 的 `SKILL.md`；停用入口仅在用户显式调用时使用。
+
 ## 工作入口
 
 - 修改任一插件、插件清单、skill 或发布资源时，读取 `CONTEXT.md` 中对应章节。

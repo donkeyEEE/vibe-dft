@@ -1,23 +1,10 @@
 # YZ Skills 开发上下文
 
-本仓库集中维护五个 Codex 插件。插件发布单元位于 `plugins/`；资源优先与 owning skill 共置，只有多 skill 实际消费的资源进入插件级 `resources/`。旧路径与迁移状态记录在 `docs/migrations/2026-09-04-plugin-consolidation.md`。
+本仓库集中维护四个 Codex 插件。插件发布单元位于 `plugins/`；资源优先与 owning skill 共置，只有多 skill 实际消费的资源进入插件级 `resources/`。旧路径与迁移状态记录在 `docs/migrations/2026-09-04-plugin-consolidation.md`。
 
 ## 插件导航
 
-**[calc-project](plugins/calc-project)**:
-面向科研计算项目及其可执行工作流，管理项目结构、任务事实、受限同步、[共享计算模板](plugins/calc-project/resources/)和方法专属计算流程。
-
-**[paper-project](plugins/paper-project)**:
-面向研究论文与学位论文生产，组织文献证据、[共享写作资源](plugins/paper-project/resources/)、学术写作、引用核验、科学图件和汇报材料。Cangjie 保留为显式调用的停用入口，等待未来重新设计。
-
-**[dev-productivity](plugins/dev-productivity)**:
-面向软件产品定义、需求与方案设计，提供访谈澄清、领域建模、规格与任务分解、设计调研和原型验证等协作能力。
-
-**[dev-engineering](plugins/dev-engineering)**:
-面向已定义软件工作的工程交付，负责代码与架构实现、测试、调试、审查、请求分流和代码库维护。
-
-**[osm-project](plugins/osm-project)**:
-面向个人项目状态沉淀，将当前对话提炼为经确认的项目日志并写入 Obsidian Daily Note。
+定位任务所属插件时，读取 [AGENTS.md 的插件导航](AGENTS.md#插件导航)；了解常用 skill 的功能时，读取 [README.md](README.md)。
 
 ## 技能生命周期
 
@@ -43,7 +30,7 @@ _Avoid_: 冻结
 
 ## Calc Project 计算插件术语
 
-`plugins/calc-project` 是可安装计算工作流插件。
+`plugins/calc-project` 是可安装计算工作流插件，共享计算模板位于 [resources/](plugins/calc-project/resources/)。
 
 **计算工具脚本（Calculation Utility Script）**:
 计算项目中可复用的可执行工具资产，用于辅助计算工作，但不作为生成任务输入的来源。
@@ -53,7 +40,7 @@ _Avoid_: 计算模板，任务专用脚本
 
 ## Paper Project
 
-`plugins/paper-project` 面向学术研究与论文工作；多个活动 skill 共用的写作资源位于插件内 `resources/`。Cangjie 当前停用且仅允许显式调用，未来另行设计。
+`plugins/paper-project` 面向学术研究与论文工作；多个活动 skill 共用的写作资源位于插件内 [resources/](plugins/paper-project/resources/)。Cangjie 当前停用且仅允许显式调用，未来另行设计。
 
 ## Plugin Resources
 
@@ -64,8 +51,9 @@ _Avoid_: 计算模板，任务专用脚本
 当前没有 formal、candidate 或 incubating 资源状态，也没有通用知识消费协议或项目初始化机制。历史材料只可留在历史文档或 Cangjie 明确标记为非执行的 `references/legacy/`。
 
 
-## Dev Project 插件组
+## Matt Skills
 
+`plugins/matt-skills` 是个人精选与持续改写的 Codex 插件。选择需求设计、工程交付或协作辅助流程时，读取 [skill 导航](plugins/matt-skills/skills/README.md)；核对上游来源与本地适配边界时，读取 [插件说明](plugins/matt-skills/README.md)。新增、停用和删除技能遵循本文件的生命周期规则。
 
 ## OSM Project
 

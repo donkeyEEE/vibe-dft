@@ -178,3 +178,31 @@ Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不
 - 删除启停、重启和导入 Zotero 的写操作入口；Zo2Notes 保持 Zotero 只读。
 
 该变更不改变 `zo2notes` 的已发布生命周期状态或隐式调用策略。
+
+## Matt Skills 个人插件合并
+
+2026-09-05，用户确认将两个 Dev 插件合并为个人精选的 `matt-skills`，先保留全部现有技能与状态，后续再精选和改写流程。源码插件版本为 `0.2.0`；本次没有安装、发布或改写外部 marketplace。
+
+| 合并前来源 | 合并后目标 | 处理 |
+| --- | --- | --- |
+| `plugins/dev-engineering/skills/<skill>/` | `plugins/matt-skills/skills/<skill>/` | 11 个技能及所属资源迁入，名称与状态保留 |
+| `plugins/dev-productivity/skills/<skill>/` | `plugins/matt-skills/skills/<skill>/` | 14 个技能及所属资源迁入，名称与状态保留 |
+| 两插件的 `skill-lifecycle.json` | `plugins/matt-skills/skill-lifecycle.json` | 合并无重名的两份清单，逐项保留状态 |
+| 两插件的 `.codex-plugin/plugin.json` | `plugins/matt-skills/.codex-plugin/plugin.json` | 统一插件名称、描述与发布单元 |
+| 两插件的 `skills/README.md` | `plugins/matt-skills/skills/README.md` | 保留需求设计与工程交付导航分组 |
+| 两插件的 `references/cross-plugin-dependencies.md` | 同插件直接调用 | 移除重复安装检查说明及其消费指针 |
+
+运行时调用由 `$dev-engineering:<skill>`、`$dev-productivity:<skill>` 统一为 `$matt-skills:<skill>`。`calc-project-structure/SKILL.md` 及其 `references/project-structure.md` 中的 `grill-me` 引用同时更新。旧插件目录仅从本仓库发布树移除，未删除任何技能；Git 基线仍可恢复旧文件。
+
+本次对 `ask-matt`、`triage`、`improve-codebase-architecture`、`to-spec`、`to-tickets` 和 `wayfinder` 的依赖段落进行同插件调用调整；`handoff`、`teach` 原有的 Claude `argument-hint` 字段移为正文输入提示，使当前 Codex skill validator 可接受，保留提示含义。其余技能内容只进行命名空间替换。
+
+根导航与 README 同步为四个插件。ADR 0004 取代 ADR 0002 的双插件发布边界；`matt-skills` 增加个人适配说明、上游导入记录与 MIT 许可证。上游导入事实来自原维护仓库 `/home/donk/plugins/dev-project/docs/upstream/mattpocock-skills.md`，初始导入 revision 为 `84fdeffd12f2ee307994d1eb6feb48173b6e0502`；2026-09-02 仅对三个技能选择性同步，未宣称全量追踪后续 revision。
+
+历史审查与验证：
+
+- 固定基线 `a5c73374a96af4d8b7c32a5ed6118d1faf186fdf` 的两份清单按技能名合并后，与目标清单完全一致：25 个技能，11 个 `published`、14 个 `explicit-only`；没有状态转换、技能删除或状态重置。
+- 25 份 `agents/openai.yaml` 与基线逐字一致；75 个技能所属文件全部迁入，附属资源与可执行权限均保留。
+- 根仓库测试：`16 passed`，覆盖发布单元、完整 roster、调用策略、旧名称残留、新调用目标和导航链接。
+- 25 个合并技能及受影响的 `calc-project-structure` 均通过 skill validator；新插件通过 plugin validator。
+- 检查 64 个插件内 Markdown 相对链接，排除代码块中的目标项目示例，全部有效。
+- 临时归档解包后的插件再次通过 validator，逐文件内容与源插件一致，并保留完整生命周期清单；临时归档验证后自动清理，未发布。

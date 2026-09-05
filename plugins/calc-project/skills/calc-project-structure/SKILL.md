@@ -10,7 +10,7 @@ description: Initialize or reorganize a calculation project's stable directory s
 1. Read existing project rules and architecture when present.
 2. For initialization or reorganization, read [project structure](references/project-structure.md)
    and the standard [project context](references/project-context.md).
-3. Ask whether the user wants to invoke `dev-productivity:grill-me` to align
+3. Ask whether the user wants to invoke `matt-skills:grill-me` to align
    project-specific terms. Invoke it only after the user agrees. Confirmed
    project terms may be inserted by topic into `CONTEXT.md`'s `Language` section
    and may directly redefine the standard baseline without an override marker.

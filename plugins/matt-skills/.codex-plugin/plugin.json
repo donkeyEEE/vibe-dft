@@ -1,0 +1,30 @@
+{
+  "name": "matt-skills",
+  "version": "0.2.0",
+  "description": "Personally selected Matt Pocock skills adapted for Codex: product design, engineering delivery, and collaboration.",
+  "author": {
+    "name": "YZ Skills maintainers"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/mattpocock/skills",
+  "keywords": [
+    "engineering",
+    "product-design",
+    "testing",
+    "code-review",
+    "collaboration"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Matt Skills",
+    "shortDescription": "Personal Matt Pocock skill selection adapted for Codex",
+    "longDescription": "A personally maintained selection based on Matt Pocock's skills, adapted for Codex. Covers requirements, domain modeling, research, prototypes, specifications, implementation, testing, debugging, code review, and agent-facing documentation. Workflows can evolve for the user's needs, with selective upstream updates.",
+    "developerName": "YZ Skills maintainers",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": "Help me choose and apply a skill for design, engineering, or collaboration."
+  }
+}

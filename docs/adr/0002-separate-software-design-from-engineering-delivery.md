@@ -1,5 +1,6 @@
 ---
-status: accepted
+status: superseded
+superseded_by: 0004-personal-matt-skills-plugin
 ---
 
 # Separate software design from engineering delivery
