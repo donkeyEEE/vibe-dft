@@ -62,11 +62,9 @@
 | [research](plugins/matt-skills/skills/research/SKILL.md) | 基于一手资料调查设计或技术问题，在仓库中保存带来源的研究结论。 |
 | [prototype](plugins/matt-skills/skills/prototype/SKILL.md) | 构建用于回答设计问题的临时逻辑或界面原型。 |
 | [writing-for-agents](plugins/matt-skills/skills/writing-for-agents/SKILL.md) | 编写和审查 skill、AGENTS.md、插件元数据等 agent 文档，明确触发条件、信息层次和完成标准。 |
-| [to-spec](plugins/matt-skills/skills/to-spec/SKILL.md) | 将已讨论的决定整理为规格并发布到项目任务跟踪系统；仅显式调用。 |
-| [to-tickets](plugins/matt-skills/skills/to-tickets/SKILL.md) | 将计划或规格拆为标明阻塞关系、可逐步交付的任务；仅显式调用。 |
 | [handoff](plugins/matt-skills/skills/handoff/SKILL.md) | 将当前会话压缩为供后续 agent 接手的交接文档；仅显式调用。 |
 
-其余访谈、问卷、教学及大型工作规划入口见 [完整 skill 导航](plugins/matt-skills/skills/README.md)。
+其余访谈、问卷及教学入口见 [完整 skill 导航](plugins/matt-skills/skills/README.md)。
 
 ### matt-skills：实现与验证
 

@@ -206,3 +206,86 @@ Cangjie 暂为开发者专用流程；本次迁移只更新其开发路径，不
 - 25 个合并技能及受影响的 `calc-project-structure` 均通过 skill validator；新插件通过 plugin validator。
 - 检查 64 个插件内 Markdown 相对链接，排除代码块中的目标项目示例，全部有效。
 - 临时归档解包后的插件再次通过 validator，逐文件内容与源插件一致，并保留完整生命周期清单；临时归档验证后自动清理，未发布。
+
+## Matt Skills 个人精选：第一批
+
+2026-09-05，用户决定本批五个技能全部保留，`ask-matt` 留到最后调整。
+本批变更前基线为 `1c08cee3b39adfd186c4a810bd1925863d6b5ea4`；适用源码插件版本为
+`matt-skills 0.2.0`，本次仅修改源码，未安装或发布。
+
+| 技能 | 基线状态 | 本批状态 | 决定 |
+| --- | --- | --- | --- |
+| grilling | published | published | 保留，状态不变 |
+| grill-me | explicit-only | published | 保留，恢复自动选用 |
+| grill-with-docs | explicit-only | published | 保留，恢复自动选用 |
+| domain-modeling | published | published | 保留，状态不变 |
+| writing-for-agents | published | published | 保留，状态不变 |
+
+两项恢复均遵循“停用 → 已发布”；移除对应 `agents/openai.yaml` 中的
+`allow_implicit_invocation: false`，使用默认允许隐式调用策略，并同步插件说明和技能导航。
+技能正文、调用名称和消费者路径不变，无技能删除；`ask-matt` 本批保持原状。
+
+精选进度：第一批 5/25 已介绍、已决定并实施；第二批为 `research`、`prototype`、
+`to-spec`、`to-tickets`、`wayfinder`，待用户决定，其余 15 项尚未介绍。
+
+验证：根结构测试 `16 passed`；与上述固定基线逐项比较，技能集合保持 25 项，
+仅 `grill-me`、`grill-with-docs` 从 `explicit-only` 转为 `published`；
+`ask-matt` 相对基线无差异。
+
+## Matt Skills 个人精选：第二批删除
+
+2026-09-05，用户决定删除 `to-spec`、`to-tickets`、`wayfinder`。删除前审查
+固定基线 `1c08cee3b39adfd186c4a810bd1925863d6b5ea4`：三项均为
+`explicit-only`，删除前工作区状态亦为停用，所属文件相对基线无改动，满足删除前置条件。
+适用源码插件版本为 `matt-skills 0.2.0`，未安装或发布。
+
+| 删除路径 | 原状态 | 原因 |
+| --- | --- | --- |
+| `plugins/matt-skills/skills/to-spec/` | explicit-only | 用户个人精选决定删除规格生成入口 |
+| `plugins/matt-skills/skills/to-tickets/` | explicit-only | 用户个人精选决定删除任务拆分入口 |
+| `plugins/matt-skills/skills/wayfinder/` | explicit-only | 用户个人精选决定删除大型决策地图工作流 |
+
+删除三个目录及各自调用策略，从生命周期清单和根目录、插件技能导航移除条目；
+清理 `setup-matt-pocock-skills` 中无人消费的三份 Wayfinding operations 章节
+和失效的技能举例，保留通用工单配置。结构测试 roster 更新为当前 22 项。
+
+按用户先前要求，`ask-matt` 最后统一调整，当前正文保持不变；其中指向三个已删
+技能的路由暂时失效，调用目标完整性测试继续保留严格检查，不豁免这些引用。
+最后调整路由时必须清理这些引用并恢复完整测试通过。
+
+精选进度（按初始 25 项）：已介绍 10 项，已决定并实施 8 项；第二批 `research`、
+`prototype` 尚待决定、状态不变；其余 15 项尚未介绍，`ask-matt` 最后处理。
+
+验证：根结构测试 `15 passed, 1 failed`；唯一失败为 `ask-matt` 尚未调整的
+调用目标完整性检查。完整扫描确认所有缺失调用目标仅来自该文件，且仅涉及本批
+删除的三个技能；该文件相对基线无差异。清单历史审查确认仅删除三项停用技能，
+其余状态变化仍只有第一批两项恢复为已发布。
+
+## Matt Skills 个人精选：第二批完成
+
+2026-09-05，用户决定 `research`、`prototype` 均保留并维持 `published`，
+无生命周期转换或调用策略变更。第二批五项全部处理完毕。
+
+精选进度（按初始 25 项）：前两批 10 项已决定并实施（保留 7 项、删除 3 项）；
+第三批介绍 `codebase-design`、`improve-codebase-architecture`、`tdd`、
+`implement`、`code-review`，五项均待决定；其余 10 项尚未介绍，`ask-matt` 最后处理。
+本次仅同步进度说明，已核对两项清单状态；此前 `ask-matt` 的缺失调用目标仍待最后修复。
+
+## Matt Skills 个人精选：第三批停用基线
+
+2026-09-05，用户决定删除 `implement`、`tdd`、`code-review`，保留
+`codebase-design` 与 `improve-codebase-architecture` 并均设为已发布。
+适用源码插件版本为 `matt-skills 0.2.0`；未安装或发布。
+
+删除分两阶段进行：先将 `tdd`、`code-review` 从 `published` 转为
+`explicit-only`，同步调用策略与导航并提交，随后以该提交为删除基线。
+`implement` 原本已停用；此阶段保留全部三个目录。
+`codebase-design` 维持 `published`；`improve-codebase-architecture` 从
+`explicit-only` 转为 `published`，移除禁止隐式调用策略并同步导航。
+
+此中间提交也保存此前已批准的前两批精选结果；`ask-matt` 按用户要求仍待最后
+调整，已知缺失路由保持记录和严格测试，不将该阶段视为可发布成品。
+
+中间基线验证：根结构测试 `15 passed, 1 failed`，唯一失败仍为此前记录的
+`ask-matt` 缺失路由。相对上次提交的清单审查确认：前三个删除项原状态均为停用，
+五项状态转换均合法；待删除的三个工程技能在此快照中全部存在且均为停用。

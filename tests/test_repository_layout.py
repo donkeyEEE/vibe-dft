@@ -19,9 +19,6 @@ DESIGN_SKILLS = {
     "grill-with-docs",
     "prototype",
     "research",
-    "to-spec",
-    "to-tickets",
-    "wayfinder",
 }
 ENGINEERING_SKILLS = {
     "ask-matt",
@@ -117,7 +114,7 @@ def test_skill_lifecycle_matches_codex_invocation_policy() -> None:
             )
 
 
-def test_matt_plugin_retains_the_complete_merged_roster() -> None:
+def test_matt_plugin_matches_the_selected_roster() -> None:
     plugin = ROOT / "plugins" / "matt-skills"
     expected = DESIGN_SKILLS | ENGINEERING_SKILLS | {
         "grill-me", "grilling", "handoff", "teach", "to-questionnaire",

@@ -2,7 +2,7 @@
 
 基于 [mattpocock/skills](https://github.com/mattpocock/skills) 选用并为 Codex 适配的个人插件，覆盖需求设计、工程交付与协作辅助。这里的流程可以按个人习惯持续改写，上游更新作为候选逐项吸收。
 
-本次合并完整保留现有 25 个技能：11 个已发布、14 个停用且仅显式调用。个人精选与流程重设计后续进行；合并只调整插件归属、调用名称和原来的跨插件依赖处理。
+当前保留 22 个技能：12 个已发布、10 个停用且仅显式调用。个人精选已完成第一批五项，全部保留，其中 `grill-me` 与 `grill-with-docs` 恢复为已发布；第二批已删除三个技能，`research` 与 `prototype` 保留并维持已发布；其余批次继续确认，`ask-matt` 最后调整。
 
 ## 使用
 
@@ -14,7 +14,7 @@ $matt-skills:code-review 审查当前分支相对 main 的变更。
 $matt-skills:ask-matt 帮我选择适合当前任务的工作流程。
 ```
 
-完整入口及功能见 [技能导航](skills/README.md)，当前状态事实源是 [skill-lifecycle.json](skill-lifecycle.json)。合并保留各技能的 `agents/openai.yaml` 调用策略；仅显式入口不会因为换了插件名称而自动启用。
+完整入口及功能见 [技能导航](skills/README.md)，当前状态事实源是 [skill-lifecycle.json](skill-lifecycle.json)。各技能的 `agents/openai.yaml` 调用策略与生命周期清单同步；停用入口仅允许用户显式调用。
 
 ## 来源与本地维护
 
