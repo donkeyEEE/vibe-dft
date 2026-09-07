@@ -7,7 +7,6 @@ POLISHING = PLUGIN / "skills" / "prl-polishing" / "references" / "paper-writing"
 FIGURE = PLUGIN / "skills" / "prl-figure" / "references" / "paper-writing"
 
 EXPECTED_SHARED = {
-    "write-terminology-ledger.md",
     "write-prl-model-to-validation-pairing.md",
     "write-prl-figure-prerequisite-signature-consequence.md",
     "write-prl-quantitative-claim-with-criterion.md",
@@ -32,6 +31,7 @@ EXPECTED_POLISHING = {
     "write-prl-claim-evidence-consequence-sequence.md",
     "write-prl-effective-model-assumption-boundary.md",
     "write-reader-question-sequence.md",
+    "write-terminology-ledger.md",
 }
 
 EXPECTED_FIGURE = {
@@ -56,7 +56,7 @@ def test_shared_paper_resources_declare_real_consumers() -> None:
     declaration = (SHARED / "README.md").read_text(encoding="utf-8")
     assert "prl-polishing" in declaration
     assert "prl-figure" in declaration
-    assert "paper2ppt" in declaration
+    assert "paper2ppt" not in declaration
 
 
 def test_retained_paper_resources_keep_card_metadata() -> None:

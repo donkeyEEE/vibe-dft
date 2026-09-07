@@ -6,7 +6,6 @@ directory is not a runtime discovery index.
 
 | Resource group | Active consumers |
 |---|---|
-| `write-terminology-ledger.md` | `prl-polishing`, `paper2ppt` |
 | `write-prl-*.md` | `prl-polishing`, `prl-figure` |
 
 Missing resources are reported as optional-resource failures. Consumers may

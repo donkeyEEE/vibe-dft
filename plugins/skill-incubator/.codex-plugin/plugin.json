@@ -1,0 +1,25 @@
+{
+  "name": "skill-incubator",
+  "version": "0.1.0",
+  "description": "Presentation workflows for turning research material into editable PowerPoint decks and reusable presentation templates.",
+  "author": {
+    "name": "donk"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Skill Incubator",
+    "shortDescription": "Paper-to-PPT adaptation and editable presentation production",
+    "longDescription": "Skill Incubator contains Paper2PPT for evidence-led academic source preparation and PPT Master for creating, filling, enhancing, validating, and exporting editable PowerPoint presentations.",
+    "developerName": "donk",
+    "category": "Productivity",
+    "capabilities": [
+      "Research",
+      "Presentations",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use paper2ppt to turn this scientific paper into presentation-ready source material",
+      "Use ppt-master to create, fill, or enhance an editable PowerPoint presentation"
+    ]
+  }
+}

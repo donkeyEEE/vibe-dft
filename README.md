@@ -1,13 +1,14 @@
 # YZ Skills
 
-面向科研计算、学术写作与个人项目日志的 Codex 插件集合。本仓库集中维护三个插件及其 skill、脚本、模板和参考资料，每个 `plugins/<plugin-name>/` 目录都是独立的插件发布单元。
+面向科研计算、学术写作、演示文稿与个人项目日志的 Codex 插件集合。本仓库集中维护四个插件及其 skill、脚本、模板和参考资料，每个 `plugins/<plugin-name>/` 目录都是独立的插件发布单元。
 
 ## 插件一览
 
 | 插件 | 功能 | 典型任务 |
 | --- | --- | --- |
 | [calc-project](plugins/calc-project/) | 科研计算项目与方法工作流 | 建立计算任务、准备输入、同步数据、维护模板 |
-| [paper-project](plugins/paper-project/) | 文献证据、学术写作与研究展示 | 整理文献、核查引用、润色论文、绘图与制作 PPT |
+| [paper-project](plugins/paper-project/) | 文献证据与学术写作 | 整理文献、核查引用、润色论文与制作科学图件 |
+| [skill-incubator](plugins/skill-incubator/) | 演示文稿工作流 | 论文转演示素材、生成或修改可编辑 PPTX、维护演示模板 |
 | [osm-project](plugins/osm-project/) | 个人项目进展记录 | 将当前会话整理为 Obsidian 项目日志 |
 
 ## 安装
@@ -26,6 +27,7 @@ codex plugin marketplace add "$(pwd)"
 ```bash
 codex plugin add calc-project@yz-skills
 codex plugin add paper-project@yz-skills
+codex plugin add skill-incubator@yz-skills
 codex plugin add osm-project@yz-skills
 codex plugin list
 ```
@@ -64,13 +66,18 @@ codex plugin list
 | [big-paper-helper](plugins/paper-project/skills/big-paper-helper/SKILL.md) | 规划、撰写、整合或审查计算材料领域的中文学位论文。 |
 | [nature-response](plugins/paper-project/skills/nature-response/SKILL.md) | 起草或修订逐条审稿回复、修回信、投稿附信和修改稿摘录。 |
 | [prl-figure](plugins/paper-project/skills/prl-figure/SKILL.md) | 制作、审查和导出面向投稿的科学图件，组织多面板证据与验证结果。 |
-| [paper2ppt](plugins/paper-project/skills/paper2ppt/SKILL.md) | 将论文、预印本或阅读笔记转为以证据组织的中文汇报，调用同插件的 PPT Master。 |
-| [ppt-master](plugins/paper-project/skills/ppt-master/SKILL.md) | 创建可编辑 PPTX、建立演示模板工作区、填充模板或改进现有演示文稿。 |
 | [scientific-critical-thinking](plugins/paper-project/skills/scientific-critical-thinking/SKILL.md) | 评估材料物理论断、计算与实验结果的证据、局限和替代解释。 |
 | [scholar-evaluation](plugins/paper-project/skills/scholar-evaluation/SKILL.md) | 从问题、方法、分析与写作等维度评价学术工作，给出评分和改进建议。 |
 | [yuanzhuo-skill](plugins/paper-project/skills/yuanzhuo-skill/SKILL.md) | 组织人物视角的独立分析、交叉提问与主持式圆桌讨论。 |
 
 [cangjie-skill](plugins/paper-project/skills/cangjie-skill/SKILL.md) 当前停用，仅保留显式入口，原资源蒸馏工作流等待重新设计。
+
+### skill-incubator：演示文稿
+
+| Skill | 功能与适用场景 |
+| --- | --- |
+| [paper2ppt](plugins/skill-incubator/skills/paper2ppt/SKILL.md) | 将论文、预印本或阅读笔记转为以证据组织的中文汇报素材，并调用同插件的 PPT Master。源文档解析依赖另行安装的 `paper-project:liteparse`。 |
+| [ppt-master](plugins/skill-incubator/skills/ppt-master/SKILL.md) | 创建可编辑 PPTX、建立演示模板工作区、填充模板或改进现有演示文稿。 |
 
 ### osm-project：项目日志
 

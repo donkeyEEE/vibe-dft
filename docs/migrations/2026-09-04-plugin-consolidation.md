@@ -368,3 +368,28 @@ OSM Project 三个插件。ADR 0004 标记为已取代，ADR 0005 记录当前�
 - 三个保留插件的生命周期清单逐字不变，Paper Project 与 OSM Project 无源码差异；
 - 活动源码与根导航无 Matt Skills 残留引用，旧名称仅保留于历史文档和防回归测试；
 - `git diff --check` 通过。
+
+## 演示技能迁入 Skill Incubator
+
+2026-09-07，根据用户确认的 [ADR 0006](../adr/0006-separate-presentation-skills-into-incubator.md)，
+新增独立发布单元 `plugins/skill-incubator/`，并迁移两个已发布技能：
+
+| 旧路径 | 新路径 | 生命周期状态 |
+| --- | --- | --- |
+| `plugins/paper-project/skills/paper2ppt/` | `plugins/skill-incubator/skills/paper2ppt/` | published（不变） |
+| `plugins/paper-project/skills/ppt-master/` | `plugins/skill-incubator/skills/ppt-master/` | published（不变） |
+
+`paper2ppt` 与 `ppt-master` 仍为同插件兄弟技能，素材交接接口不变；
+`paper2ppt` 继续通过公开限定名调用另行安装的 `paper-project:liteparse`。
+原由 Paper Project 共享的 terminology-ledger 分别迁入 `paper2ppt` 与
+`prl-polishing` 的 skill 所属资源，消除跨插件资源路径与单消费者共享资源。
+
+PPT Master 的上游同步脚本、逐文件来源记录、OpenAI UI overlay 和发布构建器
+迁入 Skill Incubator。Paper Project 的生命周期清单和发布构建器删除演示技能
+及其维护资产；根 marketplace、AGENTS 和 README 更新为四个插件。
+`skill-incubator` 源码插件版本为 `0.1.0`，本次未安装或发布插件。
+按用户明确要求，`CONTEXT.md` 保持不变。
+
+验证：完整测试 `80 passed`；四个插件均通过 plugin validator；PPT Master
+attribution guard 通过；两个发布构建器分别验证自身 roster 与资源边界；活动
+源码无旧演示技能运行时路径；`git diff --check` 通过。

@@ -2,7 +2,7 @@
 
 [English](README_EN.md)
 
-`paper2ppt` 是论文到 PPT Master 素材的学术适配器。它负责阅读论文、组织证据叙事、和用户确认重点、选择并核验科学图，随后生成一个极简素材目录，并调用同一插件内置的同级 `$ppt-master` 正常 Generate 流程。
+`paper2ppt` 是论文到 PPT Master 素材的学术适配器。它负责阅读论文、组织证据叙事、和用户确认重点、选择并核验科学图，随后生成一个极简素材目录，并调用同一插件内置的同级 `$ppt-master` 正常 Generate 流程。源文档规范化依赖另行安装的 `paper-project:liteparse`。
 
 ## 工作方式
 

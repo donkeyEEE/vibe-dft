@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a validated, self-contained Paper Project marketplace release."""
+"""Build a validated, self-contained Skill Incubator marketplace release."""
 
 from __future__ import annotations
 
@@ -15,8 +15,8 @@ import tarfile
 import tempfile
 
 
-MARKETPLACE_NAME = "paper-project-release"
-BUNDLE_DIRNAME = "paper-project-marketplace"
+MARKETPLACE_NAME = "skill-incubator-release"
+BUNDLE_DIRNAME = "skill-incubator-marketplace"
 EXCLUDED_DIRS = {
     ".git",
     ".ingest-staging",
@@ -29,7 +29,7 @@ SKILL_STATES = {"development", "published", "explicit-only"}
 def parse_args() -> argparse.Namespace:
     script_root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(
-        description="Build a complete local-marketplace archive for Paper Project."
+        description="Build a complete local-marketplace archive for Skill Incubator."
     )
     parser.add_argument(
         "--plugin-root",
@@ -76,11 +76,11 @@ def load_plugin_manifest(plugin_root: Path) -> dict[str, object]:
     if not manifest_path.is_file():
         raise SystemExit(f"Missing plugin manifest: {manifest_path}")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if manifest.get("name") != "paper-project":
-        raise SystemExit("plugin.json name must be paper-project")
+    if manifest.get("name") != "skill-incubator":
+        raise SystemExit("plugin.json name must be skill-incubator")
     version = manifest.get("version")
-    if not isinstance(version, str) or "+codex." not in version:
-        raise SystemExit("plugin version must include a +codex.<cachebuster> suffix")
+    if not isinstance(version, str) or not version:
+        raise SystemExit("plugin version must be a non-empty string")
     return manifest
 
 
@@ -110,13 +110,13 @@ def ignore_release_files(directory: str, names: list[str]) -> set[str]:
 def marketplace_document() -> dict[str, object]:
     return {
         "name": MARKETPLACE_NAME,
-        "interface": {"displayName": "Paper Project Release"},
+        "interface": {"displayName": "Skill Incubator Release"},
         "plugins": [
             {
-                "name": "paper-project",
+                "name": "skill-incubator",
                 "source": {
                     "source": "local",
-                    "path": "./plugins/paper-project",
+                    "path": "./plugins/skill-incubator",
                 },
                 "policy": {
                     "installation": "AVAILABLE",
@@ -129,7 +129,7 @@ def marketplace_document() -> dict[str, object]:
 
 
 def write_bundle_readme(bundle_root: Path, version: str) -> None:
-    content = f"""# Paper Project Marketplace Release
+    content = f"""# Skill Incubator Marketplace Release
 
 Version: `{version}`
 
@@ -137,17 +137,17 @@ Keep this directory at a stable absolute path. For first installation:
 
 ```bash
 codex plugin marketplace add /absolute/path/to/{BUNDLE_DIRNAME}
-codex plugin add paper-project@{MARKETPLACE_NAME}
+codex plugin add skill-incubator@{MARKETPLACE_NAME}
 codex plugin list
 ```
 
 For an archive-based update, replace the contents at the same stable path and
-run `codex plugin add paper-project@{MARKETPLACE_NAME}` again. Do not use
+run `codex plugin add skill-incubator@{MARKETPLACE_NAME}` again. Do not use
 `codex plugin marketplace upgrade` for this local directory; that command
 refreshes Git marketplace snapshots. Start a new Codex conversation after an
 install, update, or rollback.
 
-See `plugins/paper-project/README.md` for dependencies, update safety, and
+See `plugins/skill-incubator/README.md` for dependencies, update safety, and
 rollback instructions. Verify bundled files with `MANIFEST.sha256`.
 """
     (bundle_root / "README.md").write_text(content, encoding="utf-8")
@@ -231,15 +231,18 @@ def assert_skill_contract(plugin_root: Path) -> None:
 
 def assert_bundle_contract(bundle_root: Path, version: str) -> None:
     marketplace_path = bundle_root / ".agents/plugins/marketplace.json"
-    bundled_plugin = bundle_root / "plugins/paper-project"
+    bundled_plugin = bundle_root / "plugins/skill-incubator"
     required = [
         marketplace_path,
         bundled_plugin / ".codex-plugin/plugin.json",
         bundled_plugin / "skill-lifecycle.json",
         bundled_plugin / "README.md",
-        bundled_plugin / "skills/prl-polishing/SKILL.md",
-        bundled_plugin / "skills/cangjie-skill/references/legacy/README.md",
-        bundled_plugin / "resources/paper-writing/README.md",
+        bundled_plugin / "skills/paper2ppt/SKILL.md",
+        bundled_plugin / "skills/ppt-master/SKILL.md",
+        bundled_plugin / "skills/ppt-master/LICENSE",
+        bundled_plugin / "skills/ppt-master/scripts/attribution_guard.py",
+        bundled_plugin / "scripts/ppt_master_provenance.json",
+        bundled_plugin / "templates/ppt-master-openai.yaml",
         bundle_root / "README.md",
         bundle_root / "MANIFEST.sha256",
     ]
@@ -262,7 +265,7 @@ def assert_bundle_contract(bundle_root: Path, version: str) -> None:
     entry = marketplace["plugins"][0]
     if marketplace["name"] != MARKETPLACE_NAME:
         raise SystemExit("Unexpected marketplace name")
-    if entry["source"]["path"] != "./plugins/paper-project":
+    if entry["source"]["path"] != "./plugins/skill-incubator":
         raise SystemExit("Marketplace source path is not portable")
 
     bundled_manifest = json.loads(
@@ -293,7 +296,7 @@ def build_release(args: argparse.Namespace) -> tuple[Path, Path]:
     )
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    archive = output_dir / f"paper-project-marketplace-{version}.tar.gz"
+    archive = output_dir / f"skill-incubator-marketplace-{version}.tar.gz"
     checksum = archive.with_suffix(archive.suffix + ".sha256")
     existing = [path for path in (archive, checksum) if path.exists()]
     if existing and not args.force:
@@ -304,9 +307,9 @@ def build_release(args: argparse.Namespace) -> tuple[Path, Path]:
     for path in existing:
         path.unlink()
 
-    with tempfile.TemporaryDirectory(prefix="paper-project-release-") as temp_dir:
+    with tempfile.TemporaryDirectory(prefix="skill-incubator-release-") as temp_dir:
         bundle_root = Path(temp_dir) / BUNDLE_DIRNAME
-        bundled_plugin = bundle_root / "plugins/paper-project"
+        bundled_plugin = bundle_root / "plugins/skill-incubator"
         bundled_plugin.parent.mkdir(parents=True)
         shutil.copytree(
             plugin_root,

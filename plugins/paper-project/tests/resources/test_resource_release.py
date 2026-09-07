@@ -45,6 +45,10 @@ def test_release_contains_resources_without_retired_knowledge(tmp_path: Path) ->
     assert prefix + "skills/zo2notes/scripts/zotero_wsl_bridge.py" not in names
     assert not any(name.startswith(prefix + "knowledge/") for name in names)
     assert not any(name.startswith(prefix + "skills/prl-shared/") for name in names)
+    assert not any(name.startswith(prefix + "skills/paper2ppt/") for name in names)
+    assert not any(name.startswith(prefix + "skills/ppt-master/") for name in names)
+    assert prefix + "scripts/ppt_master_provenance.json" not in names
+    assert prefix + "templates/ppt-master-openai.yaml" not in names
 
 
 def test_release_skill_roster_comes_from_lifecycle_registry(tmp_path: Path) -> None:

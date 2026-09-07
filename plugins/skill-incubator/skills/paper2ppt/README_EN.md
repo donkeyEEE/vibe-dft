@@ -2,7 +2,7 @@
 
 [中文说明](README.md)
 
-`paper2ppt` is an academic adapter from a paper to PPT Master source material. It reads the paper, organizes an evidence-led story, confirms emphasis with the user, selects and verifies scientific figures, builds a minimal material directory, and invokes the bundled sibling `$ppt-master` normal Generate workflow.
+`paper2ppt` is an academic adapter from a paper to PPT Master source material. It reads the paper, organizes an evidence-led story, confirms emphasis with the user, selects and verifies scientific figures, builds a minimal material directory, and invokes the bundled sibling `$ppt-master` normal Generate workflow. Source normalization depends on `paper-project:liteparse` from the separately installed Paper Project plugin.
 
 ## Workflow
 

@@ -5,7 +5,8 @@
 ## 插件导航
 
 - [calc-project](plugins/calc-project/)：科研计算项目结构、任务元数据、数据同步与 VASP、DMFT、NAMD、磁性计算工作流。计算输入与计算模板维护进入此插件。
-- [paper-project](plugins/paper-project/)：文献整理、论文与学位论文写作、引用核验、科学图件和演示文稿。研究证据与学术表达任务进入此插件。
+- [paper-project](plugins/paper-project/)：文献整理、论文与学位论文写作、引用核验和科学图件。研究证据与学术表达任务进入此插件。
+- [skill-incubator](plugins/skill-incubator/)：论文到演示素材的适配与可编辑 PPTX 生成、填充、增强和模板工作流。演示文稿任务进入此插件。
 - [osm-project](plugins/osm-project/)：将当前对话中的项目进展整理为草稿，经确认后写入 Obsidian Daily Note。用户要求记录项目日志时进入此插件。
 
 上游来源和常用 skill 功能见 [README.md](README.md)。选择具体 skill 时，核对所属插件的 `skill-lifecycle.json` 与该 skill 的 `SKILL.md`；停用入口仅在用户显式调用时使用。

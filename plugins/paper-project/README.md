@@ -11,8 +11,6 @@ Codex 插件。插件中的技能通过 `paper-project:<skill-name>` 命名空�
 - `citation-validator`：检查 DOCX 稿件中的引用是否真正支持相邻主张。
 - `zo2notes`：把 Zotero 文献转成项目内中文阅读笔记。
 - `cangjie-skill`：保留待重设计的显式入口；当前暂停资源写入与治理。
-- `paper2ppt`：阅读论文、组织证据叙事、核验科学图，并把极简素材目录交给同插件内置的 PPT Master。
-- `ppt-master`：独立创建、填充、增强或修改可编辑 PPTX，也负责消费 `paper2ppt` 的素材交接。
 
 其余可用技能以安装后 `codex plugin list` 和 Codex 技能列表为准。
 
@@ -20,13 +18,6 @@ Codex 插件。插件中的技能通过 `paper-project:<skill-name>` 命名空�
 
 ```bash
 python3 -m pip install PyMuPDF Pillow
-```
-
-PPT Master 的完整 Python 依赖清单位于
-`skills/ppt-master/requirements.txt`；需要其完整生成、模板或增强能力时安装：
-
-```bash
-python3 -m pip install -r skills/ppt-master/requirements.txt
 ```
 
 LibreOffice/`soffice` 用于 Office 文档解析；涉及 Zotero、PDF OCR 或学术检索的技能可能还需要相应的
@@ -93,10 +84,6 @@ codex plugin add paper-project@paper-project-release
 
 发布包内的 `MANIFEST.sha256` 校验各文件，压缩包旁的 `.sha256` 文件校验
 整个归档。
-
-发行版内置 `paper2ppt` 和可独立使用的 `ppt-master`。PPT Master 保留上游
-MIT LICENSE、版权与完整性门禁；其来源版本、commit 和逐文件摘要记录在
-`scripts/ppt_master_provenance.json`。完整上游仓库及本地 checkout 不进入发行包。
 
 ## 发布者构建流程
 

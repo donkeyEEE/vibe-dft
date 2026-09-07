@@ -1,6 +1,6 @@
 # Toolchain policy
 
-Use the sibling `paper-project:liteparse` skill for document normalization.
+Use `paper-project:liteparse` from the separately installed Paper Project plugin for document normalization.
 Use PyMuPDF and Pillow only for evidence-preserving figure preparation through
 `scripts/figure_assets.py`. Use `scripts/build_material_handoff.py` to validate
 and atomically publish the minimal material directory.

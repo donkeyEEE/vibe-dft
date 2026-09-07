@@ -3,7 +3,7 @@ version: 4.0.0
 description: Academic paper analysis and interaction that hands minimal source materials to the bundled sibling PPT Master.
 
 always_load:
-  - ../../resources/paper-writing/write-terminology-ledger.md
+  - references/paper-writing/write-terminology-ledger.md
   - static/core/principles.md
   - static/core/toolchain.md
   - static/core/workflow.md

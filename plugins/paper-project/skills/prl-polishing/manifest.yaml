@@ -11,7 +11,7 @@ always_load:
   - references/paper-writing/write-cite-primary-source.md
   - references/paper-writing/write-citation-scope.md
   - references/paper-writing/meta-ai-writing-boundaries.md
-  - ../../resources/paper-writing/write-terminology-ledger.md
+  - references/paper-writing/write-terminology-ledger.md
   # Skill-local core
   - static/core/stance.md
   - static/core/prl-argument-logic.md

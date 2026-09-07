@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synchronize a verified upstream PPT Master skill snapshot into this plugin."""
+"""Synchronize a verified upstream PPT Master skill snapshot into Skill Incubator."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ def parse_args() -> argparse.Namespace:
     plugin_root = Path(__file__).resolve().parents[1]
     repository_root = plugin_root.parent
     parser = argparse.ArgumentParser(
-        description="Vendor the upstream PPT Master skill into Paper Project."
+        description="Vendor the upstream PPT Master skill into Skill Incubator."
     )
     parser.add_argument(
         "--upstream-root",
@@ -65,8 +65,8 @@ def validate_plugin_root(plugin_root: Path) -> None:
     if not manifest_path.is_file():
         raise ValueError(f"Plugin manifest is missing: {manifest_path}")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if manifest.get("name") != "paper-project":
-        raise ValueError("Plugin manifest name must be paper-project")
+    if manifest.get("name") != "skill-incubator":
+        raise ValueError("Plugin manifest name must be skill-incubator")
     skills_root = (plugin_root / "skills").resolve()
     destination = (skills_root / "ppt-master").resolve()
     if destination.parent != skills_root:
