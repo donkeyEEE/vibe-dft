@@ -6,7 +6,6 @@
 
 - [calc-project](plugins/calc-project/)：科研计算项目结构、任务元数据、数据同步与 VASP、DMFT、NAMD、磁性计算工作流。计算输入与计算模板维护进入此插件。
 - [paper-project](plugins/paper-project/)：文献整理、论文与学位论文写作、引用核验和科学图件。研究证据与学术表达任务进入此插件。
-- [skill-incubator](plugins/skill-incubator/)：可安装、可发布的通用 skill 试验场；当前包含演示文稿、审稿回复、学术评价、科学批判和待重设计的知识蒸馏入口。尚未形成独立领域边界的 skill 进入此插件。
 - [osm-project](plugins/osm-project/)：将当前对话中的项目进展整理为草稿，经确认后写入 Obsidian Daily Note。用户要求记录项目日志时进入此插件。
 
 上游来源和常用 skill 功能见 [README.md](README.md)。插件的 `skills/*/SKILL.md` 目录集合是 Skill roster；选择具体 skill 时读取其 `SKILL.md`。调用策略以该 skill 的 `agents/openai.yaml` 为准。

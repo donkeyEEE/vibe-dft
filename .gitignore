@@ -5,3 +5,4 @@ __pycache__/
 .scratch/
 /tests/
 /docs/superpowers/
+/plugins/skill-incubator/

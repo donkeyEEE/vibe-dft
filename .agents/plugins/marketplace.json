@@ -29,18 +29,6 @@
       "category": "Productivity"
     },
     {
-      "name": "skill-incubator",
-      "source": {
-        "source": "local",
-        "path": "./plugins/skill-incubator"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
       "name": "osm-project",
       "source": {
         "source": "local",

@@ -1,4 +1,0 @@
-interface:
-  display_name: "学术成果评价"
-  short_description: "从研究问题、方法、分析和写作等维度系统评价学术成果"
-  default_prompt: "使用 $scholar-evaluation 从问题、方法、分析和写作等维度评价这项学术成果。"

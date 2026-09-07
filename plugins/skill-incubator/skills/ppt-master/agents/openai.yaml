@@ -1,4 +1,0 @@
-interface:
-  display_name: "演示文稿大师"
-  short_description: "创建、填充、增强和修改可编辑演示文稿及其模板工作区"
-  default_prompt: "使用 $ppt-master 创建、填充或修改一份可编辑的演示文稿。"

@@ -1,7 +1,0 @@
-interface:
-  display_name: "仓颉（等待重设计）"
-  short_description: "保留的知识蒸馏入口，当前暂停资源写入"
-  default_prompt: "使用 $cangjie-skill 说明当前冻结状态和可用替代路径。"
-
-policy:
-  allow_implicit_invocation: false
