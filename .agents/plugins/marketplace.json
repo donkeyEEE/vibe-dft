@@ -1,0 +1,44 @@
+{
+  "name": "yz-skills",
+  "interface": {
+    "displayName": "YZ Skills"
+  },
+  "plugins": [
+    {
+      "name": "calc-project",
+      "source": {
+        "source": "local",
+        "path": "./plugins/calc-project"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "paper-project",
+      "source": {
+        "source": "local",
+        "path": "./plugins/paper-project"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "osm-project",
+      "source": {
+        "source": "local",
+        "path": "./plugins/osm-project"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -10,6 +10,28 @@
 | [paper-project](plugins/paper-project/) | 文献证据、学术写作与研究展示 | 整理文献、核查引用、润色论文、绘图与制作 PPT |
 | [osm-project](plugins/osm-project/) | 个人项目进展记录 | 将当前会话整理为 Obsidian 项目日志 |
 
+## 安装
+
+需要已安装且支持 `codex plugin` 命令的 Codex CLI。克隆仓库后，将仓库根目录注册为本地 marketplace：
+
+```bash
+git clone <repository-url> yz-skills
+cd yz-skills
+git checkout v0.1
+codex plugin marketplace add "$(pwd)"
+```
+
+按需安装一个或多个插件：
+
+```bash
+codex plugin add calc-project@yz-skills
+codex plugin add paper-project@yz-skills
+codex plugin add osm-project@yz-skills
+codex plugin list
+```
+
+安装或更新后新建 Codex 对话，使插件中的 skills 进入新的会话上下文。若从 Git marketplace 安装后需要获取新版，可先运行 `codex plugin marketplace upgrade`，再重新运行相应的 `codex plugin add` 命令。
+
 ## 常用 skill
 
 下列名称链接到仓库内的 `SKILL.md`，可查看具体流程、输入要求和依赖。表中标注“仅显式调用”的入口按仓库术语处于停用状态：保留给用户主动调用，Codex 不会自动选用。完整状态以各插件的 `skill-lifecycle.json` 为准。
