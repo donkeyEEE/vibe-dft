@@ -7,7 +7,6 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-import re
 import shutil
 import subprocess
 import sys
@@ -25,7 +24,8 @@ EXCLUDED_DIRS = {
     "tests",
 }
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
-SKILL_STATES = {"development", "published", "explicit-only"}
+
+
 def parse_args() -> argparse.Namespace:
     script_root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(
@@ -164,57 +164,20 @@ def write_content_manifest(bundle_root: Path) -> None:
     )
 
 
-def load_skill_lifecycle(plugin_root: Path) -> dict[str, str]:
-    path = plugin_root / "skill-lifecycle.json"
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if data.get("schema_version") != 1 or not isinstance(data.get("skills"), dict):
-        raise SystemExit(f"Invalid skill lifecycle registry: {path}")
-    skills = data["skills"]
-    if not set(skills.values()) <= SKILL_STATES:
-        raise SystemExit(f"Invalid skill lifecycle state: {path}")
-    return skills
-
-
-def assert_skill_contract(plugin_root: Path) -> None:
+def skill_roster(plugin_root: Path) -> set[str]:
     skills_root = plugin_root / "skills"
-    lifecycle = load_skill_lifecycle(plugin_root)
-    development_skills = sorted(
-        skill_name for skill_name, state in lifecycle.items() if state == "development"
-    )
-    if development_skills:
-        raise SystemExit(
-            f"Development skills cannot be released: {development_skills}"
-        )
-    policy_mismatches: list[str] = []
-    for skill_name, state in lifecycle.items():
-        interface = skills_root / skill_name / "agents/openai.yaml"
-        is_explicit_only = (
-            interface.is_file()
-            and re.search(
-                r"(?m)^\s*allow_implicit_invocation:\s*false\s*$",
-                interface.read_text(encoding="utf-8"),
-            )
-            is not None
-        )
-        if is_explicit_only != (state == "explicit-only"):
-            policy_mismatches.append(skill_name)
-    if policy_mismatches:
-        raise SystemExit(
-            "Lifecycle state does not match invocation policy: "
-            f"{sorted(policy_mismatches)}"
-        )
-    expected_skills = set(lifecycle)
-    actual_skills = {
+    return {
         path.name
         for path in skills_root.iterdir()
         if path.is_dir() and (path / "SKILL.md").is_file()
     }
-    if actual_skills != expected_skills:
-        missing = sorted(expected_skills - actual_skills)
-        unexpected = sorted(actual_skills - expected_skills)
-        raise SystemExit(
-            f"Unexpected skill roster; missing={missing}, unexpected={unexpected}"
-        )
+
+
+def assert_skill_contract(plugin_root: Path) -> None:
+    skills_root = plugin_root / "skills"
+    actual_skills = skill_roster(plugin_root)
+    if not actual_skills:
+        raise SystemExit(f"Plugin contains no skills: {skills_root}")
 
     actual_user_interfaces = {
         skill_name
@@ -235,7 +198,6 @@ def assert_bundle_contract(bundle_root: Path, version: str) -> None:
     required = [
         marketplace_path,
         bundled_plugin / ".codex-plugin/plugin.json",
-        bundled_plugin / "skill-lifecycle.json",
         bundled_plugin / "README.md",
         bundled_plugin / "skills/paper2ppt/SKILL.md",
         bundled_plugin / "skills/ppt-master/SKILL.md",
@@ -246,7 +208,7 @@ def assert_bundle_contract(bundle_root: Path, version: str) -> None:
         bundle_root / "README.md",
         bundle_root / "MANIFEST.sha256",
     ]
-    expected_skills = set(load_skill_lifecycle(bundled_plugin))
+    expected_skills = skill_roster(bundled_plugin)
     required.extend(
         bundled_plugin / "skills" / skill_name / "SKILL.md"
         for skill_name in sorted(expected_skills)

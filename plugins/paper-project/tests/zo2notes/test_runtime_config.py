@@ -80,9 +80,8 @@ def test_auto_mode_resolves_to_detected_environment(tmp_path: Path) -> None:
     assert config.sources["mode"] == "automatic"
 
 
-@pytest.mark.parametrize(
-    "content, message",
-    [
+def test_invalid_configuration_fails_without_fallback(tmp_path: Path) -> None:
+    invalid_cases = [
         ("not valid toml = [", "Invalid TOML"),
         ("version = 2\n", "version"),
         ('version = 1\n[zotero]\nmode = "remote"\n', "mode"),
@@ -95,16 +94,13 @@ def test_auto_mode_resolves_to_detected_environment(tmp_path: Path) -> None:
             'version = 1\n[[attachments.path_mappings]]\nwindows_prefix = "C:\\\\Papers"\n',
             "local_prefix",
         ),
-    ],
-)
-def test_invalid_configuration_fails_without_fallback(
-    tmp_path: Path, content: str, message: str
-) -> None:
+    ]
     path = tmp_path / ".config" / "zo2notes" / "config.toml"
     path.parent.mkdir(parents=True)
-    path.write_text(content, encoding="utf-8")
-    with pytest.raises(ConfigError, match=message):
-        load_runtime_config({}, {}, "Linux", "6.8", "Linux", tmp_path)
+    for content, message in invalid_cases:
+        path.write_text(content, encoding="utf-8")
+        with pytest.raises(ConfigError, match=message):
+            load_runtime_config({}, {}, "Linux", "6.8", "Linux", tmp_path)
 
 
 def runtime(*, mode: str, host: str | None, port: int = 23119) -> RuntimeConfig:
@@ -149,19 +145,17 @@ def test_native_mode_has_only_loopback_default() -> None:
     assert [endpoint.url for endpoint in endpoints] == ["http://127.0.0.1:23119"]
 
 
-@pytest.mark.parametrize(
-    "route_output",
-    [
+def test_default_gateway_rejects_unusable_routes() -> None:
+    unusable_routes = [
         "",
         "default via 127.0.0.1 dev eth0",
         "default via 0.0.0.0 dev eth0",
         "default via 224.0.0.1 dev eth0",
         "default via not-an-ip dev eth0",
-    ],
-)
-def test_default_gateway_rejects_unusable_routes(route_output: str) -> None:
-    with pytest.raises(ConfigError, match="gateway"):
-        default_gateway(route_output)
+    ]
+    for route_output in unusable_routes:
+        with pytest.raises(ConfigError, match="gateway"):
+            default_gateway(route_output)
 
 
 def test_wsl_default_gateway_invokes_ip_without_shell() -> None:

@@ -1,32 +1,21 @@
 # YZ Skills 开发上下文
 
-本仓库集中维护三个 Codex 插件。插件发布单元位于 `plugins/`；资源优先与 owning skill 共置，只有多 skill 实际消费的资源进入插件级 `resources/`。旧路径与迁移状态记录在 `docs/migrations/2026-09-04-plugin-consolidation.md`。
+本仓库集中维护四个 Codex 插件。插件发布单元位于 `plugins/`；资源优先与 owning skill 共置，只有多 skill 实际消费的资源进入插件级 `resources/`。
 
 ## 插件导航
 
 定位任务所属插件时，读取 [AGENTS.md 的插件导航](AGENTS.md#插件导航)；了解常用 skill 的功能时，读取 [README.md](README.md)。
 
-## 技能生命周期
+## Skill 收录与调用
 
-Skill 本身是生命周期主体，不设置独立版本号；每个 Skill 在任一时刻只处于开发中、已发布或停用三种状态之一。状态沿“开发中 → 已发布 ⇄ 停用”转换。
+**Skill roster**:
+一个插件当前收录的 skill 集合，以该插件下实际存在的 `skills/*/SKILL.md` 为唯一事实源。
 
-**Skill 生命周期清单（Skill Lifecycle Registry）**:
-所属插件维护的机器可读当前状态事实源，逐一标记 Skill 为开发中、已发布或停用。
+**调用策略（Invocation Policy）**:
+Skill 是否允许 Codex 隐式选择的运行时策略；默认允许隐式调用，仅限用户主动调用的入口在 `agents/openai.yaml` 声明 `allow_implicit_invocation: false`。
 
-**Skill 状态转换（Skill State Transition）**:
-Skill 生命周期状态的改变；每次转换都在迁移日志记录原因、生效插件版本及适用的替代 Skill 或验证结果。
-
-**开发中（In Development）**:
-尚未进入过正式插件发布包的 Skill。
-
-**已发布（Published）**:
-已经进入正式插件发布包且允许 Codex 隐式调用的 Skill；后续维护不改变其已发布状态。
-
-**停用（Explicit-only）**:
-仍保留在所属插件中并允许用户显式调用，但 Codex 不得隐式调用的 Skill。
-_Avoid_: 冻结
-
-删除不是 Skill 的生命周期状态。Skill 只能从停用状态删除；删除后不再属于当前 Skill 集合，其旧路径和删除原因只保留在迁移日志中。
+**Skill Incubator**:
+可安装、可发布并允许正常调用的通用 skill 试验场。Skill 是否继续留在其中或形成独立插件，由维护者根据领域边界、依赖与发布需要逐项决定。
 
 ## Calc Project 计算插件术语
 
@@ -40,7 +29,7 @@ _Avoid_: 计算模板，任务专用脚本
 
 ## Paper Project
 
-`plugins/paper-project` 面向学术研究与论文工作；多个活动 skill 共用的写作资源位于插件内 [resources/](plugins/paper-project/resources/)。Cangjie 当前停用且仅允许显式调用，未来另行设计。
+`plugins/paper-project` 面向学术研究与论文工作；多个活动 skill 共用的写作资源位于插件内 [resources/](plugins/paper-project/resources/)。
 
 ## Plugin Resources
 

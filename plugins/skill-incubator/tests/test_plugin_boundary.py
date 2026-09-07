@@ -13,31 +13,39 @@ def load_json(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_skill_incubator_owns_presentation_skills() -> None:
+def check_skill_incubator_owns_expected_skills() -> None:
     manifest = load_json(PLUGIN / ".codex-plugin" / "plugin.json")
     assert manifest["name"] == "skill-incubator"
 
-    lifecycle = load_json(PLUGIN / "skill-lifecycle.json")
-    assert lifecycle == {
-        "schema_version": 1,
-        "skills": {
-            "paper2ppt": "published",
-            "ppt-master": "published",
-        },
+    skill_names = {
+        path.parent.name for path in (PLUGIN / "skills").glob("*/SKILL.md")
     }
-
-    for skill_name in lifecycle["skills"]:
+    assert skill_names == {
+        "cangjie-skill",
+        "nature-response",
+        "paper2ppt",
+        "ppt-master",
+        "scholar-evaluation",
+        "scientific-critical-thinking",
+    }
+    for skill_name in skill_names:
         assert (PLUGIN / "skills" / skill_name / "SKILL.md").is_file()
         assert not (PAPER / "skills" / skill_name).exists()
 
 
-def test_paper_project_no_longer_lists_presentation_skills() -> None:
-    lifecycle = load_json(PAPER / "skill-lifecycle.json")
-    assert "paper2ppt" not in lifecycle["skills"]
-    assert "ppt-master" not in lifecycle["skills"]
+def check_paper_project_no_longer_owns_incubator_skills() -> None:
+    for skill_name in (
+        "cangjie-skill",
+        "nature-response",
+        "paper2ppt",
+        "ppt-master",
+        "scholar-evaluation",
+        "scientific-critical-thinking",
+    ):
+        assert not (PAPER / "skills" / skill_name).exists()
 
 
-def test_paper2ppt_consumer_path_resolves_to_bundled_ppt_master() -> None:
+def check_paper2ppt_consumer_path_resolves_to_bundled_ppt_master() -> None:
     manifest = (PLUGIN / "skills" / "paper2ppt" / "manifest.yaml").read_text(
         encoding="utf-8"
     )
@@ -45,7 +53,7 @@ def test_paper2ppt_consumer_path_resolves_to_bundled_ppt_master() -> None:
     assert (PLUGIN / "skills" / "ppt-master" / "SKILL.md").is_file()
 
 
-def test_paper2ppt_owns_its_terminology_resource() -> None:
+def check_paper2ppt_owns_its_terminology_resource() -> None:
     paper2ppt = PLUGIN / "skills" / "paper2ppt"
     manifest = (paper2ppt / "manifest.yaml").read_text(encoding="utf-8")
     local_resource = (
@@ -62,7 +70,7 @@ def test_paper2ppt_owns_its_terminology_resource() -> None:
     assert "../../resources/paper-writing" not in manifest
 
 
-def test_paper2ppt_names_only_its_public_cross_plugin_dependency() -> None:
+def check_paper2ppt_names_only_its_public_cross_plugin_dependency() -> None:
     paper2ppt = PLUGIN / "skills" / "paper2ppt"
     runtime_docs = [
         paper2ppt / "README.md",
@@ -78,7 +86,7 @@ def test_paper2ppt_names_only_its_public_cross_plugin_dependency() -> None:
     assert "plugins/paper-project/resources" not in combined
 
 
-def test_terminology_ledger_is_owned_by_each_remaining_consumer() -> None:
+def check_terminology_ledger_is_owned_by_each_remaining_consumer() -> None:
     relative = Path("references/paper-writing/write-terminology-ledger.md")
     assert (PLUGIN / "skills" / "paper2ppt" / relative).is_file()
     assert (PAPER / "skills" / "prl-polishing" / relative).is_file()
@@ -87,7 +95,7 @@ def test_terminology_ledger_is_owned_by_each_remaining_consumer() -> None:
     ).exists()
 
 
-def test_repository_navigation_exposes_skill_incubator() -> None:
+def check_repository_navigation_exposes_skill_incubator() -> None:
     marketplace = load_json(ROOT / ".agents" / "plugins" / "marketplace.json")
     entries = {entry["name"]: entry for entry in marketplace["plugins"]}
     assert entries["skill-incubator"]["source"]["path"] == (
@@ -103,3 +111,13 @@ def test_repository_navigation_exposes_skill_incubator() -> None:
     assert "plugins/skill-incubator/skills/ppt-master/SKILL.md" in readme
     assert "`paper2ppt`" not in paper_readme
     assert "`ppt-master`" not in paper_readme
+
+
+def test_skill_incubator_boundary() -> None:
+    check_skill_incubator_owns_expected_skills()
+    check_paper_project_no_longer_owns_incubator_skills()
+    check_paper2ppt_consumer_path_resolves_to_bundled_ppt_master()
+    check_paper2ppt_owns_its_terminology_resource()
+    check_paper2ppt_names_only_its_public_cross_plugin_dependency()
+    check_terminology_ledger_is_owned_by_each_remaining_consumer()
+    check_repository_navigation_exposes_skill_incubator()

@@ -10,7 +10,7 @@ PLUGIN = Path(__file__).resolve().parents[1]
 BUILD = PLUGIN / "scripts" / "build_marketplace_release.py"
 
 
-def test_release_contains_both_presentation_skills(tmp_path: Path) -> None:
+def test_release_contains_all_incubating_skills(tmp_path: Path) -> None:
     subprocess.run(
         [
             sys.executable,
@@ -32,6 +32,10 @@ def test_release_contains_both_presentation_skills(tmp_path: Path) -> None:
     prefix = "skill-incubator-marketplace/plugins/skill-incubator/"
     assert prefix + "skills/paper2ppt/SKILL.md" in names
     assert prefix + "skills/ppt-master/SKILL.md" in names
+    assert prefix + "skills/cangjie-skill/SKILL.md" in names
+    assert prefix + "skills/nature-response/SKILL.md" in names
+    assert prefix + "skills/scholar-evaluation/SKILL.md" in names
+    assert prefix + "skills/scientific-critical-thinking/SKILL.md" in names
     assert prefix + "skills/ppt-master/LICENSE" in names
     assert prefix + "scripts/ppt_master_provenance.json" in names
     assert prefix + "templates/ppt-master-openai.yaml" in names

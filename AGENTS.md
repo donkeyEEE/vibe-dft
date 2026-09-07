@@ -6,18 +6,17 @@
 
 - [calc-project](plugins/calc-project/)：科研计算项目结构、任务元数据、数据同步与 VASP、DMFT、NAMD、磁性计算工作流。计算输入与计算模板维护进入此插件。
 - [paper-project](plugins/paper-project/)：文献整理、论文与学位论文写作、引用核验和科学图件。研究证据与学术表达任务进入此插件。
-- [skill-incubator](plugins/skill-incubator/)：论文到演示素材的适配与可编辑 PPTX 生成、填充、增强和模板工作流。演示文稿任务进入此插件。
+- [skill-incubator](plugins/skill-incubator/)：可安装、可发布的通用 skill 试验场；当前包含演示文稿、审稿回复、学术评价、科学批判和待重设计的知识蒸馏入口。尚未形成独立领域边界的 skill 进入此插件。
 - [osm-project](plugins/osm-project/)：将当前对话中的项目进展整理为草稿，经确认后写入 Obsidian Daily Note。用户要求记录项目日志时进入此插件。
 
-上游来源和常用 skill 功能见 [README.md](README.md)。选择具体 skill 时，核对所属插件的 `skill-lifecycle.json` 与该 skill 的 `SKILL.md`；停用入口仅在用户显式调用时使用。
+上游来源和常用 skill 功能见 [README.md](README.md)。插件的 `skills/*/SKILL.md` 目录集合是 Skill roster；选择具体 skill 时读取其 `SKILL.md`。调用策略以该 skill 的 `agents/openai.yaml` 为准。
 
 ## 工作入口
 
 - 修改任一插件、插件清单、skill 或发布资源时，读取 `CONTEXT.md` 中对应章节。
-- 修改 skill 生命周期状态时，读取 `CONTEXT.md` 的技能生命周期章节，更新所属插件的 `skill-lifecycle.json`，同步 `agents/openai.yaml` 调用策略，并在迁移日志记录转换。
-- 审查 skill 生命周期变更时，将清单与基线 revision 对比，只接受“开发中 → 已发布 ⇄ 停用”；删除项的基线状态必须为停用。当前快照测试不替代这项历史审查。
+- 修改 skill 的隐式调用能力时，更新其 `agents/openai.yaml`；默认允许隐式调用，只有仅限用户显式调用的入口才声明 `allow_implicit_invocation: false`。
+- 新增或删除 skill 时，直接修改所属插件的 `skills/` 目录并按普通代码审查验证；仓库不维护 skill 生命周期状态或独立 roster 清单。
 - 修改 skill 所属资源、插件共享资源、计算模板或其消费路径时，读取 `CONTEXT.md` 的 Paper Project、Calc Project 和 Plugin Resources 章节。
-- 核对迁移路径、旧目录、排除项或迁移状态时，读取 `docs/migrations/2026-09-04-plugin-consolidation.md`；历史迁移映射只在该日志维护。
 
 ## 仓库规则
 
@@ -25,5 +24,5 @@
 - 只有至少两个活动 skill 实际消费的资源才进入所属插件的 `resources/`；消费者直接声明精确相对路径。
 - 修改资源消费 seam 时，联动验证 consuming skills、相对路径和插件发布包。
 - 保留用户已有改动；提交只包含当前任务范围。
-- 变更完成前运行与范围相称的测试，并在迁移日志记录跨目录迁移或运行时路径变更。
+- 变更完成前运行与范围相称的测试。
 - 安装、发布、删除源仓库或改写外部环境需要用户明确授权。

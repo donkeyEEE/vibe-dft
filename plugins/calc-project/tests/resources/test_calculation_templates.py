@@ -28,13 +28,13 @@ def inventory(root: Path) -> set[str]:
     return {path.relative_to(root).as_posix() for path in root.rglob("*.template")}
 
 
-def test_calculation_template_inventory_matches_resource_owners() -> None:
+def check_calculation_template_inventory_matches_resource_owners() -> None:
     """Catch a template assigned to the wrong owner or lost during packaging."""
     assert inventory(SHARED) == EXPECTED_SHARED
     assert inventory(MAGNETIC) == EXPECTED_MAGNETIC
 
 
-def test_shared_templates_declare_multiple_workflow_consumers() -> None:
+def check_shared_templates_declare_multiple_workflow_consumers() -> None:
     """Catch shared calculation resources becoming an undifferentiated dump."""
     declaration = (SHARED / "README.md").read_text(encoding="utf-8")
     assert "calc-workflows" in declaration
@@ -43,7 +43,7 @@ def test_shared_templates_declare_multiple_workflow_consumers() -> None:
     assert "script-management" in declaration
 
 
-def test_calc_acceptance_is_recorded() -> None:
+def check_calc_acceptance_is_recorded() -> None:
     """Catch promoting calculation templates without calc-owner evidence."""
     acceptance = (SHARED / "ACCEPTANCE.md").read_text(encoding="utf-8")
     assert "calc-project source revision" in acceptance
@@ -51,7 +51,7 @@ def test_calc_acceptance_is_recorded() -> None:
     assert "test_magnetic_workflow.py" in acceptance
 
 
-def test_pbs_templates_keep_preparation_and_handoff_guards() -> None:
+def check_pbs_templates_keep_preparation_and_handoff_guards() -> None:
     """Catch templates that bypass prepared task inputs or scheduler guards."""
     pbs_templates = tuple(SHARED.glob("**/*.pbs.template")) + tuple(
         MAGNETIC.glob("**/*.pbs.template")
@@ -65,7 +65,7 @@ def test_pbs_templates_keep_preparation_and_handoff_guards() -> None:
         assert "#PBS -o" not in text and "#PBS -e" not in text
 
 
-def test_magnetic_templates_keep_safe_input_boundaries() -> None:
+def check_magnetic_templates_keep_safe_input_boundaries() -> None:
     """Catch magnetic templates mutating their immutable task input copies."""
     for relative in (
         "tb2j/run_tb2j.pbs.template",
@@ -75,3 +75,11 @@ def test_magnetic_templates_keep_safe_input_boundaries() -> None:
         assert 'rm -f "$RUN_INPUTS' not in text
         assert 'sed -i "$RUN_INPUTS' not in text
         assert '> "$RUN_INPUTS' not in text
+
+
+def test_calculation_template_contract() -> None:
+    check_calculation_template_inventory_matches_resource_owners()
+    check_shared_templates_declare_multiple_workflow_consumers()
+    check_calc_acceptance_is_recorded()
+    check_pbs_templates_keep_preparation_and_handoff_guards()
+    check_magnetic_templates_keep_safe_input_boundaries()

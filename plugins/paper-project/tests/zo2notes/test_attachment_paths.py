@@ -74,18 +74,16 @@ def test_unc_path_requires_explicit_mapping() -> None:
         )
 
 
-@pytest.mark.parametrize(
-    "raw",
-    [
+def test_unsafe_or_nonlocal_paths_are_rejected() -> None:
+    unsafe_paths = [
         "https://example.test/paper.pdf",
         "relative/paper.pdf",
         "/tmp/../secret/paper.pdf",
         "/tmp/paper\x00.pdf",
-    ],
-)
-def test_unsafe_or_nonlocal_paths_are_rejected(raw: str) -> None:
-    with pytest.raises(AttachmentPathError):
-        resolve_attachment_path(raw, "native", (), exists=lambda path: True)
+    ]
+    for raw in unsafe_paths:
+        with pytest.raises(AttachmentPathError):
+            resolve_attachment_path(raw, "native", (), exists=lambda path: True)
 
 
 def test_failure_message_does_not_reveal_full_path() -> None:
