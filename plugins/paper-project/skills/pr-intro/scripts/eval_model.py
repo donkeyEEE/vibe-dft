@@ -259,7 +259,7 @@ _WEB_URL = re.compile(r"(?i)\bhttps?://\S+")
 _ARXIV = re.compile(
     r"(?i)\barxiv\s*:\s*(?:\d{4}\.\d{4,5}|[a-z-]+/\d{7})(?:v\d+)?\b"
 )
-_PUBLIC_URI = re.compile(r"(?i)\b(?:zotero|file)://[^\s<>\[\]{}'\"()]+")
+_PUBLIC_URI = re.compile(r"(?i)\b(?:zotero|file)://\S+")
 _ABSOLUTE_PATH = re.compile(
     r"(?i)(^|[\s'\"(<\[])(?:/|~/|[A-Za-z]:[\\/]|\\\\)"
     r"[^\s<>\[\]{}'\"()]+",
@@ -299,7 +299,8 @@ def _redact_public_retrieval_handles(case: EvalCase, texts: Sequence[str]) -> tu
             raise ValueError("sanitized case contains a retrieval handle")
         clean = value
         clean = _WEB_URL.sub(_redact_url, clean)
-        for pattern in (_DOI, _ARXIV, _PUBLIC_URI, _RELATIVE_SOURCE_PATH):
+        clean = _PUBLIC_URI.sub(_redact_url, clean)
+        for pattern in (_DOI, _ARXIV, _RELATIVE_SOURCE_PATH):
             clean = pattern.sub(_REDACTION, clean)
         clean = _ABSOLUTE_PATH.sub(_redact_path, clean)
         if any(handle.casefold() in clean.casefold() for handle in handles):
