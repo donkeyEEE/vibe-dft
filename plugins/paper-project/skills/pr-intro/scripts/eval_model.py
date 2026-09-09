@@ -72,7 +72,12 @@ class EvalCase:
 
 @dataclass(frozen=True)
 class Dataset:
-    """A validated 15/5 paper-level evaluation dataset."""
+    """A validated 15/5 dataset in canonical split/item/type order.
+
+    Development precedes acceptance, paper keys are lexicographic within each
+    split, and SCC precedes FGCC for the same paper. Canonical construction
+    makes serialized round trips independent of caller-provided case order.
+    """
 
     cases: Sequence[EvalCase | Mapping[str, object]]
     seed: int
@@ -84,8 +89,17 @@ class Dataset:
             raise ValueError("seed must be an integer")
 
         cases = tuple(
-            case if isinstance(case, EvalCase) else EvalCase(**case)
-            for case in self.cases
+            sorted(
+                (
+                    case if isinstance(case, EvalCase) else EvalCase(**case)
+                    for case in self.cases
+                ),
+                key=lambda case: (
+                    0 if case.split == "development" else 1,
+                    case.item_key,
+                    0 if case.case_type == "SCC" else 1,
+                ),
+            )
         )
         case_ids = [case.case_id for case in cases]
         if len(set(case_ids)) != len(case_ids):

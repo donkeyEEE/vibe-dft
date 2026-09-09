@@ -325,6 +325,21 @@ def test_dataset_serializes_as_exact_paper_group_arrays_and_round_trips():
     assert Dataset.from_record(record) == dataset
 
 
+def test_dataset_canonicalizes_non_adjacent_cases_before_round_trip():
+    cases = list(valid_cases())
+    i00_fgcc = cases.pop(1)
+    cases.append(i00_fgcc)
+
+    dataset = Dataset(cases=cases, seed=17)
+
+    assert [case.case_id for case in dataset.cases[:3]] == [
+        "I00-SCC",
+        "I00-FGCC",
+        "I01-SCC",
+    ]
+    assert Dataset.from_record(dataset.to_record()) == dataset
+
+
 def test_dataset_requires_a_recorded_seed():
     with pytest.raises(TypeError):
         Dataset(cases=valid_cases())
