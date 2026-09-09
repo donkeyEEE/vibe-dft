@@ -1,6 +1,7 @@
 import json
 import sys
 import subprocess
+import shutil
 from contextlib import contextmanager
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -108,8 +109,10 @@ def local_api(routes):
                 self.send_error(404)
                 return
             if isinstance(value, tuple):
-                status, body = value
+                status, body, *headers = value
                 self.send_response(status)
+                for name, content in (headers[0] if headers else {}).items():
+                    self.send_header(name, content)
                 self.end_headers()
                 self.wfile.write(body)
                 return
@@ -155,6 +158,75 @@ def test_acquisition_is_paginated_read_only_deduplicated_and_auditable():
     assert {skip.reason for skip in result.skipped} == {"unsupported-item-type", "fulltext-http-404"}
     assert any("start=2" in path for _, path, _ in requests)
     assert all(method == "GET" and path.startswith("/api/users/0/") and version == "3" for method, path, version in requests)
+
+
+def test_curl_transport_gets_paginated_json_without_shell_interpretation(tmp_path):
+    from build_eval_dataset import ZoteroClient
+
+    curl = shutil.which("curl")
+    if curl is None:
+        pytest.skip("curl executable unavailable")
+    executable = tmp_path / "curl with spaces;literal"
+    executable.symlink_to(curl)
+    routes = {"/api/users/0/collections": [{"key": "A"}, {"key": "B"}]}
+    with local_api(routes) as (port, requests):
+        client = ZoteroClient(port=port, page_size=1, curl_executable=str(executable))
+        assert client.list("collections") == ({"key": "A"}, {"key": "B"})
+    assert len(requests) == 3
+    assert all(method == "GET" and version == "3" for method, _, version in requests)
+
+
+@pytest.mark.parametrize("value,error", [
+    ((403, b"Private error body."), "zotero-http-403"),
+    ((302, b"{}", {"Location": "/api/users/0/redirect-target"}), "zotero-http-302"),
+    ((200, b"Private non-JSON body."), "zotero-invalid-json"),
+])
+def test_curl_transport_rejects_http_errors_redirects_and_invalid_json(value, error):
+    from build_eval_dataset import ZoteroClient
+
+    curl = shutil.which("curl")
+    if curl is None:
+        pytest.skip("curl executable unavailable")
+    with local_api({"/api/users/0/collections": value}) as (port, requests):
+        with pytest.raises(BuildError, match=f"^{error}$"):
+            ZoteroClient(port=port, curl_executable=curl).get("collections")
+    assert len(requests) == 1
+
+
+def test_curl_transport_reports_missing_executable_without_private_details(tmp_path):
+    from build_eval_dataset import ZoteroClient
+
+    with pytest.raises(BuildError, match="^zotero-connection-failed$"):
+        ZoteroClient(curl_executable=str(tmp_path / "private-missing-path")).get("collections")
+
+
+def test_export_cli_accepts_curl_executable_and_ignores_user_curl_config(tmp_path, monkeypatch):
+    curl = shutil.which("curl")
+    if curl is None:
+        pytest.skip("curl executable unavailable")
+    (tmp_path / ".curlrc").write_text('request = "POST"\nlocation\n')
+    monkeypatch.setenv("CURL_HOME", str(tmp_path))
+    routes = {
+        "/api/users/0/collections": [{"key": "C", "data": {"name": "Papers", "parentCollection": False}}],
+        "/api/users/0/collections/C/items/top": [],
+    }
+    for i in range(20):
+        routes["/api/users/0/collections/C/items/top"].append(
+            {"key": f"P{i}", "data": {"itemType": "journalArticle"}})
+        routes[f"/api/users/0/items/P{i}/children"] = [
+            {"key": f"A{i}", "data": {"itemType": "attachment"}}]
+        routes[f"/api/users/0/items/A{i}/fulltext"] = {"content": PRL_UNTITLED_FIXTURE}
+    output = tmp_path / "dataset"
+    with local_api(routes) as (port, requests):
+        completed = subprocess.run([
+            sys.executable, str(SCRIPTS / "build_eval_dataset.py"),
+            "--collection", "Papers", "--output", str(output), "--seed", "20260909",
+            "--port", str(port), "--curl-executable", curl,
+        ], capture_output=True, text=True)
+    assert completed.returncode == 0, completed.stderr
+    assert json.loads(completed.stdout) == {"status": "awaiting-agent-review", "candidate_papers": 20}
+    assert len(list((output / "sources").glob("*.json"))) == 20
+    assert all(method == "GET" for method, _, _ in requests)
 
 
 def test_candidates_do_not_claim_semantic_selection_or_paraphrase_facts():

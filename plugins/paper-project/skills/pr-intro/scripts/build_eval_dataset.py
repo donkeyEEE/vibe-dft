@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 from random import Random
 import re
+import subprocess
 import sys
 from typing import Mapping, Sequence
 from urllib.error import HTTPError, URLError
@@ -101,7 +102,8 @@ class ZoteroClient:
     """GET-only local API client; never changes preferences or uses Connector."""
 
     def __init__(self, host: str = "127.0.0.1", port: int = 23119,
-                 timeout: float = 30, page_size: int = 100):
+                 timeout: float = 30, page_size: int = 100,
+                 curl_executable: str | None = None):
         if not re.fullmatch(r"[A-Za-z0-9._-]+", host) or not 1 <= port <= 65535:
             raise BuildError("invalid Zotero host or port")
         if not 1 <= page_size <= 100:
@@ -109,6 +111,7 @@ class ZoteroClient:
         self.base = f"http://{host}:{port}/api/users/0/"
         self.timeout = timeout
         self.page_size = page_size
+        self.curl_executable = curl_executable
         self.opener = build_opener(_NoRedirect())
 
     def get(self, route: str, **params: object) -> object:
@@ -117,6 +120,31 @@ class ZoteroClient:
         url = self.base + route
         if params:
             url += "?" + urlencode(params)
+        if self.curl_executable is not None:
+            # -q must be first: user curl configuration must not introduce
+            # writes, redirects, or other requests. Pass argv directly, never
+            # through a shell, including when using Windows curl from WSL.
+            try:
+                response = subprocess.run(
+                    [self.curl_executable, "-q", "--silent", "--show-error",
+                     "--noproxy", "*", "--max-time", str(self.timeout),
+                     "--request", "GET", "--header", "Zotero-API-Version: 3",
+                     "--write-out", "\n%{http_code}", "--url", url],
+                    capture_output=True, timeout=self.timeout + 1, check=False,
+                )
+            except (OSError, subprocess.TimeoutExpired):
+                raise BuildError("zotero-connection-failed") from None
+            if response.returncode:
+                raise BuildError("zotero-connection-failed")
+            body, _, status = response.stdout.rpartition(b"\n")
+            if not re.fullmatch(rb"[1-5]\d\d", status):
+                raise BuildError("zotero-connection-failed")
+            if not 200 <= int(status) < 300:
+                raise BuildError(f"zotero-http-{int(status)}")
+            try:
+                return json.loads(body)
+            except (ValueError, UnicodeError):
+                raise BuildError("zotero-invalid-json") from None
         request = Request(url, headers={"Zotero-API-Version": "3"}, method="GET")
         try:
             with self.opener.open(request, timeout=self.timeout) as response:
@@ -650,6 +678,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.add_argument("--seed", required=True, type=int)
         parser.add_argument("--host", default="127.0.0.1")
         parser.add_argument("--port", default=23119, type=int)
+        parser.add_argument("--curl-executable", help="optional curl binary, e.g. Windows curl.exe from WSL")
     else:
         parser.add_argument("--cases", required=True, type=Path)
     args = parser.parse_args(argv)
@@ -657,7 +686,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         output = validate_output_root(args.output, repository_root)
         if stage == "export":
-            client = ZoteroClient(args.host, args.port)
+            client = ZoteroClient(args.host, args.port, curl_executable=args.curl_executable)
             keys = resolve_collection_tree(client.list("collections"), args.collection)
             fetched = fetch_collection_papers(client, keys)
             report = export_sources(fetched.papers, output, args.seed, repository_root, fetched.skipped)
