@@ -1,0 +1,7 @@
+interface:
+  display_name: "Physical Review Introduction"
+  short_description: "Draft or restructure evidence-grounded Physical Review Introductions"
+  default_prompt: "Use $pr-intro to draft or restructure this Physical Review Introduction from the confirmed research material."
+
+policy:
+  allow_implicit_invocation: true
