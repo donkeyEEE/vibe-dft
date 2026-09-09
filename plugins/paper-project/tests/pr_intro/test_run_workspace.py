@@ -77,16 +77,10 @@ def test_prepare_copies_only_runtime_files_and_sanitizes_prompts(api, inputs):
 @pytest.mark.parametrize(
     "field,value",
     [
-        ("visible_context", "See doi:10.1103/PhysRevLett.130.123456"),
-        ("visible_context", "Source: /private/dataset/sources/item-0.json"),
-        ("visible_context", "Preprint arXiv:2609.01234v2"),
-        ("visible_context", "Mirror https://example.org/paper"),
-        ("visible_context", r"Local copy \\server\share\paper.pdf"),
-        ("visible_context", "Local copy ~/papers/source.pdf"),
         ("fact_packet", ["Zotero item item-0 supplies this fact."]),
     ],
 )
-def test_prepare_refuses_to_emit_prompts_with_retrieval_handles(api, inputs, field, value):
+def test_prepare_refuses_to_emit_prompts_with_internal_retrieval_handles(api, inputs, field, value):
     skill, dataset, runs = inputs
     record = json.loads((dataset / "dataset.json").read_text())
     record["development"][0]["cases"][1][field] = value
@@ -96,6 +90,32 @@ def test_prepare_refuses_to_emit_prompts_with_retrieval_handles(api, inputs, fie
         api.prepare_run(skill, dataset, runs, "unsafe-run")
 
     assert not (runs / "unsafe-run").exists()
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "See doi:10.1103/PhysRevLett.130.123456",
+        "Source: /private/dataset/sources/public-paper.json",
+        "Preprint arXiv:2609.01234v2",
+        "Mirror https://example.org/paper",
+        r"Local copy \\server\share\paper.pdf",
+        "Local copy ~/papers/source.pdf",
+    ],
+)
+def test_prepare_redacts_public_handles_before_emitting_prompt(api, inputs, value):
+    skill, dataset, runs = inputs
+    record = json.loads((dataset / "dataset.json").read_text())
+    record["development"][0]["cases"][1]["visible_context"] = value
+    (dataset / "dataset.json").write_text(json.dumps(record))
+
+    run = api.prepare_run(skill, dataset, runs, "redacted-run")
+    prompt_text = "\n".join(
+        path.read_text() for path in (run.root / "prompts/development").glob("*.json")
+    )
+
+    assert value not in prompt_text
+    assert "[SOURCE_IDENTIFIER_REDACTED]" in prompt_text
 
 
 def test_patch_and_apply_preserve_baseline_and_immutable_files(api, inputs):

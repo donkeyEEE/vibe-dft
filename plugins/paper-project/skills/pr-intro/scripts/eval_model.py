@@ -260,34 +260,47 @@ _ARXIV = re.compile(
     r"(?i)\barxiv\s*:\s*(?:\d{4}\.\d{4,5}|[a-z-]+/\d{7})(?:v\d+)?\b"
 )
 _OBVIOUS_PATH = re.compile(
-    r"(?i)(?:\b(?:zotero|file)://|(?:^|[\s'\"(])(?:/|~/|[A-Za-z]:[\\/]|\\\\)\S+|"
+    r"(?i)(?:\b(?:zotero|file)://\S+|(?<!\S)(?:/|~/|[A-Za-z]:[\\/]|\\\\)\S+|"
     r"\bsources/[A-Za-z0-9_.-]+\.json\b)"
 )
+_REDACTION = "[SOURCE_IDENTIFIER_REDACTED]"
 
 
-def _reject_retrieval_handles(case: EvalCase, texts: Sequence[str]) -> None:
+def _redact_public_retrieval_handles(case: EvalCase, texts: Sequence[str]) -> tuple[str, ...]:
+    """Redact public handles while rejecting case-specific private handles."""
+
     handles = (case.item_key, case.attachment_key, *case.retrieval_handles)
+    redacted = []
     for value in texts:
         folded = value.casefold()
         if any(handle.casefold() in folded for handle in handles):
             raise ValueError("sanitized case contains a retrieval handle")
-        if (_DOI.search(value) or _WEB_URL.search(value) or _ARXIV.search(value)
-                or _OBVIOUS_PATH.search(value)):
+        clean = value
+        for pattern in (_WEB_URL, _DOI, _ARXIV, _OBVIOUS_PATH):
+            clean = pattern.sub(_REDACTION, clean)
+        if any(handle.casefold() in clean.casefold() for handle in handles):
             raise ValueError("sanitized case contains a retrieval handle")
+        if (_DOI.search(clean) or _WEB_URL.search(clean) or _ARXIV.search(clean)
+                or _OBVIOUS_PATH.search(clean)):
+            raise ValueError("sanitized case contains an unredacted retrieval handle")
+        redacted.append(clean)
+    return tuple(redacted)
 
 
 def sanitized_case_view(case: EvalCase) -> dict[str, object]:
     """Build the allowlisted, retrieval-handle-free child-agent view."""
 
-    _reject_retrieval_handles(case, (case.visible_context, *case.fact_packet))
+    visible_context, *fact_packet = _redact_public_retrieval_handles(
+        case, (case.visible_context, *case.fact_packet)
+    )
 
     view: dict[str, object] = {
         "case_id": case.case_id,
         "case_type": case.case_type,
-        "visible_context": case.visible_context,
+        "visible_context": visible_context,
     }
     if case.case_type == "FGCC":
-        view["fact_packet"] = list(case.fact_packet)
+        view["fact_packet"] = fact_packet
     return view
 
 

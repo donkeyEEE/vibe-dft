@@ -142,8 +142,6 @@ def test_sanitized_view_is_a_fresh_copy():
 @pytest.mark.parametrize(
     "leak",
     [
-        "ITEM1234",
-        "ATT-ITEM1234",
         "doi:10.1103/PhysRevLett.130.123456",
         "10.1103/PhysRevLett.130.123456",
         "https://arxiv.org/abs/2609.01234",
@@ -151,11 +149,11 @@ def test_sanitized_view_is_a_fresh_copy():
         "file:///private/sources/paper.pdf",
         r"\\server\share\paper.pdf",
         "~/papers/source.pdf",
-        "/private/pr-intro-evals/sources/ITEM1234.json",
-        "zotero://select/library/items/ITEM1234",
+        "/private/pr-intro-evals/sources/public-paper.json",
+        "zotero://select/library/items/OTHERKEY",
     ],
 )
-def test_sanitized_view_rejects_embedded_retrieval_handles(leak):
+def test_sanitized_view_redacts_public_retrieval_handles(leak):
     case = EvalCase(
         case_id="case-1",
         case_type="FGCC",
@@ -167,6 +165,26 @@ def test_sanitized_view_rejects_embedded_retrieval_handles(leak):
         attachment_key="ATT-ITEM1234",
         content_hash="hash-ITEM1234",
         retrieval_handles=(),
+    )
+
+    view = sanitized_case_view(case)
+
+    assert leak not in view["visible_context"]
+    assert "[SOURCE_IDENTIFIER_REDACTED]" in view["visible_context"]
+
+
+@pytest.mark.parametrize("leak", ["ITEM1234", "ATT-ITEM1234"])
+def test_sanitized_view_rejects_internal_retrieval_handles(leak):
+    case = EvalCase(
+        case_id="case-1",
+        case_type="SCC",
+        split="development",
+        visible_context=f"Scientific context with {leak}",
+        fact_packet=(),
+        reference_continuation="Hidden answer.",
+        item_key="ITEM1234",
+        attachment_key="ATT-ITEM1234",
+        content_hash="hash-ITEM1234",
     )
 
     with pytest.raises(ValueError, match="retrieval handle"):

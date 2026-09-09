@@ -161,11 +161,12 @@ Only the primary agent accesses source packets and reference continuations.
 Downstream evaluated agents receive `sanitized_case_view` from `eval_model.py`:
 visible context, case type, an opaque case ID, and FGCC facts when applicable.
 They must never receive source keys, titles, full text, or hidden continuations.
-The sanitizer rejects case/attachment keys, explicitly recorded handles, DOI and
-arXiv identifiers, HTTP(S)/Zotero/file URIs, and common local or network paths.
-This conservative list covers common machine-retrievable handles; it is not proof
-that every arbitrary identifier is harmless, so semantic review must remove any
-additional source-specific locator before finalization.
+The sanitizer always rejects an embedded item key, attachment key, or explicitly
+recorded private handle. It replaces public DOI and arXiv identifiers,
+HTTP(S)/Zotero/file URIs, and common local or network paths with
+`[SOURCE_IDENTIFIER_REDACTED]`, then scans again and fails closed if a recognized
+handle remains. This conservative list covers common machine-retrievable handles;
+semantic review must identify any additional source-specific locator.
 
 ## 3. Validate and finalize offline
 

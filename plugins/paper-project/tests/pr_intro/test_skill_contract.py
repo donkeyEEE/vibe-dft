@@ -116,3 +116,15 @@ def test_optimization_protocol_pins_every_agent_role_to_sol_low():
     ):
         assert role in protocol
     assert "Only an explicit user instruction may override" in protocol
+
+
+def test_evaluation_docs_define_public_handle_redaction_boundary():
+    evals = (SKILL_ROOT / "evals/README.md").read_text(encoding="utf-8")
+    protocol = (
+        SKILL_ROOT / "references/maintenance/optimization-protocol.md"
+    ).read_text(encoding="utf-8")
+
+    for text in (evals, protocol):
+        assert "[SOURCE_IDENTIFIER_REDACTED]" in text
+        assert "item key" in text
+        assert "attachment key" in text
