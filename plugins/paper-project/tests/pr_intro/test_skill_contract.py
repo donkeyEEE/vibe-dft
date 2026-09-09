@@ -118,6 +118,42 @@ def test_optimization_protocol_pins_every_agent_role_to_sol_low():
     assert "Only an explicit user instruction may override" in protocol
 
 
+def test_baseline_annotation_contract_enforces_single_scorer_calibration():
+    rubric = " ".join(
+        (SKILL_ROOT / "references/maintenance/scoring-rubric.md")
+        .read_text(encoding="utf-8")
+        .lower()
+        .split()
+    )
+    protocol = " ".join(
+        (SKILL_ROOT / "references/maintenance/optimization-protocol.md")
+        .read_text(encoding="utf-8")
+        .lower()
+        .split()
+    )
+
+    for requirement in (
+        "score 5 is rare",
+        "mandatory deduction",
+        "score each dimension independently",
+        "concrete evidence",
+    ):
+        assert requirement in rubric
+
+    for requirement in (
+        "one fixed scorer",
+        "complete baseline annotation pass",
+        "one final score set",
+        "aggregate <= 80",
+        "calibration failure",
+        "rescore the fixed outputs",
+    ):
+        assert requirement in protocol
+
+    for forbidden in ("transform the scores", "directly decrement"):
+        assert forbidden in protocol
+
+
 def test_evaluation_docs_define_public_handle_redaction_boundary():
     evals = (SKILL_ROOT / "evals/README.md").read_text(encoding="utf-8")
     protocol = (

@@ -16,6 +16,24 @@ implicitly: set both explicitly at dispatch, and record them in the run audit.
 Only an explicit user instruction may override this policy; tool defaults,
 task complexity, or an agent's preference may not.
 
+## Baseline annotation calibration
+
+Before development iteration, have one fixed scorer agent and context perform
+one complete baseline annotation pass over every fixed baseline output. The
+scorer uses the pinned model policy above, the unchanged dimensions, and the
+rubric's raw integer anchors. Keep one final score set per output; do not
+average, vote, reconcile multiple scorers, or retain alternate judgments as
+equivalent scores.
+
+An aggregate <= 80 is the calibration gate. An aggregate above 80 is a
+calibration failure, not evidence that the baseline is exceptionally strong.
+In that event, strengthen the general annotation guidance, then have the same
+fixed scorer rescore the fixed outputs in a complete pass from the anchors.
+Never transform the scores or directly decrement stored values to reach the
+gate. Retain only the one final score set for subsequent comparisons, record
+the calibration result in the run audit, and freeze the rubric before scoring
+any candidate.
+
 ## 1. Prepare a fixed run
 
 Use an existing Introduction dataset snapshot produced according to

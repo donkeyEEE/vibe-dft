@@ -16,6 +16,22 @@ than averaging away fabrication within a dimension. Record concise evidence
 for each score. SCC has the five shared dimensions; FGCC has all six, including
 `fact_packet_use`. The identifiers match `scripts/eval_model.py` exactly.
 
+Apply these annotation rules before consulting the table:
+
+- Score each dimension independently. Strength in one dimension cannot offset
+  a defect in another, and a defect affects multiple dimensions only when its
+  consequence genuinely bears on each anchor.
+- Score 5 is rare. Reserve it for work that satisfies the full anchor with no
+  material defect; polished or broadly successful prose alone does not qualify.
+- A matched anchor defect is a mandatory deduction: select the lower anchor
+  that describes the defect instead of subtracting points from a presumed 5.
+  Unsupported progression, scientific mismatch, weak use of a needed packet
+  fact, generic padding, imprecise expression, and ungrounded claims bear on
+  their respective dimensions even when the rest of the continuation is strong.
+- Record concrete evidence for every dimension: identify the relevant claim,
+  omission, transition, or wording and state its consequence. A score label or
+  generic adjective is not evidence.
+
 | Dimension | 1 | 2 | 3 | 4 | 5 |
 | --- | --- | --- | --- | --- | --- |
 | `logical_continuation` | Unrelated or contradictory argument; no usable next step. | Some topical connection, but an unsupported leap or repetition prevents progress. | Plausible next step with a missing bridge or weak motivation. | Coherent progression with only a minor transition or emphasis defect. | Precise, necessary progression that resolves the prior setup and motivates the next scientific question. |
