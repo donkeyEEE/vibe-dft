@@ -314,6 +314,28 @@ def materialize(output):
     return review
 
 
+def test_build_dataset_v2_rejects_a_paper_missing_one_case_type():
+    from build_eval_dataset import AgentCase, ReviewedPaper, build_dataset
+
+    papers = []
+    for paper in synthetic_papers(20):
+        cases = [
+            AgentCase("SCC", CONTEXT, HIDDEN, (), True),
+            AgentCase(
+                "FGCC",
+                CONTEXT,
+                HIDDEN,
+                ("Open question: applicability under lattice disorder.",),
+                True,
+            ),
+        ]
+        papers.append(ReviewedPaper(paper, True, tuple(cases), ()))
+    papers[0] = ReviewedPaper(papers[0].source, True, papers[0].cases[:1], ())
+
+    with pytest.raises(BuildError, match="one SCC and one FGCC"):
+        build_dataset(papers, seed=17)
+
+
 def test_staged_builder_freezes_reproducible_dataset_and_prose_free_report(tmp_path):
     from build_eval_dataset import export_sources, finalize_dataset
     from eval_model import Dataset
@@ -329,7 +351,12 @@ def test_staged_builder_freezes_reproducible_dataset_and_prose_free_report(tmp_p
     assert len(stored["acceptance"]) == 5
     report_text = (output / "build-report.json").read_text()
     report = json.loads(report_text)
+    assert report["dataset_contract"] == "balanced-v2"
     assert report["case_counts"] == {"SCC": 20, "FGCC": 20}
+    assert report["split_case_counts"] == {
+        "development": {"SCC": 15, "FGCC": 15},
+        "acceptance": {"SCC": 5, "FGCC": 5},
+    }
     assert len(report["selected_item_keys"]) == 20
     assert len(report["unselected_item_keys"]) == 3
     assert CONTEXT not in report_text and HIDDEN not in report_text
@@ -621,7 +648,7 @@ def test_exclusion_codes_preserve_boundary_and_case_decisions_in_report(tmp_path
     from build_eval_dataset import export_sources, finalize_dataset
 
     output = tmp_path / "snapshot"
-    export_sources(synthetic_papers(23), output, seed=17, repository_root=ROOT)
+    export_sources(synthetic_papers(24), output, seed=17, repository_root=ROOT)
     review = materialize(output)
     records = json.loads(review.read_text())
     reasons = ["ambiguous-boundary", "scc-requires-unknown-result", "fgcc-facts-conflict"]
@@ -630,9 +657,8 @@ def test_exclusion_codes_preserve_boundary_and_case_decisions_in_report(tmp_path
     for paper, reason in zip(records["papers"], reasons):
         paper["cases"] = []
         paper["exclusion_reasons"] = [reason]
-    retained = records["papers"][3]
-    retained["cases"] = [retained["cases"][0]]
-    retained["exclusion_reasons"] = ["fgcc-fact-packet-leakage"]
+    records["papers"][3]["cases"] = []
+    records["papers"][3]["exclusion_reasons"] = ["fgcc-fact-packet-leakage"]
     review.write_text(json.dumps(records))
     finalize_dataset(output, review, repository_root=ROOT)
     report = json.loads((output / "build-report.json").read_text())
@@ -640,7 +666,7 @@ def test_exclusion_codes_preserve_boundary_and_case_decisions_in_report(tmp_path
         ("P00", "ambiguous-boundary"), ("P01", "scc-requires-unknown-result"),
         ("P02", "fgcc-facts-conflict"), ("P03", "fgcc-fact-packet-leakage"),
     }
-    assert "P03" in report["selected_item_keys"]
+    assert "P03" not in report["selected_item_keys"]
 
 
 @pytest.mark.parametrize("reasons", [[HIDDEN], "no-eligible-case", [], ["no-eligible-case", "no-eligible-case"]])

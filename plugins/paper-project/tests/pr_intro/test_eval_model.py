@@ -65,6 +65,18 @@ def valid_cases():
     return tuple(cases)
 
 
+def balanced_cases():
+    return tuple(
+        make_case(
+            f"I{i:02d}",
+            "development" if i < 15 else "acceptance",
+            case_type,
+        )
+        for i in range(20)
+        for case_type in ("SCC", "FGCC")
+    )
+
+
 def serialized_dataset():
     return Dataset(cases=valid_cases(), seed=17).to_record()
 
@@ -481,6 +493,50 @@ def test_dataset_rejects_duplicate_case_type_for_one_paper():
         Dataset(cases=cases, seed=17)
 
 
+def test_v2_dataset_requires_one_scc_and_one_fgcc_for_every_paper():
+    cases = list(balanced_cases())
+    cases.pop(1)
+
+    with pytest.raises(ValueError, match="v2.*one SCC and one FGCC"):
+        Dataset(cases=cases, seed=17, version=2)
+
+    cases = list(balanced_cases())
+    cases[1] = make_case("I00", "development", "SCC", case_id="duplicate-scc")
+    with pytest.raises(ValueError, match="duplicate SCC case.*I00"):
+        Dataset(cases=cases, seed=17, version=2)
+
+
+def test_v2_dataset_has_balanced_case_counts_in_each_paper_split():
+    dataset = Dataset(cases=balanced_cases(), seed=17, version=2)
+
+    assert dataset.version == 2
+    assert sum(
+        case.split == "development" and case.case_type == "SCC"
+        for case in dataset.cases
+    ) == 15
+    assert sum(
+        case.split == "development" and case.case_type == "FGCC"
+        for case in dataset.cases
+    ) == 15
+    assert sum(
+        case.split == "acceptance" and case.case_type == "SCC"
+        for case in dataset.cases
+    ) == 5
+    assert sum(
+        case.split == "acceptance" and case.case_type == "FGCC"
+        for case in dataset.cases
+    ) == 5
+    assert Dataset.from_record(dataset.to_record()) == dataset
+
+
+def test_dataset_reads_v1_records_without_a_version_field():
+    payload = serialized_dataset()
+
+    loaded = Dataset.from_record(payload)
+
+    assert loaded.version == 1
+
+
 def test_serialized_dataset_rejects_duplicate_and_cross_split_membership():
     duplicate = serialized_dataset()
     duplicate["development"][1]["item_key"] = duplicate["development"][0][
@@ -576,6 +632,7 @@ def test_schema_requires_the_python_case_fields_and_closes_records():
     }
 
     assert set(schema["required"]) == {"development", "acceptance", "seed"}
+    assert schema["properties"]["version"] == {"type": "integer", "enum": [1, 2]}
     assert schema["properties"]["development"]["minItems"] == 15
     assert schema["properties"]["development"]["maxItems"] == 15
     assert schema["properties"]["acceptance"]["minItems"] == 5

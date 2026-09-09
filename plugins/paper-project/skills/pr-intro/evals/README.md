@@ -189,7 +189,11 @@ Any invalid case fails instead of being silently dropped. There must be
 at least 20 reviewed eligible papers. Sorted item keys and the recorded seed
 select exactly 20, then split them by paper into 15 development and 5 acceptance
 papers; repeated source/review inputs and seed produce identical `dataset.json`.
-Each selected paper has one or two cases. The build report records selected and
+The finalizer writes dataset version 2, which requires every selected paper to
+have exactly one SCC and one FGCC. Thus development contains 15 SCC and 15 FGCC,
+while acceptance contains 5 SCC and 5 FGCC. Version-less existing records remain
+readable as version 1 and may contain one or two cases per paper. The build report
+records `dataset_contract: balanced-v2`, per-split case counts, selected and
 unselected papers, attachment keys, source hashes, boundary confidence, SCC/FGCC
 counts, and exclusion reasons without source prose.
 

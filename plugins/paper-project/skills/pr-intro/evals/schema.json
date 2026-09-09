@@ -12,6 +12,10 @@
     "seed": {
       "type": "integer"
     },
+    "version": {
+      "type": "integer",
+      "enum": [1, 2]
+    },
     "development": {
       "type": "array",
       "minItems": 15,
@@ -30,6 +34,20 @@
     }
   },
   "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {"version": {"const": 2}},
+        "required": ["version"]
+      },
+      "then": {
+        "properties": {
+          "development": {"items": {"$ref": "#/$defs/v2DevelopmentPaper"}},
+          "acceptance": {"items": {"$ref": "#/$defs/v2AcceptancePaper"}}
+        }
+      }
+    }
+  ],
   "$comment": "The x-semantic-invariants below are not enforced by JSON Schema; Dataset.from_record enforces them.",
   "x-semantic-invariants": [
     "item_key values are unique within and across the paper-group arrays",
@@ -206,6 +224,30 @@
         }
       },
       "additionalProperties": false
+    },
+    "v2DevelopmentPaper": {
+      "allOf": [
+        {"$ref": "#/$defs/developmentPaper"},
+        {"$ref": "#/$defs/v2CasePair"}
+      ]
+    },
+    "v2AcceptancePaper": {
+      "allOf": [
+        {"$ref": "#/$defs/acceptancePaper"},
+        {"$ref": "#/$defs/v2CasePair"}
+      ]
+    },
+    "v2CasePair": {
+      "properties": {
+        "cases": {
+          "minItems": 2,
+          "maxItems": 2,
+          "allOf": [
+            {"contains": {"properties": {"case_type": {"const": "SCC"}}}},
+            {"contains": {"properties": {"case_type": {"const": "FGCC"}}}}
+          ]
+        }
+      }
     }
   }
 }

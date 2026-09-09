@@ -522,6 +522,13 @@ def build_dataset(papers: Sequence[ReviewedPaper], seed: int) -> Dataset:
     for paper in papers:
         _validate_review(paper)
     eligible = {paper.source.item_key: paper for paper in papers if paper.cases}
+    if any(
+        {case.case_type for case in paper.cases} != {"SCC", "FGCC"}
+        for paper in eligible.values()
+    ):
+        raise BuildError(
+            "balanced-v2 requires one SCC and one FGCC for every eligible paper"
+        )
     if len(eligible) < 20:
         raise BuildError("exactly 20 eligible papers required; fewer than 20 reviewed papers")
     selected = sorted(Random(seed).sample(sorted(eligible), 20))
@@ -538,7 +545,7 @@ def build_dataset(papers: Sequence[ReviewedPaper], seed: int) -> Dataset:
                 item_key=key, attachment_key=paper.source.attachment_key,
                 content_hash=paper.source.content_hash,
             ))
-    return Dataset(cases, seed)
+    return Dataset(cases, seed, version=2)
 
 
 def _private_path(root: Path, relative: str, repository_root: Path) -> Path:
@@ -716,10 +723,21 @@ def finalize_dataset(output: Path, cases_path: Path, repository_root: Path) -> D
         raise BuildError("invalid source or agent-materialized record") from None
     selected = {case.item_key for case in dataset.cases}
     report["status"] = "finalized"
+    report["dataset_contract"] = "balanced-v2"
     report["selected_item_keys"] = sorted(selected)
     report["unselected_item_keys"] = sorted(set(report["unselected_item_keys"]) - selected)
     report["case_counts"] = {kind: sum(case.case_type == kind for case in dataset.cases)
                              for kind in ("SCC", "FGCC")}
+    report["split_case_counts"] = {
+        split: {
+            kind: sum(
+                case.split == split and case.case_type == kind
+                for case in dataset.cases
+            )
+            for kind in ("SCC", "FGCC")
+        }
+        for split in ("development", "acceptance")
+    }
     report["skipped"].extend(
         asdict(SkipRecord(paper.source.item_key, paper.source.attachment_key,
                          "seeded-selection-not-chosen", paper.source.content_hash))

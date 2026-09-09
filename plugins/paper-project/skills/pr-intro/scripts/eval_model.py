@@ -87,16 +87,21 @@ class Dataset:
     Development precedes acceptance, paper keys are lexicographic within each
     split, and SCC precedes FGCC for the same paper. Canonical construction
     makes serialized round trips independent of caller-provided case order.
+    Version 1 permits one or two cases per paper for legacy snapshot reading;
+    version 2 requires exactly one SCC and one FGCC for every paper.
     """
 
     cases: Sequence[EvalCase | Mapping[str, object]]
     seed: int
+    version: Literal[1, 2] = 1
 
     def __post_init__(self) -> None:
         if isinstance(self.cases, (str, bytes)):
             raise ValueError("cases must be a sequence of EvalCase records")
         if not isinstance(self.seed, int) or isinstance(self.seed, bool):
             raise ValueError("seed must be an integer")
+        if self.version not in (1, 2) or isinstance(self.version, bool):
+            raise ValueError("dataset version must be 1 or 2")
 
         cases = tuple(
             sorted(
@@ -138,6 +143,17 @@ class Dataset:
                 )
             paper_case_types.add(membership)
 
+        if self.version == 2:
+            expected = {"SCC", "FGCC"}
+            for item_key in development | acceptance:
+                actual = {
+                    case.case_type for case in cases if case.item_key == item_key
+                }
+                if actual != expected:
+                    raise ValueError(
+                        "v2 dataset requires one SCC and one FGCC for every paper"
+                    )
+
         object.__setattr__(self, "cases", cases)
 
     def to_record(self) -> dict[str, object]:
@@ -151,6 +167,8 @@ class Dataset:
             grouped[case.split].setdefault(case.item_key, []).append(case)
 
         record: dict[str, object] = {"seed": self.seed}
+        if self.version == 2:
+            record["version"] = 2
         for split in ("development", "acceptance"):
             record[split] = [
                 {
@@ -168,9 +186,10 @@ class Dataset:
         if not isinstance(record, Mapping):
             raise ValueError("dataset record must be an object")
         expected_fields = {"seed", "development", "acceptance"}
-        if set(record) != expected_fields:
+        if set(record) not in (expected_fields, expected_fields | {"version"}):
             raise ValueError(
-                "dataset record must contain exactly seed, development, and acceptance"
+                "dataset record must contain seed, development, acceptance, and "
+                "an optional version"
             )
 
         cases: list[EvalCase] = []
@@ -231,7 +250,7 @@ class Dataset:
                         )
                     cases.append(case)
 
-        return cls(cases=cases, seed=record["seed"])
+        return cls(cases=cases, seed=record["seed"], version=record.get("version", 1))
 
 
 def _case_record(case: EvalCase) -> dict[str, object]:
