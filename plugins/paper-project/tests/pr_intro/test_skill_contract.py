@@ -98,3 +98,21 @@ def test_dataset_materialization_and_optimization_require_fresh_separate_context
 
     assert "remaining hidden suffix" not in evals
     assert "contiguous next complete argument move" in evals
+
+
+def test_optimization_protocol_pins_every_agent_role_to_sol_low():
+    protocol = (
+        SKILL_ROOT / "references/maintenance/optimization-protocol.md"
+    ).read_text(encoding="utf-8")
+
+    assert "gpt-5.6-sol" in protocol
+    assert "reasoning_effort=\"low\"" in protocol
+    for role in (
+        "optimizing primary agent",
+        "generator",
+        "scorer",
+        "acceptance coordinator",
+        "code reviewer",
+    ):
+        assert role in protocol
+    assert "Only an explicit user instruction may override" in protocol

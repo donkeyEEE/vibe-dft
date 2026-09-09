@@ -6,6 +6,16 @@ semantic diagnosis and edits; Python owns dataset validation, sanitized views,
 hashes, snapshots, diffs, and application. Ordinary writing never enters this
 workflow.
 
+## Fixed model policy
+
+Run every agent role in this optimization workflow with model `gpt-5.6-sol`
+and `reasoning_effort="low"`. This includes the optimizing primary agent, every
+generator and scorer, the acceptance coordinator, and every code reviewer or
+fix agent. Fresh-context children and CLI subprocesses inherit neither setting
+implicitly: set both explicitly at dispatch, and record them in the run audit.
+Only an explicit user instruction may override this policy; tool defaults,
+task complexity, or an agent's preference may not.
+
 ## 1. Prepare a fixed run
 
 Use an existing Introduction dataset snapshot produced according to
@@ -44,9 +54,9 @@ scripts, tests, and agent metadata are immutable for the entire run. Never copy
 them into `candidate/` or change them to improve a score. Baseline hashes and
 permissions are integrity checks, not an operating-system sandbox.
 
-Record model, reasoning effort, sampling settings, seed, candidate hashes, and
-the regression policy before the first generation. Keep those settings fixed
-for comparable runs. The default material regression rule is a decrease in the
+Record the pinned model and reasoning effort, sampling settings, seed,
+candidate hashes, and the regression policy before the first generation. Keep
+those settings fixed for comparable runs. The default material regression rule is a decrease in the
 mean normalized score of previously exercised cases, overall or in either case
 type. An alternative tolerance must be justified and fixed before scoring.
 
