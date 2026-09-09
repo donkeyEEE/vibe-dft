@@ -24,6 +24,17 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 from eval_model import Dataset, EvalCase, split_papers
 
 
+# Bump when extraction/boundary candidate behavior changes. Finalization is
+# deliberately exact-version compatible; older snapshots require a fresh export.
+EXTRACTOR_VERSION = "pr-intro-extractor-v1"
+
+
+EXCLUSION_REASONS = frozenset({
+    "ambiguous-boundary", "scc-requires-unknown-result", "fgcc-facts-conflict",
+    "fgcc-fact-packet-leakage", "no-eligible-case",
+})
+
+
 class BuildError(ValueError):
     """A safe-to-report build failure without article prose."""
 
@@ -186,12 +197,20 @@ def fetch_collection_papers(client: ZoteroClient, keys: Sequence[str]) -> FetchR
             try:
                 fulltext = client.get(f"items/{attachment_key}/fulltext")
             except BuildError as exc:
-                if str(exc) != "zotero-http-404":
+                error = str(exc)
+                if re.fullmatch(r"zotero-http-\d{3}", error):
+                    reason = error.replace("zotero-", "fulltext-", 1)
+                elif error == "zotero-invalid-json":
+                    reason = "fulltext-invalid-json"
+                else:
+                    # Transport/API unavailability remains fatal; HTTP/payload
+                    # errors are attributable to this attachment endpoint.
                     raise
-                skipped.append(SkipRecord(item_key, attachment_key, "fulltext-http-404"))
+                skipped.append(SkipRecord(item_key, attachment_key, reason))
                 continue
             if not isinstance(fulltext, dict) or not isinstance(fulltext.get("content"), str):
-                raise BuildError("zotero-invalid-fulltext-response")
+                skipped.append(SkipRecord(item_key, attachment_key, "fulltext-invalid-response"))
+                continue
             if not fulltext["content"].strip():
                 skipped.append(SkipRecord(item_key, attachment_key, "empty-fulltext"))
                 continue
@@ -354,12 +373,30 @@ class ReviewedPaper:
     source: SourcePaper
     introduction_reviewed: bool
     cases: tuple[AgentCase, ...]
+    exclusion_reasons: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "cases", tuple(self.cases))
+        if isinstance(self.exclusion_reasons, (str, bytes)):
+            raise BuildError("exclusion reasons must be an array of allowed codes")
+        object.__setattr__(self, "exclusion_reasons", tuple(self.exclusion_reasons))
 
 
 def _validate_review(paper: ReviewedPaper) -> None:
+    reasons = paper.exclusion_reasons
+    if (any(not isinstance(reason, str) or reason not in EXCLUSION_REASONS for reason in reasons)
+            or len(set(reasons)) != len(reasons)):
+        raise BuildError("exclusion reasons must be unique allowed codes")
+    if not paper.cases and not reasons:
+        raise BuildError("excluded paper requires an exclusion reason code")
+    accepted_types = {case.case_type for case in paper.cases}
+    if any(
+        (paper.cases and reason in {"ambiguous-boundary", "no-eligible-case"})
+        or ("SCC" in accepted_types and reason.startswith("scc-"))
+        or ("FGCC" in accepted_types and reason.startswith("fgcc-"))
+        for reason in reasons
+    ):
+        raise BuildError("exclusion reason conflicts with accepted cases")
     if not paper.cases:
         return
     if paper.introduction_reviewed is not True:
@@ -487,12 +524,14 @@ def export_sources(papers: Sequence[SourcePaper], output: Path, seed: int,
         seen.add(paper.item_key)
         metadata = {
             "item_key": paper.item_key, "attachment_key": paper.attachment_key,
+            "extractor_version": EXTRACTOR_VERSION,
             "content_hash": paper.content_hash, "boundary_confidence": intro.confidence,
             "start_reason": intro.start_reason, "end_reason": intro.end_reason,
         }
         # Keep all source text here so the agent can locate and verify conclusion
         # evidence without trusting a second automatic section extraction.
         packet = {**asdict(paper), "content_hash": paper.content_hash,
+                  "extractor_version": EXTRACTOR_VERSION,
                   "introduction": asdict(intro),
                   "candidates": [asdict(candidate) for candidate in
                                  (*scc, *choose_fgcc(intro, paper.abstract, ""))]}
@@ -500,10 +539,12 @@ def export_sources(papers: Sequence[SourcePaper], output: Path, seed: int,
         sources.append(metadata)
         _write_json(_private_path(output, f"sources/{paper.item_key}.json", repository_root), packet)
         reviews.append({"item_key": paper.item_key, "attachment_key": paper.attachment_key,
+                        "extractor_version": EXTRACTOR_VERSION,
                         "content_hash": paper.content_hash, "introduction_reviewed": False,
-                        "cases": []})
+                        "cases": [], "exclusion_reasons": []})
     all_keys = {paper.item_key for paper in papers} | {skip.item_key for skip in skipped}
     report = {
+        "extractor_version": EXTRACTOR_VERSION,
         "status": "awaiting-agent-review" if len(seen) >= 20 else "insufficient-candidates",
         "seed": seed, "selected_item_keys": [], "unselected_item_keys": sorted(all_keys),
         "sources": sources, "skipped": exclusions, "case_counts": {"SCC": 0, "FGCC": 0},
@@ -523,6 +564,8 @@ def finalize_dataset(output: Path, cases_path: Path, repository_root: Path) -> D
         raise BuildError("snapshot already finalized; explicitly rebuild in a new directory")
     report_path = _private_path(output, "build-report.json", repository_root)
     report = _load_json(report_path)
+    if report.get("extractor_version") != EXTRACTOR_VERSION:
+        raise BuildError("extractor version mismatch in build report; rebuild the snapshot")
     records = _load_json(validate_output_root(cases_path, repository_root))
     if set(records) != {"papers"} or not isinstance(records["papers"], list):
         raise BuildError("review file must contain a papers array")
@@ -530,15 +573,21 @@ def finalize_dataset(output: Path, cases_path: Path, repository_root: Path) -> D
     reviewed = []
     try:
         for record in records["papers"]:
-            if set(record) != {"item_key", "attachment_key", "content_hash", "introduction_reviewed", "cases"}:
+            if record.get("extractor_version") != EXTRACTOR_VERSION:
+                raise BuildError("extractor version mismatch in agent review; rebuild the snapshot")
+            if set(record) != {"item_key", "attachment_key", "content_hash", "extractor_version", "introduction_reviewed", "cases", "exclusion_reasons"}:
                 raise BuildError("invalid reviewed paper fields")
             item_key = _key(record["item_key"])
             if item_key not in sources:
                 raise BuildError("review provenance does not match exported sources")
             metadata = sources[item_key]
+            if metadata.get("extractor_version") != EXTRACTOR_VERSION:
+                raise BuildError("extractor version mismatch in source provenance; rebuild the snapshot")
             if any(record[key] != metadata[key] for key in ("attachment_key", "content_hash")):
                 raise BuildError("review provenance does not match exported sources")
             packet = _load_json(_private_path(output, f"sources/{item_key}.json", repository_root))
+            if packet.get("extractor_version") != EXTRACTOR_VERSION:
+                raise BuildError("extractor version mismatch in source packet; rebuild the snapshot")
             if _record_hash(packet) != metadata["source_packet_hash"]:
                 raise BuildError("source packet hash mismatch")
             source = SourcePaper(**{key: packet[key] for key in
@@ -549,8 +598,11 @@ def finalize_dataset(output: Path, cases_path: Path, repository_root: Path) -> D
                 raise BuildError("source provenance mismatch")
             if not isinstance(record["cases"], list):
                 raise BuildError("reviewed cases must be an array")
+            if not isinstance(record["exclusion_reasons"], list):
+                raise BuildError("exclusion reasons must be an array of allowed codes")
             reviewed.append(ReviewedPaper(source, record["introduction_reviewed"],
-                                          tuple(AgentCase(**case) for case in record["cases"])))
+                                          tuple(AgentCase(**case) for case in record["cases"]),
+                                          tuple(record["exclusion_reasons"])))
         if {paper.source.item_key for paper in reviewed} != set(sources):
             raise BuildError("review must account for every exported paper; use empty cases for exclusions")
         # Validate before treating empty cases as exclusions, then record that
@@ -558,13 +610,15 @@ def finalize_dataset(output: Path, cases_path: Path, repository_root: Path) -> D
         for paper in reviewed:
             _validate_review(paper)
         report["skipped"] = [skip for skip in report["skipped"]
-                             if skip["reason"] not in {"agent-no-eligible-case", "seeded-selection-not-chosen"}]
+                             if skip.get("stage") != "agent-review"
+                             and skip["reason"] != "seeded-selection-not-chosen"]
+        report["skipped"].extend(
+            {**asdict(SkipRecord(paper.source.item_key, paper.source.attachment_key,
+                                reason, paper.source.content_hash)), "stage": "agent-review"}
+            for paper in reviewed for reason in paper.exclusion_reasons
+        )
         if sum(bool(paper.cases) for paper in reviewed) < 20:
             report["status"] = "insufficient-reviewed-papers"
-            report["skipped"].extend(asdict(SkipRecord(paper.source.item_key,
-                                                     paper.source.attachment_key,
-                                                     "agent-no-eligible-case"))
-                                     for paper in reviewed if not paper.cases)
             _write_json(report_path, report, replace=True)
             raise BuildError("exactly 20 eligible papers required; fewer than 20 reviewed papers")
         dataset = build_dataset(reviewed, report["seed"])
@@ -578,8 +632,8 @@ def finalize_dataset(output: Path, cases_path: Path, repository_root: Path) -> D
                              for kind in ("SCC", "FGCC")}
     report["skipped"].extend(
         asdict(SkipRecord(paper.source.item_key, paper.source.attachment_key,
-                         "seeded-selection-not-chosen" if paper.cases else "agent-no-eligible-case"))
-        for paper in reviewed if paper.source.item_key not in selected
+                         "seeded-selection-not-chosen", paper.source.content_hash))
+        for paper in reviewed if paper.cases and paper.source.item_key not in selected
     )
     _write_json(dataset_path, dataset.to_record())
     _write_json(report_path, report, replace=True)

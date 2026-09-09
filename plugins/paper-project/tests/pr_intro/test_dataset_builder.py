@@ -107,6 +107,12 @@ def local_api(routes):
             if value is None:
                 self.send_error(404)
                 return
+            if isinstance(value, tuple):
+                status, body = value
+                self.send_response(status)
+                self.end_headers()
+                self.wfile.write(body)
+                return
             if isinstance(value, list):
                 query = parse_qs(url.query)
                 start = int(query.get("start", ["0"])[0])
@@ -323,13 +329,14 @@ def test_semantic_exclusions_cannot_silently_shrink_dataset(tmp_path):
     review = materialize(output)
     records = json.loads(review.read_text())
     records["papers"][0]["cases"] = []
+    records["papers"][0]["exclusion_reasons"] = ["no-eligible-case"]
     review.write_text(json.dumps(records))
     with pytest.raises(BuildError, match="20"):
         finalize_dataset(output, review, repository_root=ROOT)
     assert not (output / "dataset.json").exists()
     report = json.loads((output / "build-report.json").read_text())
     assert report["status"] == "insufficient-reviewed-papers"
-    assert any(skip["reason"] == "agent-no-eligible-case" and skip["item_key"] == "P00"
+    assert any(skip["reason"] == "no-eligible-case" and skip["item_key"] == "P00"
                for skip in report["skipped"])
 
 
@@ -343,3 +350,149 @@ def test_rejected_boundary_report_retains_attachment_hash_without_prose(tmp_path
     assert skip["content_hash"] == rejected.content_hash
     assert skip["attachment_key"] == "BADATT"
     assert rejected.fulltext not in json.dumps(report)
+
+
+@pytest.mark.parametrize("response, expected_reason", [
+    ((403, b"Private error body."), "fulltext-http-403"),
+    ((500, b"Private error body."), "fulltext-http-500"),
+    ((200, b"Private malformed JSON."), "fulltext-invalid-json"),
+    ({"unexpected": "Private malformed payload."}, "fulltext-invalid-response"),
+])
+def test_attachment_failures_skip_only_bad_attachment(response, expected_reason):
+    from build_eval_dataset import ZoteroClient, fetch_collection_papers
+
+    routes = {
+        "/api/users/0/collections/C/items/top": [
+            {"key": "P1", "data": {"itemType": "journalArticle"}},
+            {"key": "P2", "data": {"itemType": "journalArticle"}},
+        ],
+        "/api/users/0/items/P1/children": [
+            {"key": "A_BAD", "data": {"itemType": "attachment"}},
+            {"key": "B_GOOD", "data": {"itemType": "attachment"}},
+        ],
+        "/api/users/0/items/P2/children": [
+            {"key": "C_GOOD", "data": {"itemType": "attachment"}},
+        ],
+        "/api/users/0/items/A_BAD/fulltext": response,
+        "/api/users/0/items/B_GOOD/fulltext": {"content": PRL_UNTITLED_FIXTURE},
+        "/api/users/0/items/C_GOOD/fulltext": {"content": PRL_UNTITLED_FIXTURE},
+    }
+    with local_api(routes) as (port, _):
+        result = fetch_collection_papers(ZoteroClient(port=port), ["C"])
+    assert [(paper.item_key, paper.attachment_key) for paper in result.papers] == [
+        ("P1", "B_GOOD"), ("P2", "C_GOOD"),
+    ]
+    assert [(skip.item_key, skip.attachment_key, skip.reason) for skip in result.skipped] == [
+        ("P1", "A_BAD", expected_reason),
+    ]
+
+
+def test_collection_api_failure_remains_fatal():
+    from build_eval_dataset import ZoteroClient, fetch_collection_papers
+
+    with local_api({"/api/users/0/collections/C/items/top": (503, b"unavailable")}) as (port, _):
+        with pytest.raises(BuildError, match="zotero-http-503"):
+            fetch_collection_papers(ZoteroClient(port=port), ["C"])
+
+
+def test_exclusion_codes_preserve_boundary_and_case_decisions_in_report(tmp_path):
+    from build_eval_dataset import export_sources, finalize_dataset
+
+    output = tmp_path / "snapshot"
+    export_sources(synthetic_papers(23), output, seed=17, repository_root=ROOT)
+    review = materialize(output)
+    records = json.loads(review.read_text())
+    reasons = ["ambiguous-boundary", "scc-requires-unknown-result", "fgcc-facts-conflict"]
+    for paper in records["papers"]:
+        paper["exclusion_reasons"] = []
+    for paper, reason in zip(records["papers"], reasons):
+        paper["cases"] = []
+        paper["exclusion_reasons"] = [reason]
+    retained = records["papers"][3]
+    retained["cases"] = [retained["cases"][0]]
+    retained["exclusion_reasons"] = ["fgcc-fact-packet-leakage"]
+    review.write_text(json.dumps(records))
+    finalize_dataset(output, review, repository_root=ROOT)
+    report = json.loads((output / "build-report.json").read_text())
+    assert {(skip["item_key"], skip["reason"]) for skip in report["skipped"]} >= {
+        ("P00", "ambiguous-boundary"), ("P01", "scc-requires-unknown-result"),
+        ("P02", "fgcc-facts-conflict"), ("P03", "fgcc-fact-packet-leakage"),
+    }
+    assert "P03" in report["selected_item_keys"]
+
+
+@pytest.mark.parametrize("reasons", [[HIDDEN], "no-eligible-case", [], ["no-eligible-case", "no-eligible-case"]])
+def test_excluded_papers_require_validated_reason_codes(tmp_path, reasons):
+    from build_eval_dataset import export_sources, finalize_dataset
+
+    output = tmp_path / "snapshot"
+    export_sources(synthetic_papers(21), output, seed=17, repository_root=ROOT)
+    review = materialize(output)
+    records = json.loads(review.read_text())
+    for paper in records["papers"]:
+        paper["exclusion_reasons"] = []
+    records["papers"][0]["cases"] = []
+    records["papers"][0]["exclusion_reasons"] = reasons
+    review.write_text(json.dumps(records))
+    with pytest.raises(BuildError, match="exclusion reason") as error:
+        finalize_dataset(output, review, repository_root=ROOT)
+    assert HIDDEN not in str(error.value)
+    assert HIDDEN not in (output / "build-report.json").read_text()
+    assert not (output / "dataset.json").exists()
+
+
+def test_exclusion_reason_cannot_contradict_an_accepted_case(tmp_path):
+    from build_eval_dataset import export_sources, finalize_dataset
+
+    output = tmp_path / "snapshot"
+    export_sources(synthetic_papers(20), output, seed=17, repository_root=ROOT)
+    review = materialize(output)
+    records = json.loads(review.read_text())
+    for paper in records["papers"]:
+        paper["exclusion_reasons"] = []
+    records["papers"][0]["exclusion_reasons"] = ["scc-requires-unknown-result"]
+    review.write_text(json.dumps(records))
+    with pytest.raises(BuildError, match="exclusion reason"):
+        finalize_dataset(output, review, repository_root=ROOT)
+
+
+def test_export_records_matching_extractor_version_in_provenance(tmp_path):
+    from build_eval_dataset import EXTRACTOR_VERSION, export_sources
+
+    output = tmp_path / "snapshot"
+    report = export_sources(synthetic_papers(20), output, seed=17, repository_root=ROOT)
+    packet = json.loads((output / "sources/P00.json").read_text())
+    template = json.loads((output / "review-template.json").read_text())
+    assert isinstance(EXTRACTOR_VERSION, str) and EXTRACTOR_VERSION
+    assert report["extractor_version"] == EXTRACTOR_VERSION
+    assert report["sources"][0]["extractor_version"] == EXTRACTOR_VERSION
+    assert packet["extractor_version"] == EXTRACTOR_VERSION
+    assert template["papers"][0]["extractor_version"] == EXTRACTOR_VERSION
+
+
+@pytest.mark.parametrize("target", ["report", "source-metadata", "source-packet", "review", "missing-version"])
+def test_finalization_rejects_incompatible_extractor_versions(tmp_path, target):
+    from build_eval_dataset import export_sources, finalize_dataset
+
+    output = tmp_path / "snapshot"
+    export_sources(synthetic_papers(20), output, seed=17, repository_root=ROOT)
+    review = materialize(output)
+    if target == "review":
+        path = review
+    elif target == "source-packet":
+        path = output / "sources/P00.json"
+    else:
+        path = output / "build-report.json"
+    record = json.loads(path.read_text())
+    if target == "source-metadata":
+        record["sources"][0]["extractor_version"] = "unsupported-version"
+    elif target == "review":
+        record["papers"][0]["extractor_version"] = "unsupported-version"
+    elif target == "missing-version":
+        record.pop("extractor_version", None)
+    else:
+        record["extractor_version"] = "unsupported-version"
+    path.write_text(json.dumps(record))
+    with pytest.raises(BuildError, match="extractor version"):
+        finalize_dataset(output, review, repository_root=ROOT)
+    assert not (output / "dataset.json").exists()
