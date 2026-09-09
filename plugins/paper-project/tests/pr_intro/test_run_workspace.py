@@ -79,6 +79,10 @@ def test_prepare_copies_only_runtime_files_and_sanitizes_prompts(api, inputs):
     [
         ("visible_context", "See doi:10.1103/PhysRevLett.130.123456"),
         ("visible_context", "Source: /private/dataset/sources/item-0.json"),
+        ("visible_context", "Preprint arXiv:2609.01234v2"),
+        ("visible_context", "Mirror https://example.org/paper"),
+        ("visible_context", r"Local copy \\server\share\paper.pdf"),
+        ("visible_context", "Local copy ~/papers/source.pdf"),
         ("fact_packet", ["Zotero item item-0 supplies this fact."]),
     ],
 )

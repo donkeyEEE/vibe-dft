@@ -255,8 +255,12 @@ _DOI = re.compile(
     r"(?i)(?:https?://(?:dx\.)?doi\.org/|\bdoi\s*:\s*)?"
     r"\b10\.\d{4,9}/[-._;()/:A-Z0-9]+"
 )
+_WEB_URL = re.compile(r"(?i)\bhttps?://\S+")
+_ARXIV = re.compile(
+    r"(?i)\barxiv\s*:\s*(?:\d{4}\.\d{4,5}|[a-z-]+/\d{7})(?:v\d+)?\b"
+)
 _OBVIOUS_PATH = re.compile(
-    r"(?i)(?:\bzotero://|(?:^|[\s'\"(])(?:/|[A-Za-z]:[\\/])\S+|"
+    r"(?i)(?:\b(?:zotero|file)://|(?:^|[\s'\"(])(?:/|~/|[A-Za-z]:[\\/]|\\\\)\S+|"
     r"\bsources/[A-Za-z0-9_.-]+\.json\b)"
 )
 
@@ -267,7 +271,8 @@ def _reject_retrieval_handles(case: EvalCase, texts: Sequence[str]) -> None:
         folded = value.casefold()
         if any(handle.casefold() in folded for handle in handles):
             raise ValueError("sanitized case contains a retrieval handle")
-        if _DOI.search(value) or _OBVIOUS_PATH.search(value):
+        if (_DOI.search(value) or _WEB_URL.search(value) or _ARXIV.search(value)
+                or _OBVIOUS_PATH.search(value)):
             raise ValueError("sanitized case contains a retrieval handle")
 
 

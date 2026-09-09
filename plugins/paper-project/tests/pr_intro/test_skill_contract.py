@@ -95,3 +95,6 @@ def test_dataset_materialization_and_optimization_require_fresh_separate_context
     for text in (evals, protocol):
         assert "separate fresh optimizer context" in text
         assert "must not inherit" in text
+
+    assert "remaining hidden suffix" not in evals
+    assert "contiguous next complete argument move" in evals

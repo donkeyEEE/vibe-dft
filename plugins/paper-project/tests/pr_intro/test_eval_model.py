@@ -146,6 +146,11 @@ def test_sanitized_view_is_a_fresh_copy():
         "ATT-ITEM1234",
         "doi:10.1103/PhysRevLett.130.123456",
         "10.1103/PhysRevLett.130.123456",
+        "https://arxiv.org/abs/2609.01234",
+        "arXiv:2609.01234v2",
+        "file:///private/sources/paper.pdf",
+        r"\\server\share\paper.pdf",
+        "~/papers/source.pdf",
         "/private/pr-intro-evals/sources/ITEM1234.json",
         "zotero://select/library/items/ITEM1234",
     ],
@@ -161,7 +166,25 @@ def test_sanitized_view_rejects_embedded_retrieval_handles(leak):
         item_key="ITEM1234",
         attachment_key="ATT-ITEM1234",
         content_hash="hash-ITEM1234",
-        retrieval_handles=("zotero://select/library/items/ITEM1234",),
+        retrieval_handles=(),
+    )
+
+    with pytest.raises(ValueError, match="retrieval handle"):
+        sanitized_case_view(case)
+
+
+def test_sanitized_view_rejects_explicit_nonstandard_retrieval_handle():
+    case = EvalCase(
+        case_id="case-1",
+        case_type="SCC",
+        split="development",
+        visible_context="Located by library-record:alpha-7.",
+        fact_packet=(),
+        reference_continuation="Hidden answer.",
+        item_key="ITEM1234",
+        attachment_key="ATT-ITEM1234",
+        content_hash="hash-ITEM1234",
+        retrieval_handles=("library-record:alpha-7",),
     )
 
     with pytest.raises(ValueError, match="retrieval handle"):

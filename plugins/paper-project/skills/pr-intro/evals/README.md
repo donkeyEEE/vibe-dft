@@ -121,7 +121,7 @@ Each nonempty paper record has this shape (the example is synthetic):
     {
       "case_type": "SCC",
       "visible_context": "Copy the visible Introduction prefix exactly.",
-      "reference_continuation": "Copy its remaining hidden suffix exactly.",
+      "reference_continuation": "Copy the contiguous next complete argument move exactly.",
       "fact_packet": [],
       "semantic_reviewed": true
     }
@@ -140,14 +140,14 @@ The finalizer adds case IDs, paper splits and provenance to conform to
 
 Set review flags to true only after these checks:
 
-- SCC: the masked suffix can be evaluated as a continuation of the visible
+- SCC: the masked next move can be evaluated as a continuation of the visible
   argument without asking the evaluated agent to guess unknown research results.
-  A suffix containing undisclosed results requires an FGCC or exclusion.
+  A move containing undisclosed results requires an FGCC or exclusion.
 - FGCC: derive atomic facts from the Introduction, abstract and the conclusion
   located in the full text. Include the facts required for the masked argument,
   verify their support, paraphrase source wording, and remove the source's
   rhetorical ordering. Supply a nonempty array of independently phrased facts.
-  Do not reconstruct sentences or turn the reference suffix into a fill-in task.
+  Do not reconstruct sentences or turn the reference move into a fill-in task.
 - Both: verify scientific compatibility, non-fabrication, and the usefulness of
   the visible/hidden split. Python does not make these semantic judgments.
 
@@ -161,6 +161,11 @@ Only the primary agent accesses source packets and reference continuations.
 Downstream evaluated agents receive `sanitized_case_view` from `eval_model.py`:
 visible context, case type, an opaque case ID, and FGCC facts when applicable.
 They must never receive source keys, titles, full text, or hidden continuations.
+The sanitizer rejects case/attachment keys, explicitly recorded handles, DOI and
+arXiv identifiers, HTTP(S)/Zotero/file URIs, and common local or network paths.
+This conservative list covers common machine-retrievable handles; it is not proof
+that every arbitrary identifier is harmless, so semantic review must remove any
+additional source-specific locator before finalization.
 
 ## 3. Validate and finalize offline
 
