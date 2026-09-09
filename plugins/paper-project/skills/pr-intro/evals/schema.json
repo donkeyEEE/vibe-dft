@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema.json",
+  "title": "PR Introduction masked-continuation dataset",
+  "type": "object",
+  "required": [
+    "cases",
+    "seed"
+  ],
+  "properties": {
+    "cases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evalCase"
+      },
+      "minItems": 20,
+      "maxItems": 40
+    },
+    "seed": {
+      "type": "integer"
+    }
+  },
+  "additionalProperties": false,
+  "$comment": "Dataset validation additionally requires 15 development and 5 acceptance papers, grouped by item_key.",
+  "$defs": {
+    "evalCase": {
+      "type": "object",
+      "required": [
+        "case_id",
+        "case_type",
+        "split",
+        "visible_context",
+        "fact_packet",
+        "reference_continuation",
+        "item_key",
+        "attachment_key",
+        "content_hash"
+      ],
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_type": {
+          "enum": [
+            "SCC",
+            "FGCC"
+          ]
+        },
+        "split": {
+          "enum": [
+            "development",
+            "acceptance"
+          ]
+        },
+        "visible_context": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fact_packet": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "reference_continuation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "item_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attachment_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content_hash": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "case_type": {
+                "const": "SCC"
+              }
+            },
+            "required": [
+              "case_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fact_packet": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

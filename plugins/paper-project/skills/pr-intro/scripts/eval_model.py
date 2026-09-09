@@ -1,0 +1,171 @@
+"""Immutable data contract and pure helpers for PR Introduction evaluation."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from random import Random
+from typing import Literal, Mapping, Sequence, TypeAlias
+
+
+CaseType: TypeAlias = Literal["SCC", "FGCC"]
+Split: TypeAlias = Literal["development", "acceptance"]
+
+SCC_DIMENSIONS = (
+    "logical_continuation",
+    "scientific_compatibility",
+    "information_density",
+    "physical_review_expression",
+    "non_fabrication",
+)
+FGCC_DIMENSIONS = SCC_DIMENSIONS[:2] + ("fact_packet_use",) + SCC_DIMENSIONS[2:]
+
+
+def _require_nonempty_text(value: object, field_name: str) -> None:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{field_name} must be a non-empty string")
+
+
+@dataclass(frozen=True)
+class EvalCase:
+    """A complete evaluator-side masked-continuation case."""
+
+    case_id: str
+    case_type: CaseType
+    split: Split
+    visible_context: str
+    fact_packet: Sequence[str]
+    reference_continuation: str
+    item_key: str
+    attachment_key: str
+    content_hash: str
+
+    def __post_init__(self) -> None:
+        for field_name in (
+            "case_id",
+            "visible_context",
+            "reference_continuation",
+            "item_key",
+            "attachment_key",
+            "content_hash",
+        ):
+            _require_nonempty_text(getattr(self, field_name), field_name)
+
+        if self.case_type not in ("SCC", "FGCC"):
+            raise ValueError("case_type must be 'SCC' or 'FGCC'")
+        if self.split not in ("development", "acceptance"):
+            raise ValueError("split must be 'development' or 'acceptance'")
+        if isinstance(self.fact_packet, (str, bytes)):
+            raise ValueError("fact_packet must be a sequence of strings")
+
+        packet = tuple(self.fact_packet)
+        if any(not isinstance(fact, str) or not fact.strip() for fact in packet):
+            raise ValueError("fact_packet entries must be non-empty strings")
+        if len(set(packet)) != len(packet):
+            raise ValueError("fact_packet must not contain duplicate facts")
+        if self.case_type == "SCC" and packet:
+            raise ValueError("SCC cases cannot contain a fact packet")
+
+        object.__setattr__(self, "fact_packet", packet)
+
+
+@dataclass(frozen=True)
+class Dataset:
+    """A validated 15/5 paper-level evaluation dataset."""
+
+    cases: Sequence[EvalCase | Mapping[str, object]]
+    seed: int
+
+    def __post_init__(self) -> None:
+        if isinstance(self.cases, (str, bytes)):
+            raise ValueError("cases must be a sequence of EvalCase records")
+        if not isinstance(self.seed, int) or isinstance(self.seed, bool):
+            raise ValueError("seed must be an integer")
+
+        cases = tuple(
+            case if isinstance(case, EvalCase) else EvalCase(**case)
+            for case in self.cases
+        )
+        case_ids = [case.case_id for case in cases]
+        if len(set(case_ids)) != len(case_ids):
+            raise ValueError("dataset contains a duplicate case_id")
+
+        development = {case.item_key for case in cases if case.split == "development"}
+        acceptance = {case.item_key for case in cases if case.split == "acceptance"}
+        overlap = development & acceptance
+        if overlap:
+            raise ValueError(
+                "a paper cannot belong to both development and acceptance splits"
+            )
+        if len(development) != 15 or len(acceptance) != 5:
+            raise ValueError(
+                "dataset must contain exactly 15 development papers and "
+                "5 acceptance papers"
+            )
+
+        paper_case_types: set[tuple[str, CaseType]] = set()
+        for case in cases:
+            membership = (case.item_key, case.case_type)
+            if membership in paper_case_types:
+                raise ValueError(
+                    f"dataset contains a duplicate {case.case_type} case for "
+                    f"paper {case.item_key}"
+                )
+            paper_case_types.add(membership)
+
+        object.__setattr__(self, "cases", cases)
+
+
+def sanitized_case_view(case: EvalCase) -> dict[str, object]:
+    """Build the allowlisted, retrieval-handle-free child-agent view."""
+
+    view: dict[str, object] = {
+        "case_id": case.case_id,
+        "case_type": case.case_type,
+        "visible_context": case.visible_context,
+    }
+    if case.case_type == "FGCC":
+        view["fact_packet"] = list(case.fact_packet)
+    return view
+
+
+def normalized_score(scores: Mapping[str, int], case_type: CaseType) -> float:
+    """Validate a rubric score mapping and normalize it to a percentage."""
+
+    if case_type == "SCC":
+        dimensions = SCC_DIMENSIONS
+    elif case_type == "FGCC":
+        dimensions = FGCC_DIMENSIONS
+    else:
+        raise ValueError("case type must be 'SCC' or 'FGCC'")
+
+    if set(scores) != set(dimensions):
+        raise ValueError(
+            f"{case_type} scores must contain exactly these dimensions: "
+            f"{', '.join(dimensions)}"
+        )
+    if any(
+        not isinstance(value, int) or isinstance(value, bool) or not 1 <= value <= 5
+        for value in scores.values()
+    ):
+        raise ValueError("dimension scores must be integers between 1 and 5")
+
+    return sum(scores[dimension] for dimension in dimensions) * 100.0 / (
+        len(dimensions) * 5
+    )
+
+
+def split_papers(item_keys: Sequence[str], seed: int) -> dict[str, list[str]]:
+    """Deterministically partition exactly 20 unique papers into 15 and 5."""
+
+    keys = list(item_keys)
+    if len(keys) != 20:
+        raise ValueError("paper split requires exactly 20 item keys")
+    if len(set(keys)) != len(keys):
+        raise ValueError("paper split cannot contain duplicate item keys")
+    if any(not isinstance(key, str) or not key.strip() for key in keys):
+        raise ValueError("item keys must be non-empty strings")
+    if not isinstance(seed, int) or isinstance(seed, bool):
+        raise ValueError("seed must be an integer")
+
+    Random(seed).shuffle(keys)
+    return {"development": keys[:15], "acceptance": keys[15:]}
