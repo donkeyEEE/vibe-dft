@@ -31,6 +31,30 @@ _Avoid_: 计算模板，任务专用脚本
 
 `plugins/paper-project` 面向学术研究与论文工作；多个活动 skill 共用的写作资源位于插件内 [resources/](plugins/paper-project/resources/)。
 
+**遮蔽续写测试（Masked Continuation Evaluation）**:
+向受测 agent 只提供 Introduction 的可见前文与候选 skill，由其生成被遮蔽的后续论证；评估以修辞功能、科学内容兼容性、信息密度和无虚构为主，不要求逐字复现原文。
+_Avoid_: 原文复现测试、字面续写测试
+
+**开发集（Development Set）**:
+在 skill 优化循环中可反复评估并用于定位规则缺陷的遮蔽续写样例集。
+_Avoid_: 训练集
+
+**验收集（Acceptance Set）**:
+由 Introduction 数据快照固定，不向迭代循环暴露逐例反馈，只用于判定候选 skill 相对 baseline 是否真正改善的遮蔽续写样例集。只有显式重建数据快照才会重新抽取验收集。
+_Avoid_: 测试集、开发集
+
+**结构续写样例（Structural Continuation Case, SCC）**:
+不提供未知研究结果，用于评估 skill 能否根据可见前文合理推进 Introduction 论证结构的遮蔽续写样例。
+_Avoid_: 普通样本、无条件样本
+
+**事实落地样例（Fact-Grounded Continuation Case, FGCC）**:
+向受测 agent 额外提供去除原文措辞和修辞顺序的原子事实包，用于评估 skill 能否在不虚构的前提下将研究事实放入正确论证位置的遮蔽续写样例。
+_Avoid_: 事实样本、有条件样本
+
+**Introduction 数据快照（Introduction Dataset Snapshot）**:
+由独立构建流程从用户指定的 Zotero 分类及子分类生成、供后续 skill 优化运行反复使用的本地 SCC 与 FGCC 集合。快照包含的论文原文与派生文本不进入 Git 或插件发布包，只有显式重建才更新。
+_Avoid_: 训练数据集、临时样本集
+
 ## Plugin Resources
 
 **skill 所属资源（skill-owned resource）**只服务一个 skill 并与其共置。agent 阅读的说明进入 `references/`；会复制到任务中的文件进入 `assets/`。其接口是 consuming skill 声明的精确相对路径。
