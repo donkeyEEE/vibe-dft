@@ -151,6 +151,8 @@ def test_sanitized_view_is_a_fresh_copy():
         "~/papers/source.pdf",
         "/private/pr-intro-evals/sources/public-paper.json",
         "zotero://select/library/items/OTHERKEY",
+        "http://[2001:db8::1]/paper",
+        "https://example.org/a_(b)",
         "(/private/data/paper.pdf)",
         '"C:\\papers\\paper.pdf"',
         "'~/papers/study.pdf'",
@@ -193,6 +195,19 @@ def test_sanitized_view_rejects_internal_retrieval_handles(leak):
 
     with pytest.raises(ValueError, match="retrieval handle"):
         sanitized_case_view(case)
+
+
+def test_url_redaction_consumes_balanced_url_delimiters_but_preserves_prose_punctuation():
+    case = EvalCase(
+        case_id="case-1", case_type="SCC", split="development",
+        visible_context="See (https://example.org/a_(b)), then continue.",
+        fact_packet=(), reference_continuation="Hidden answer.",
+        item_key="ITEM1234", attachment_key="ATT-ITEM1234", content_hash="hash",
+    )
+
+    assert sanitized_case_view(case)["visible_context"] == (
+        "See ([SOURCE_IDENTIFIER_REDACTED]), then continue."
+    )
 
 
 def test_sanitized_view_rejects_explicit_nonstandard_retrieval_handle():

@@ -255,7 +255,7 @@ _DOI = re.compile(
     r"(?i)(?:https?://(?:dx\.)?doi\.org/|\bdoi\s*:\s*)?"
     r"\b10\.\d{4,9}/[-._;()/:A-Z0-9]+"
 )
-_WEB_URL = re.compile(r"(?i)\bhttps?://[^\s<>\[\]{}'\"()]+")
+_WEB_URL = re.compile(r"(?i)\bhttps?://\S+")
 _ARXIV = re.compile(
     r"(?i)\barxiv\s*:\s*(?:\d{4}\.\d{4,5}|[a-z-]+/\d{7})(?:v\d+)?\b"
 )
@@ -273,6 +273,21 @@ def _redact_path(match: re.Match[str]) -> str:
     return match.group(1) + _REDACTION
 
 
+def _redact_url(match: re.Match[str]) -> str:
+    token = match.group(0)
+    suffix = ""
+    pairs = {")": "(", "]": "[", "}": "{"}
+    while token:
+        final = token[-1]
+        if final in ".,;:!?\"'":
+            token, suffix = token[:-1], final + suffix
+        elif final in pairs and token.count(final) > token.count(pairs[final]):
+            token, suffix = token[:-1], final + suffix
+        else:
+            break
+    return _REDACTION + suffix
+
+
 def _redact_public_retrieval_handles(case: EvalCase, texts: Sequence[str]) -> tuple[str, ...]:
     """Redact public handles while rejecting case-specific private handles."""
 
@@ -283,7 +298,8 @@ def _redact_public_retrieval_handles(case: EvalCase, texts: Sequence[str]) -> tu
         if any(handle.casefold() in folded for handle in handles):
             raise ValueError("sanitized case contains a retrieval handle")
         clean = value
-        for pattern in (_WEB_URL, _DOI, _ARXIV, _PUBLIC_URI, _RELATIVE_SOURCE_PATH):
+        clean = _WEB_URL.sub(_redact_url, clean)
+        for pattern in (_DOI, _ARXIV, _PUBLIC_URI, _RELATIVE_SOURCE_PATH):
             clean = pattern.sub(_REDACTION, clean)
         clean = _ABSOLUTE_PATH.sub(_redact_path, clean)
         if any(handle.casefold() in clean.casefold() for handle in handles):
