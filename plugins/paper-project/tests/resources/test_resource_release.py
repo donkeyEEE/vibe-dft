@@ -1,15 +1,18 @@
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import subprocess
 import sys
 import tarfile
 
+import pytest
+
 
 PLUGIN = Path(__file__).resolve().parents[2]
 BUILD = PLUGIN / "scripts" / "build_marketplace_release.py"
+PREFIX = "paper-project-marketplace/plugins/paper-project/"
 
 
-def test_release_contains_resources_without_retired_knowledge(tmp_path: Path) -> None:
-    """Catch release packaging that omits live resources or ships retired data."""
+@pytest.fixture
+def release_files(tmp_path: Path) -> set[str]:
     subprocess.run(
         [
             sys.executable,
@@ -26,11 +29,20 @@ def test_release_contains_resources_without_retired_knowledge(tmp_path: Path) ->
     )
     archive = next(tmp_path.glob("*.tar.gz"))
     with tarfile.open(archive) as package:
-        names = set(package.getnames())
-    prefix = "paper-project-marketplace/plugins/paper-project/"
-    assert prefix + "resources/paper-writing/README.md" in names
-    assert prefix + "skills/prl-polishing/references/paper-writing/write-reader-question-sequence.md" in names
-    assert prefix + "skills/cangjie-skill/SKILL.md" not in names
+        return set(package.getnames())
+
+
+def test_release_contains_resources_without_retired_knowledge(
+    release_files: set[str],
+) -> None:
+    """Catch release packaging that omits live resources or ships retired data."""
+    assert PREFIX + "resources/paper-writing/README.md" in release_files
+    assert (
+        PREFIX
+        + "skills/prl-polishing/references/paper-writing/write-reader-question-sequence.md"
+        in release_files
+    )
+    assert PREFIX + "skills/cangjie-skill/SKILL.md" not in release_files
     for relative in (
         "skills/zo2notes/scripts/runtime_config.py",
         "skills/zo2notes/scripts/attachment_paths.py",
@@ -38,11 +50,41 @@ def test_release_contains_resources_without_retired_knowledge(tmp_path: Path) ->
         "skills/zo2notes/references/configuration.md",
         "skills/zo2notes/references/troubleshooting.md",
     ):
-        assert prefix + relative in names
-    assert prefix + "skills/zo2notes/scripts/zotero_wsl_bridge.py" not in names
-    assert not any(name.startswith(prefix + "knowledge/") for name in names)
-    assert not any(name.startswith(prefix + "skills/prl-shared/") for name in names)
-    assert not any(name.startswith(prefix + "skills/paper2ppt/") for name in names)
-    assert not any(name.startswith(prefix + "skills/ppt-master/") for name in names)
-    assert prefix + "scripts/ppt_master_provenance.json" not in names
-    assert prefix + "templates/ppt-master-openai.yaml" not in names
+        assert PREFIX + relative in release_files
+    assert (
+        PREFIX + "skills/zo2notes/scripts/zotero_wsl_bridge.py" not in release_files
+    )
+    assert not any(name.startswith(PREFIX + "knowledge/") for name in release_files)
+    for retired_skill in ("prl-shared", "paper2ppt", "ppt-master"):
+        assert not any(
+            name.startswith(PREFIX + f"skills/{retired_skill}/")
+            for name in release_files
+        )
+    assert PREFIX + "scripts/ppt_master_provenance.json" not in release_files
+    assert PREFIX + "templates/ppt-master-openai.yaml" not in release_files
+
+
+def test_pr_intro_runtime_files_ship_without_local_eval_data(
+    release_files: set[str],
+) -> None:
+    required = (
+        "SKILL.md",
+        "agents/openai.yaml",
+        "evals/schema.json",
+        "references/maintenance/optimization-protocol.md",
+        "references/writing/pr-introduction-logic.md",
+        "references/writing/source-boundaries.md",
+        "scripts/build_eval_dataset.py",
+        "scripts/eval_model.py",
+        "scripts/prepare_optimization_run.py",
+    )
+    skill_prefix = PREFIX + "skills/pr-intro/"
+
+    for relative in required:
+        assert skill_prefix + relative in release_files
+
+    release_paths = (PurePosixPath(name) for name in release_files)
+    for path in release_paths:
+        assert path.name != "dataset.json"
+        assert "runs" not in path.parts
+        assert "tests" not in path.parts
