@@ -494,14 +494,14 @@ def _validate_review(paper: ReviewedPaper) -> None:
         if not all(isinstance(value, str) and value.strip()
                    for value in (case.visible_context, case.reference_continuation)):
             raise BuildError("case requires non-empty Introduction spans")
-        # Context is a prefix and the hidden continuation the remaining suffix;
-        # only whitespace between the two spans may be omitted.
+        # Context is a prefix and the hidden continuation begins immediately
+        # after optional whitespace. Later Introduction text may remain outside
+        # the case; semantic review certifies a complete next argument move.
         visible = case.visible_context
         hidden = case.reference_continuation
+        remainder = text[len(visible):] if text.startswith(visible) else ""
         if (not text.startswith(visible)
-                or not text.endswith(hidden)
-                or len(visible) + len(hidden) > len(text)
-                or text[len(visible):len(text) - len(hidden)].strip()):
+                or not remainder.lstrip().startswith(hidden)):
             raise BuildError("case does not match a contiguous Introduction span")
         if case.case_type == "SCC" and case.fact_packet:
             raise BuildError("SCC cannot contain a fact packet")

@@ -18,6 +18,12 @@ must not inspect that split. Rebuilding a dataset is a separate explicit action.
 Choose a fresh run ID and private persistent dataset/run locations outside Git
 repositories and outside the formal skill. From the formal skill root:
 
+Dataset construction/materialization finishes before optimization enters a
+separate fresh optimizer context. The optimizer must not inherit conversation
+history, tool results, summaries, scratch files, or other material that exposed acceptance
+text during construction. If fresh-context separation cannot be established,
+stop before preparing the optimization run.
+
 ```bash
 python scripts/prepare_optimization_run.py prepare \
   --skill-root /absolute/path/to/pr-intro \

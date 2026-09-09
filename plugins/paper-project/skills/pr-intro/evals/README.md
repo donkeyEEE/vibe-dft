@@ -129,10 +129,12 @@ Each nonempty paper record has this shape (the example is synthetic):
 }
 ```
 
-The complete file is `{"papers": [ ...paper records... ]}`. A case must split the
-entire reviewed Introduction into a nonempty prefix and its nonempty remaining
-suffix; only whitespace between the spans may be omitted. Paragraph candidates
-are suggestions; a scientifically justified sentence boundary is also accepted.
+The complete file is `{"papers": [ ...paper records... ]}`. A case uses a
+nonempty Introduction prefix followed, apart from optional whitespace, by a
+contiguous nonempty reference span covering the next complete argument move.
+Later Introduction text may remain outside the case. Gaps, reordered text and
+partial moves are invalid. Paragraph candidates are suggestions; a scientifically
+justified sentence boundary is also accepted.
 The finalizer adds case IDs, paper splits and provenance to conform to
 `scripts/eval_model.py` and `evals/schema.json`.
 
@@ -188,6 +190,11 @@ counts, and exclusion reasons without source prose.
 Once `dataset.json` exists the snapshot is immutable to this builder. Explicitly
 rebuild into a new directory to change sources, cases, seed or acceptance split.
 Keep the frozen acceptance set out of iterative development feedback.
+
+Dataset construction and semantic materialization must finish before entering a
+separate fresh optimizer context. The optimizer must not inherit
+messages, tool results, summaries, files, or other history containing acceptance
+text; it receives only the finalized dataset through the isolated protocol.
 
 ## Synthetic verification
 

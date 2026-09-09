@@ -373,6 +373,39 @@ def test_finalizer_rejects_unreviewed_leaking_or_unbound_records(tmp_path, mutat
     assert not (output / "dataset.json").exists()
 
 
+def test_finalizer_accepts_contiguous_next_move_before_later_introduction_text(tmp_path):
+    from build_eval_dataset import export_sources, finalize_dataset
+
+    output = tmp_path / "snapshot"
+    export_sources(synthetic_papers(20), output, seed=17, repository_root=ROOT)
+    review = materialize(output)
+    records = json.loads(review.read_text())
+    next_move = HIDDEN.split(" A comparison", 1)[0]
+    for paper in records["papers"]:
+        for case in paper["cases"]:
+            case["reference_continuation"] = next_move
+    review.write_text(json.dumps(records))
+
+    dataset = finalize_dataset(output, review, repository_root=ROOT)
+
+    assert all(case.reference_continuation == next_move for case in dataset.cases)
+
+
+def test_finalizer_rejects_gap_before_selected_next_move(tmp_path):
+    from build_eval_dataset import export_sources, finalize_dataset
+
+    output = tmp_path / "snapshot"
+    export_sources(synthetic_papers(20), output, seed=17, repository_root=ROOT)
+    review = materialize(output)
+    records = json.loads(review.read_text())
+    for paper in records["papers"]:
+        paper["cases"][0]["reference_continuation"] = HIDDEN.split("A comparison", 1)[1]
+    review.write_text(json.dumps(records))
+
+    with pytest.raises(BuildError, match="contiguous Introduction span"):
+        finalize_dataset(output, review, repository_root=ROOT)
+
+
 def test_insufficient_candidates_leave_auditable_failure_without_dataset(tmp_path):
     from build_eval_dataset import export_sources
 

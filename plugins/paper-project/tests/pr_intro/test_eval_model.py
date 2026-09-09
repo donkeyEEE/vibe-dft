@@ -139,6 +139,53 @@ def test_sanitized_view_is_a_fresh_copy():
     assert case.fact_packet == ("method: DFT",)
 
 
+@pytest.mark.parametrize(
+    "leak",
+    [
+        "ITEM1234",
+        "ATT-ITEM1234",
+        "doi:10.1103/PhysRevLett.130.123456",
+        "10.1103/PhysRevLett.130.123456",
+        "/private/pr-intro-evals/sources/ITEM1234.json",
+        "zotero://select/library/items/ITEM1234",
+    ],
+)
+def test_sanitized_view_rejects_embedded_retrieval_handles(leak):
+    case = EvalCase(
+        case_id="case-1",
+        case_type="FGCC",
+        split="development",
+        visible_context=f"Scientific context with {leak}",
+        fact_packet=("method: DFT",),
+        reference_continuation="Hidden answer.",
+        item_key="ITEM1234",
+        attachment_key="ATT-ITEM1234",
+        content_hash="hash-ITEM1234",
+        retrieval_handles=("zotero://select/library/items/ITEM1234",),
+    )
+
+    with pytest.raises(ValueError, match="retrieval handle"):
+        sanitized_case_view(case)
+
+
+def test_dataset_round_trip_preserves_explicit_retrieval_handles():
+    cases = list(valid_cases())
+    original = cases[0]
+    cases[0] = EvalCase(
+        **{
+            **original.__dict__,
+            "retrieval_handles": ("https://doi.org/10.1103/example", "sources/I00.json"),
+        }
+    )
+
+    loaded = Dataset.from_record(Dataset(cases=cases, seed=17).to_record())
+
+    assert loaded.cases[0].retrieval_handles == (
+        "https://doi.org/10.1103/example",
+        "sources/I00.json",
+    )
+
+
 def test_split_groups_exactly_fifteen_and_five_papers():
     item_keys = [f"I{i:02d}" for i in range(20)]
 
@@ -471,7 +518,7 @@ def test_schema_requires_the_python_case_fields_and_closes_records():
     assert schema["properties"]["acceptance"]["minItems"] == 5
     assert schema["properties"]["acceptance"]["maxItems"] == 5
     assert set(case_schema["required"]) == expected_fields
-    assert set(case_schema["properties"]) == expected_fields
+    assert set(case_schema["properties"]) == expected_fields | {"retrieval_handles"}
     assert case_schema["additionalProperties"] is False
     assert schema["$defs"]["nonBlankString"] == {
         "type": "string",

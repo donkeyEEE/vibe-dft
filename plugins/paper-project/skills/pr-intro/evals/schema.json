@@ -92,6 +92,13 @@
         },
         "content_hash": {
           "$ref": "#/$defs/nonBlankString"
+        },
+        "retrieval_handles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonBlankString"
+          },
+          "uniqueItems": true
         }
       },
       "additionalProperties": false,

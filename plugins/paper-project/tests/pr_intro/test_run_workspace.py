@@ -74,6 +74,26 @@ def test_prepare_copies_only_runtime_files_and_sanitizes_prompts(api, inputs):
     assert not (run.baseline / "SKILL.md").stat().st_mode & 0o222
 
 
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("visible_context", "See doi:10.1103/PhysRevLett.130.123456"),
+        ("visible_context", "Source: /private/dataset/sources/item-0.json"),
+        ("fact_packet", ["Zotero item item-0 supplies this fact."]),
+    ],
+)
+def test_prepare_refuses_to_emit_prompts_with_retrieval_handles(api, inputs, field, value):
+    skill, dataset, runs = inputs
+    record = json.loads((dataset / "dataset.json").read_text())
+    record["development"][0]["cases"][1][field] = value
+    (dataset / "dataset.json").write_text(json.dumps(record))
+
+    with pytest.raises(ValueError, match="retrieval handle"):
+        api.prepare_run(skill, dataset, runs, "unsafe-run")
+
+    assert not (runs / "unsafe-run").exists()
+
+
 def test_patch_and_apply_preserve_baseline_and_immutable_files(api, inputs):
     run = prepared(api, inputs)
     logic = "references/writing/logic.md"

@@ -84,3 +84,14 @@ def test_repository_navigation_lists_pr_intro():
     assert description in root_readme
     assert "[pr-intro](skills/pr-intro/SKILL.md)" in plugin_readme
     assert description in plugin_readme
+
+
+def test_dataset_materialization_and_optimization_require_fresh_separate_contexts():
+    evals = (SKILL_ROOT / "evals/README.md").read_text(encoding="utf-8").lower()
+    protocol = (
+        SKILL_ROOT / "references/maintenance/optimization-protocol.md"
+    ).read_text(encoding="utf-8").lower()
+
+    for text in (evals, protocol):
+        assert "separate fresh optimizer context" in text
+        assert "must not inherit" in text

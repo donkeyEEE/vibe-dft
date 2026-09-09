@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from random import Random
+import re
 from typing import Literal, Mapping, Sequence, TypeAlias
 
 
@@ -38,6 +39,7 @@ class EvalCase:
     item_key: str
     attachment_key: str
     content_hash: str
+    retrieval_handles: Sequence[str] = ()
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -68,6 +70,14 @@ class EvalCase:
             raise ValueError("FGCC cases require a non-empty fact packet")
 
         object.__setattr__(self, "fact_packet", packet)
+        if isinstance(self.retrieval_handles, (str, bytes)):
+            raise ValueError("retrieval_handles must be a sequence of strings")
+        handles = tuple(self.retrieval_handles)
+        if any(not isinstance(handle, str) or not handle.strip() for handle in handles):
+            raise ValueError("retrieval_handles entries must be non-empty strings")
+        if len(set(handles)) != len(handles):
+            raise ValueError("retrieval_handles must not contain duplicates")
+        object.__setattr__(self, "retrieval_handles", handles)
 
 
 @dataclass(frozen=True)
@@ -225,7 +235,7 @@ class Dataset:
 
 
 def _case_record(case: EvalCase) -> dict[str, object]:
-    return {
+    record: dict[str, object] = {
         "case_id": case.case_id,
         "case_type": case.case_type,
         "split": case.split,
@@ -236,10 +246,35 @@ def _case_record(case: EvalCase) -> dict[str, object]:
         "attachment_key": case.attachment_key,
         "content_hash": case.content_hash,
     }
+    if case.retrieval_handles:
+        record["retrieval_handles"] = list(case.retrieval_handles)
+    return record
+
+
+_DOI = re.compile(
+    r"(?i)(?:https?://(?:dx\.)?doi\.org/|\bdoi\s*:\s*)?"
+    r"\b10\.\d{4,9}/[-._;()/:A-Z0-9]+"
+)
+_OBVIOUS_PATH = re.compile(
+    r"(?i)(?:\bzotero://|(?:^|[\s'\"(])(?:/|[A-Za-z]:[\\/])\S+|"
+    r"\bsources/[A-Za-z0-9_.-]+\.json\b)"
+)
+
+
+def _reject_retrieval_handles(case: EvalCase, texts: Sequence[str]) -> None:
+    handles = (case.item_key, case.attachment_key, *case.retrieval_handles)
+    for value in texts:
+        folded = value.casefold()
+        if any(handle.casefold() in folded for handle in handles):
+            raise ValueError("sanitized case contains a retrieval handle")
+        if _DOI.search(value) or _OBVIOUS_PATH.search(value):
+            raise ValueError("sanitized case contains a retrieval handle")
 
 
 def sanitized_case_view(case: EvalCase) -> dict[str, object]:
     """Build the allowlisted, retrieval-handle-free child-agent view."""
+
+    _reject_retrieval_handles(case, (case.visible_context, *case.fact_packet))
 
     view: dict[str, object] = {
         "case_id": case.case_id,
