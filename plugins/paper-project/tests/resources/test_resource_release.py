@@ -9,6 +9,15 @@ import pytest
 PLUGIN = Path(__file__).resolve().parents[2]
 BUILD = PLUGIN / "scripts" / "build_marketplace_release.py"
 PREFIX = "paper-project-marketplace/plugins/paper-project/"
+PRIVATE_DIRECTORY_NAMES = {"runs", "sources"}
+PRIVATE_FILE_NAMES = {
+    "build-report.json",
+    "dataset.json",
+    "final-report.md",
+    "review-template.json",
+    "reviewed-cases.json",
+    "source-packets.json",
+}
 
 
 @pytest.fixture
@@ -70,8 +79,10 @@ def test_pr_intro_runtime_files_ship_without_local_eval_data(
     required = (
         "SKILL.md",
         "agents/openai.yaml",
+        "evals/README.md",
         "evals/schema.json",
         "references/maintenance/optimization-protocol.md",
+        "references/maintenance/scoring-rubric.md",
         "references/writing/pr-introduction-logic.md",
         "references/writing/source-boundaries.md",
         "scripts/build_eval_dataset.py",
@@ -85,6 +96,6 @@ def test_pr_intro_runtime_files_ship_without_local_eval_data(
 
     release_paths = (PurePosixPath(name) for name in release_files)
     for path in release_paths:
-        assert path.name != "dataset.json"
-        assert "runs" not in path.parts
+        assert PRIVATE_DIRECTORY_NAMES.isdisjoint(path.parts)
+        assert path.name not in PRIVATE_FILE_NAMES
         assert "tests" not in path.parts
