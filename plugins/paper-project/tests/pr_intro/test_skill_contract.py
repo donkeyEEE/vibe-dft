@@ -2,14 +2,38 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[4]
-SKILL = ROOT / "plugins/paper-project/skills/pr-intro/SKILL.md"
+SKILL_ROOT = ROOT / "plugins/paper-project/skills/pr-intro"
+SKILL = SKILL_ROOT / "SKILL.md"
+INTRO_LOGIC = "references/writing/pr-introduction-logic.md"
+SOURCE_BOUNDARIES = "references/writing/source-boundaries.md"
 
 
 def test_router_keeps_maintenance_explicit():
     text = SKILL.read_text(encoding="utf-8")
+    frontmatter = text.split("---", 2)[1]
     assert "explicit request to optimize `pr-intro`" in text
+    assert "explicitly asks to optimize `pr-intro`" in frontmatter
     assert "references/maintenance/optimization-protocol.md" in text
     assert "Do not load maintenance" in text
+
+
+def test_router_names_existing_writing_references():
+    text = SKILL.read_text(encoding="utf-8")
+
+    for relative_path in (INTRO_LOGIC, SOURCE_BOUNDARIES):
+        assert relative_path in text
+        assert (SKILL_ROOT / relative_path).is_file()
+
+
+def test_ordinary_route_excludes_evaluation_and_maintenance_content():
+    text = SKILL.read_text(encoding="utf-8")
+    ordinary_route = text.split("For ordinary writing", 1)[1]
+
+    assert text.count("references/maintenance/") == 1
+    for forbidden in ("evaluation", "evals/", "dataset", "SCC", "FGCC"):
+        assert forbidden not in text
+    for forbidden in ("maintenance", "optimization", "references/maintenance/"):
+        assert forbidden not in ordinary_route
 
 
 def test_runtime_contract_names_grounding_and_argument_map():
@@ -17,6 +41,36 @@ def test_runtime_contract_names_grounding_and_argument_map():
     assert "available-facts" in text
     assert "argument map" in text
     assert "do not invent" in text.lower()
+
+
+def test_writing_references_encode_six_moves_and_source_boundaries():
+    logic = (SKILL_ROOT / INTRO_LOGIC).read_text(encoding="utf-8")
+    boundaries = (SKILL_ROOT / SOURCE_BOUNDARIES).read_text(encoding="utf-8")
+    normalized_boundaries = " ".join(boundaries.split())
+    moves = (
+        "Establish the research territory",
+        "Synthesize relevant progress",
+        "Narrow to a specific unresolved problem",
+        "why that gap is a scientific obstacle",
+        "Introduce the study's research path",
+        "contribution and significance from confirmed material only",
+    )
+
+    for move in moves:
+        assert move in logic
+    for boundary in (
+        "primary source",
+        "explicitly permitted",
+        "traceable source",
+        "require direct support",
+        "Do not infer",
+    ):
+        assert boundary in normalized_boundaries
+
+
+def test_openai_interface_allows_implicit_invocation():
+    interface = (SKILL_ROOT / "agents/openai.yaml").read_text(encoding="utf-8")
+    assert "allow_implicit_invocation: true" in interface
 
 
 def test_repository_navigation_lists_pr_intro():
