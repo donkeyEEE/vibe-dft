@@ -151,6 +151,10 @@ def test_sanitized_view_is_a_fresh_copy():
         "~/papers/source.pdf",
         "/private/pr-intro-evals/sources/public-paper.json",
         "zotero://select/library/items/OTHERKEY",
+        "(/private/data/paper.pdf)",
+        '"C:\\papers\\paper.pdf"',
+        "'~/papers/study.pdf'",
+        r"(\\server\share\paper.pdf)",
     ],
 )
 def test_sanitized_view_redacts_public_retrieval_handles(leak):

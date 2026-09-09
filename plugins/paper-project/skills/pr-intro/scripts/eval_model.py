@@ -255,15 +255,22 @@ _DOI = re.compile(
     r"(?i)(?:https?://(?:dx\.)?doi\.org/|\bdoi\s*:\s*)?"
     r"\b10\.\d{4,9}/[-._;()/:A-Z0-9]+"
 )
-_WEB_URL = re.compile(r"(?i)\bhttps?://\S+")
+_WEB_URL = re.compile(r"(?i)\bhttps?://[^\s<>\[\]{}'\"()]+")
 _ARXIV = re.compile(
     r"(?i)\barxiv\s*:\s*(?:\d{4}\.\d{4,5}|[a-z-]+/\d{7})(?:v\d+)?\b"
 )
-_OBVIOUS_PATH = re.compile(
-    r"(?i)(?:\b(?:zotero|file)://\S+|(?<!\S)(?:/|~/|[A-Za-z]:[\\/]|\\\\)\S+|"
-    r"\bsources/[A-Za-z0-9_.-]+\.json\b)"
+_PUBLIC_URI = re.compile(r"(?i)\b(?:zotero|file)://[^\s<>\[\]{}'\"()]+")
+_ABSOLUTE_PATH = re.compile(
+    r"(?i)(^|[\s'\"(<\[])(?:/|~/|[A-Za-z]:[\\/]|\\\\)"
+    r"[^\s<>\[\]{}'\"()]+",
+    re.MULTILINE,
 )
+_RELATIVE_SOURCE_PATH = re.compile(r"(?i)\bsources/[A-Za-z0-9_.-]+\.json\b")
 _REDACTION = "[SOURCE_IDENTIFIER_REDACTED]"
+
+
+def _redact_path(match: re.Match[str]) -> str:
+    return match.group(1) + _REDACTION
 
 
 def _redact_public_retrieval_handles(case: EvalCase, texts: Sequence[str]) -> tuple[str, ...]:
@@ -276,12 +283,14 @@ def _redact_public_retrieval_handles(case: EvalCase, texts: Sequence[str]) -> tu
         if any(handle.casefold() in folded for handle in handles):
             raise ValueError("sanitized case contains a retrieval handle")
         clean = value
-        for pattern in (_WEB_URL, _DOI, _ARXIV, _OBVIOUS_PATH):
+        for pattern in (_WEB_URL, _DOI, _ARXIV, _PUBLIC_URI, _RELATIVE_SOURCE_PATH):
             clean = pattern.sub(_REDACTION, clean)
+        clean = _ABSOLUTE_PATH.sub(_redact_path, clean)
         if any(handle.casefold() in clean.casefold() for handle in handles):
             raise ValueError("sanitized case contains a retrieval handle")
         if (_DOI.search(clean) or _WEB_URL.search(clean) or _ARXIV.search(clean)
-                or _OBVIOUS_PATH.search(clean)):
+                or _PUBLIC_URI.search(clean) or _ABSOLUTE_PATH.search(clean)
+                or _RELATIVE_SOURCE_PATH.search(clean)):
             raise ValueError("sanitized case contains an unredacted retrieval handle")
         redacted.append(clean)
     return tuple(redacted)
