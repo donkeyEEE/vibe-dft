@@ -64,6 +64,8 @@ class EvalCase:
             raise ValueError("fact_packet must not contain duplicate facts")
         if self.case_type == "SCC" and packet:
             raise ValueError("SCC cases cannot contain a fact packet")
+        if self.case_type == "FGCC" and not packet:
+            raise ValueError("FGCC cases require a non-empty fact packet")
 
         object.__setattr__(self, "fact_packet", packet)
 
@@ -113,6 +115,113 @@ class Dataset:
             paper_case_types.add(membership)
 
         object.__setattr__(self, "cases", cases)
+
+    def to_record(self) -> dict[str, object]:
+        """Return the schema-shaped JSON-compatible dataset record."""
+
+        grouped: dict[Split, dict[str, list[EvalCase]]] = {
+            "development": {},
+            "acceptance": {},
+        }
+        for case in self.cases:
+            grouped[case.split].setdefault(case.item_key, []).append(case)
+
+        record: dict[str, object] = {"seed": self.seed}
+        for split in ("development", "acceptance"):
+            record[split] = [
+                {
+                    "item_key": item_key,
+                    "cases": [_case_record(case) for case in cases],
+                }
+                for item_key, cases in grouped[split].items()
+            ]
+        return record
+
+    @classmethod
+    def from_record(cls, record: Mapping[str, object]) -> Dataset:
+        """Validate and load a schema-shaped JSON-compatible dataset record."""
+
+        if not isinstance(record, Mapping):
+            raise ValueError("dataset record must be an object")
+        expected_fields = {"seed", "development", "acceptance"}
+        if set(record) != expected_fields:
+            raise ValueError(
+                "dataset record must contain exactly seed, development, and acceptance"
+            )
+
+        cases: list[EvalCase] = []
+        paper_memberships: dict[str, Split] = {}
+        for split, expected_count in (("development", 15), ("acceptance", 5)):
+            paper_groups = record[split]
+            if isinstance(paper_groups, (str, bytes)) or not isinstance(
+                paper_groups, Sequence
+            ):
+                raise ValueError(f"{split} must be an array of paper groups")
+            if len(paper_groups) != expected_count:
+                raise ValueError(
+                    "dataset must contain exactly 15 development papers and "
+                    "5 acceptance papers"
+                )
+
+            seen_in_split: set[str] = set()
+            for group in paper_groups:
+                if not isinstance(group, Mapping) or set(group) != {
+                    "item_key",
+                    "cases",
+                }:
+                    raise ValueError(
+                        "paper groups must contain exactly item_key and cases"
+                    )
+                item_key = group["item_key"]
+                _require_nonempty_text(item_key, "item_key")
+                if item_key in seen_in_split:
+                    raise ValueError(
+                        f"duplicate paper membership for {item_key} in {split}"
+                    )
+                if item_key in paper_memberships:
+                    raise ValueError(
+                        "a paper cannot belong to both development and acceptance "
+                        "splits"
+                    )
+                seen_in_split.add(item_key)
+                paper_memberships[item_key] = split
+
+                case_records = group["cases"]
+                if isinstance(case_records, (str, bytes)) or not isinstance(
+                    case_records, Sequence
+                ):
+                    raise ValueError("paper-group cases must be an array")
+                if not 1 <= len(case_records) <= 2:
+                    raise ValueError("each paper group must contain one or two cases")
+                for case_record in case_records:
+                    if not isinstance(case_record, Mapping):
+                        raise ValueError("case records must be objects")
+                    case = EvalCase(**case_record)
+                    if case.split != split:
+                        raise ValueError(
+                            f"case {case.case_id} split does not match its paper group"
+                        )
+                    if case.item_key != item_key:
+                        raise ValueError(
+                            f"case {case.case_id} item_key does not match its paper group"
+                        )
+                    cases.append(case)
+
+        return cls(cases=cases, seed=record["seed"])
+
+
+def _case_record(case: EvalCase) -> dict[str, object]:
+    return {
+        "case_id": case.case_id,
+        "case_type": case.case_type,
+        "split": case.split,
+        "visible_context": case.visible_context,
+        "fact_packet": list(case.fact_packet),
+        "reference_continuation": case.reference_continuation,
+        "item_key": case.item_key,
+        "attachment_key": case.attachment_key,
+        "content_hash": case.content_hash,
+    }
 
 
 def sanitized_case_view(case: EvalCase) -> dict[str, object]:
