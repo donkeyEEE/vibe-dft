@@ -17,6 +17,7 @@ from random import Random
 import re
 import subprocess
 import sys
+import unicodedata
 from typing import Mapping, Sequence
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
@@ -27,7 +28,7 @@ from eval_model import Dataset, EvalCase, split_papers
 
 # Bump when extraction/boundary candidate behavior changes. Finalization is
 # deliberately exact-version compatible; older snapshots require a fresh export.
-EXTRACTOR_VERSION = "pr-intro-extractor-v1"
+EXTRACTOR_VERSION = "pr-intro-extractor-v2"
 
 
 EXCLUSION_REASONS = frozenset({
@@ -255,14 +256,44 @@ def fetch_collection_papers(client: ZoteroClient, keys: Sequence[str]) -> FetchR
     return FetchResult(tuple(papers), tuple(skipped))
 
 
-def extract_introduction(fulltext: str) -> Introduction:
+def _normalized_characters(text: str) -> tuple[str, list[int]]:
+    """Normalize layout/typography while retaining original character offsets."""
+    characters = []
+    offsets = []
+    for offset, character in enumerate(text):
+        for normalized in unicodedata.normalize("NFKD", character).casefold():
+            if normalized.isalnum():
+                characters.append(normalized)
+                offsets.append(offset)
+    return "".join(characters), offsets
+
+
+def _abstract_end(fulltext: str, abstract: str) -> int:
+    """Require a unique complete normalized abstract; never approximate words."""
+    needle, _ = _normalized_characters(abstract)
+    if len(re.findall(r"\w+", abstract)) < 30 or len(needle) < 120:
+        raise BoundaryError("low boundary confidence: abstract-too-short")
+    haystack, offsets = _normalized_characters(fulltext)
+    match = haystack.find(needle)
+    if match < 0:
+        raise BoundaryError("low boundary confidence: abstract-not-matched")
+    if haystack.find(needle, match + 1) >= 0:
+        raise BoundaryError("low boundary confidence: abstract-match-ambiguous")
+    end = offsets[match + len(needle) - 1] + 1
+    while end < len(fulltext) and fulltext[end] in ".!?\"'”’)]} ":
+        end += 1
+    return end
+
+
+def extract_introduction(fulltext: str, abstract: str = "") -> Introduction:
     """Propose conservative boundaries in indexed text; agent review is required.
 
-    Untitled PRL starts require an end-of-front-matter marker (DOI or PACS)
-    followed by a paragraph break. Layouts lacking this evidence are rejected.
+    Untitled starts require an end-of-front-matter marker or a unique complete
+    normalized metadata abstract. Source offsets and original text are retained.
     """
     explicit = re.search(
-        r"(?im)^\s*(?:(?:[IVX]+|\d+)\.?\s+)?Introduction\s*(?:[.—–:]\s*)?$",
+        r"(?im)(?:^[ \t]*(?:(?:[IVX]+|\d+)\.?[ \t]+)?|(?<=\s)I\.[ \t]+)"
+        r"Introduction(?:[ \t]*[.—–:]+[ \t]*|[ \t]*$)",
         fulltext,
     )
     if explicit:
@@ -271,19 +302,29 @@ def extract_introduction(fulltext: str) -> Introduction:
         confidence = 0.95
     else:
         marker = re.search(
-            r"(?im)^(?:DOI\s*:|PACS(?:\s+numbers)?\s*:)[^\n]*\n\s*\n",
+            r"(?im)^(?:DOI\s*:|PACS(?:\s+numbers)?\s*:)[^\n]*\n",
             fulltext,
         )
-        if not marker:
+        if marker:
+            start = marker.end()
+            start_reason = "untitled-body-after-front-matter"
+            confidence = 0.85
+        elif abstract:
+            start = _abstract_end(fulltext, abstract)
+            start_reason = "untitled-body-after-matched-abstract"
+            confidence = 0.85
+        else:
             raise BoundaryError("low boundary confidence: no supported body start")
-        start = marker.end()
-        start_reason = "untitled-body-after-front-matter"
-        confidence = 0.85
     while start < len(fulltext) and fulltext[start].isspace():
         start += 1
     tail = fulltext[start:]
     transitions = (
-        (r"(?m)^[ \t]*[A-Z][A-Za-z /,&()-]{0,65}\.\s*[—–]", "first-run-in-heading"),
+        (r"(?m)^[ \t]*[A-Z][A-Za-z /,&()-]{0,80}(?:\.[ \t]*)?[—–]", "first-run-in-heading"),
+        (r"(?im)^[ \t]*(?:(?:[A-Z][A-Za-z -]{0,35} )?model(?: for [A-Za-z -]{1,45})?|"
+         r"Results?(?: and discussion)?|Methods?|Conclusions?)\.[ \t]+(?=[A-Z])",
+         "first-run-in-heading"),
+        (r"(?m)^[ \t]*(?:II|III|IV|V|2|3|4|5)\.[ \t]+[A-Z][^\n.]{2,100}$",
+         "numbered-section-heading"),
         (
             r"(?im)^[ \t]*(?:(?:[IVX]+|\d+)\.?[ \t]+)?"
             r"(?:Methods?|Models?|Results?(?: and discussion)?|Theory|"
@@ -402,6 +443,7 @@ class ReviewedPaper:
     introduction_reviewed: bool
     cases: tuple[AgentCase, ...]
     exclusion_reasons: tuple[str, ...] = ()
+    introduction_override: Mapping[str, object] | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "cases", tuple(self.cases))
@@ -425,11 +467,23 @@ def _validate_review(paper: ReviewedPaper) -> None:
         for reason in reasons
     ):
         raise BuildError("exclusion reason conflicts with accepted cases")
+    if (paper.cases or paper.introduction_override is not None) and paper.introduction_reviewed is not True:
+        raise BuildError("Introduction boundary requires agent semantic review")
+    override = paper.introduction_override
+    if override is not None:
+        if not isinstance(override, dict) or set(override) != {"start", "end", "text"}:
+            raise BuildError("invalid Introduction override fields")
+        start, end, text = override["start"], override["end"], override["text"]
+        if (type(start) is not int or type(end) is not int
+                or not 0 <= start < end <= len(paper.source.fulltext)
+                or not isinstance(text, str) or not text.strip()
+                or paper.source.fulltext[start:end] != text
+                or len(re.findall(r"\w+", text)) < 30):
+            raise BuildError("Introduction override does not match exact source offsets and text")
+    elif paper.cases:
+        text = extract_introduction(paper.source.fulltext, abstract=paper.source.abstract).text
     if not paper.cases:
         return
-    if paper.introduction_reviewed is not True:
-        raise BuildError("Introduction boundary requires agent semantic review")
-    introduction = extract_introduction(paper.source.fulltext)
     seen = set()
     for case in paper.cases:
         if case.semantic_reviewed is not True:
@@ -444,10 +498,10 @@ def _validate_review(paper: ReviewedPaper) -> None:
         # only whitespace between the two spans may be omitted.
         visible = case.visible_context
         hidden = case.reference_continuation
-        if (not introduction.text.startswith(visible)
-                or not introduction.text.endswith(hidden)
-                or len(visible) + len(hidden) > len(introduction.text)
-                or introduction.text[len(visible):len(introduction.text) - len(hidden)].strip()):
+        if (not text.startswith(visible)
+                or not text.endswith(hidden)
+                or len(visible) + len(hidden) > len(text)
+                or text[len(visible):len(text) - len(hidden)].strip()):
             raise BuildError("case does not match a contiguous Introduction span")
         if case.case_type == "SCC" and case.fact_packet:
             raise BuildError("SCC cannot contain a fact packet")
@@ -538,37 +592,44 @@ def export_sources(papers: Sequence[SourcePaper], output: Path, seed: int,
             exclusions.append(asdict(SkipRecord(paper.item_key, paper.attachment_key,
                                                  "alternative-attachment", paper.content_hash)))
             continue
+        extraction_reason = None
         try:
-            intro = extract_introduction(paper.fulltext)
+            intro = extract_introduction(paper.fulltext, abstract=paper.abstract)
         except BoundaryError as exc:
-            exclusions.append(asdict(SkipRecord(paper.item_key, paper.attachment_key,
-                                                 str(exc), paper.content_hash)))
-            continue
-        scc = choose_scc(intro)
-        if not scc:
-            exclusions.append(asdict(SkipRecord(paper.item_key, paper.attachment_key,
-                                                 "no-paragraph-split-candidate", paper.content_hash)))
-            continue
+            intro = None
+            extraction_reason = str(exc)
+        scc = choose_scc(intro) if intro else ()
+        extraction_status = "proposed" if intro else "requires-boundary-review"
+        if intro and not scc:
+            extraction_status = "requires-split-review"
+            extraction_reason = "no-paragraph-split-candidate"
         seen.add(paper.item_key)
         metadata = {
             "item_key": paper.item_key, "attachment_key": paper.attachment_key,
             "extractor_version": EXTRACTOR_VERSION,
-            "content_hash": paper.content_hash, "boundary_confidence": intro.confidence,
-            "start_reason": intro.start_reason, "end_reason": intro.end_reason,
+            "content_hash": paper.content_hash,
+            "boundary_confidence": intro.confidence if intro else None,
+            "start_reason": intro.start_reason if intro else None,
+            "end_reason": intro.end_reason if intro else None,
+            "auto_extraction_status": extraction_status,
+            "auto_extraction_reason": extraction_reason,
         }
         # Keep all source text here so the agent can locate and verify conclusion
         # evidence without trusting a second automatic section extraction.
         packet = {**asdict(paper), "content_hash": paper.content_hash,
                   "extractor_version": EXTRACTOR_VERSION,
-                  "introduction": asdict(intro),
+                  "auto_extraction_status": extraction_status,
+                  "auto_extraction_reason": extraction_reason,
+                  "introduction": asdict(intro) if intro else None,
                   "candidates": [asdict(candidate) for candidate in
-                                 (*scc, *choose_fgcc(intro, paper.abstract, ""))]}
+                                 (*scc, *(choose_fgcc(intro, paper.abstract, "") if intro else ()))]}
         metadata["source_packet_hash"] = _record_hash(packet)
         sources.append(metadata)
         _write_json(_private_path(output, f"sources/{paper.item_key}.json", repository_root), packet)
         reviews.append({"item_key": paper.item_key, "attachment_key": paper.attachment_key,
                         "extractor_version": EXTRACTOR_VERSION,
                         "content_hash": paper.content_hash, "introduction_reviewed": False,
+                        "introduction_override": None,
                         "cases": [], "exclusion_reasons": []})
     all_keys = {paper.item_key for paper in papers} | {skip.item_key for skip in skipped}
     report = {
@@ -580,7 +641,7 @@ def export_sources(papers: Sequence[SourcePaper], output: Path, seed: int,
     _write_json(output / "review-template.json", {"papers": reviews})
     _write_json(output / "build-report.json", report)
     if len(seen) < 20:
-        raise BuildError("exactly 20 eligible papers required; fewer than 20 boundary candidates")
+        raise BuildError("exactly 20 eligible papers required; fewer than 20 source papers")
     return report
 
 
@@ -603,7 +664,7 @@ def finalize_dataset(output: Path, cases_path: Path, repository_root: Path) -> D
         for record in records["papers"]:
             if record.get("extractor_version") != EXTRACTOR_VERSION:
                 raise BuildError("extractor version mismatch in agent review; rebuild the snapshot")
-            if set(record) != {"item_key", "attachment_key", "content_hash", "extractor_version", "introduction_reviewed", "cases", "exclusion_reasons"}:
+            if set(record) - {"introduction_override"} != {"item_key", "attachment_key", "content_hash", "extractor_version", "introduction_reviewed", "cases", "exclusion_reasons"}:
                 raise BuildError("invalid reviewed paper fields")
             item_key = _key(record["item_key"])
             if item_key not in sources:
@@ -630,7 +691,8 @@ def finalize_dataset(output: Path, cases_path: Path, repository_root: Path) -> D
                 raise BuildError("exclusion reasons must be an array of allowed codes")
             reviewed.append(ReviewedPaper(source, record["introduction_reviewed"],
                                           tuple(AgentCase(**case) for case in record["cases"]),
-                                          tuple(record["exclusion_reasons"])))
+                                          tuple(record["exclusion_reasons"]),
+                                          record.get("introduction_override")))
         if {paper.source.item_key for paper in reviewed} != set(sources):
             raise BuildError("review must account for every exported paper; use empty cases for exclusions")
         # Validate before treating empty cases as exclusions, then record that

@@ -63,6 +63,46 @@ def test_ambiguous_boundary_is_rejected():
         extract_introduction("A title and author line.\nSome text without boundaries.")
 
 
+def test_abstract_guided_start_maps_wrapped_hyphenated_math_text_to_source_offsets():
+    abstract = (
+        "We investigate collective excitations in a two-dimensional synthetic lattice "
+        "with tunable interactions and compare independently measured response functions. "
+        "The resulting spectra establish a robust energy scale E(k) and resolve "
+        "the temperature dependence of the observed modes."
+    )
+    indexed = abstract.replace("two-dimensional", "two-\ndimensional").replace("E(k)", "E ( k )")
+    fulltext = "Synthetic title\nA. Example\n" + indexed + "\n\n" + CONTEXT + "\n\n" + HIDDEN + "\n\nModel.—Hamiltonian."
+    result = extract_introduction(fulltext, abstract=abstract)
+    assert result.text == CONTEXT + "\n\n" + HIDDEN
+    assert fulltext[result.start:result.end] == result.text
+    assert result.start_reason == "untitled-body-after-matched-abstract"
+
+
+@pytest.mark.parametrize("abstract,source,error", [
+    ("Brief summary.", "Brief summary.", "abstract-too-short"),
+    (CONTEXT + " " + HIDDEN, CONTEXT + " " + HIDDEN.replace("unresolved", "resolved"), "abstract-not-matched"),
+    (CONTEXT + " " + HIDDEN, (CONTEXT + " " + HIDDEN + "\n") * 2, "abstract-match-ambiguous"),
+])
+def test_abstract_start_rejects_weak_different_or_ambiguous_matches(abstract, source, error):
+    with pytest.raises(BoundaryError, match=error):
+        extract_introduction(source + "\n\n" + CONTEXT + "\n\nModel.—Hamiltonian.", abstract=abstract)
+
+
+@pytest.mark.parametrize("heading,ending", [
+    ("Introduction. ", "Continuum model for a synthetic bilayer. We define the model."),
+    ("Introduction.— ", "Substrate-induced mass and topology– We define the model."),
+    ("Corresponding authors: A. Example I. Introduction\n", "II. Magnetic symmetry conditions\nDetails."),
+])
+def test_recognizes_indexed_run_in_and_numbered_section_headings(heading, ending):
+    result = extract_introduction("Title\n" + heading + CONTEXT + "\n\n" + HIDDEN + "\n\n" + ending)
+    assert result.text == CONTEXT + "\n\n" + HIDDEN
+
+
+def test_doi_marker_can_be_immediately_followed_by_body():
+    result = extract_introduction("Title\nDOI: 10.0000/example\n" + CONTEXT + "\n\n" + HIDDEN + "\n\nMethods\nDetails.")
+    assert result.text == CONTEXT + "\n\n" + HIDDEN
+
+
 @pytest.mark.parametrize("packet", [[HIDDEN], [HIDDEN.upper()], ["Fact: " + HIDDEN]])
 def test_fact_packet_rejects_verbatim_sentence_leakage(packet):
     with pytest.raises(FactPacketError, match="source wording"):
@@ -412,16 +452,93 @@ def test_semantic_exclusions_cannot_silently_shrink_dataset(tmp_path):
                for skip in report["skipped"])
 
 
-def test_rejected_boundary_report_retains_attachment_hash_without_prose(tmp_path):
+def test_uncertain_boundary_is_exported_for_review_without_report_prose(tmp_path):
     from build_eval_dataset import SourcePaper, export_sources
 
     rejected = SourcePaper("BAD", "BADATT", "Private synthetic text with no clear boundaries.")
     output = tmp_path / "snapshot"
     report = export_sources((*synthetic_papers(20), rejected), output, seed=17, repository_root=ROOT)
-    skip = next(skip for skip in report["skipped"] if skip["item_key"] == "BAD")
-    assert skip["content_hash"] == rejected.content_hash
-    assert skip["attachment_key"] == "BADATT"
+    source = next(row for row in report["sources"] if row["item_key"] == "BAD")
+    assert source["content_hash"] == rejected.content_hash
+    assert source["attachment_key"] == "BADATT"
+    assert source["auto_extraction_status"] == "requires-boundary-review"
+    assert source["auto_extraction_reason"] == "low boundary confidence: no supported body start"
+    packet = json.loads((output / "sources/BAD.json").read_text())
+    assert packet["fulltext"] == rejected.fulltext
+    assert packet["introduction"] is None and packet["candidates"] == []
     assert rejected.fulltext not in json.dumps(report)
+
+
+@pytest.mark.parametrize("mutation,error", [
+    (None, None),
+    ("offset", "override"),
+    ("text", "override"),
+    ("boolean-offset", "override"),
+    ("unreviewed", "semantic review"),
+    ("hash", "provenance"),
+    ("version", "extractor version"),
+    ("outside-case", "Introduction span"),
+])
+def test_finalizer_checks_source_reviewed_boundary_overrides(tmp_path, mutation, error):
+    from build_eval_dataset import SourcePaper, export_sources, finalize_dataset
+
+    introduction = CONTEXT + "\n" + HIDDEN
+    fulltext = "Synthetic front matter.\n" + introduction + "\nUnlabeled methods."
+    papers = tuple(SourcePaper(f"P{i:02}", f"A{i:02}", fulltext) for i in range(20))
+    output = tmp_path / "snapshot"
+    report = export_sources(papers, output, seed=17, repository_root=ROOT)
+    assert len(report["sources"]) == 20
+    review = materialize(output)
+    records = json.loads(review.read_text())
+    for paper in records["papers"]:
+        paper["introduction_override"] = {
+            "start": len("Synthetic front matter.\n"),
+            "end": len("Synthetic front matter.\n") + len(introduction),
+            "text": introduction,
+        }
+    first = records["papers"][0]
+    if mutation == "offset":
+        first["introduction_override"]["end"] += 1
+    elif mutation == "text":
+        first["introduction_override"]["text"] += " Invented."
+    elif mutation == "boolean-offset":
+        first["introduction_override"]["start"] = True
+    elif mutation == "unreviewed":
+        first["introduction_reviewed"] = False
+    elif mutation == "hash":
+        first["content_hash"] = "0" * 64
+    elif mutation == "version":
+        first["extractor_version"] = "old-version"
+    elif mutation == "outside-case":
+        first["cases"][0]["reference_continuation"] += "\nUnlabeled methods."
+    review.write_text(json.dumps(records))
+    if error:
+        with pytest.raises(BuildError, match=error):
+            finalize_dataset(output, review, repository_root=ROOT)
+        assert not (output / "dataset.json").exists()
+    else:
+        dataset = finalize_dataset(output, review, repository_root=ROOT)
+        assert len(dataset.cases) == 40
+        assert CONTEXT not in (output / "build-report.json").read_text()
+
+
+def test_abstract_export_and_finalization_preserve_single_newline_sentence_splits(tmp_path):
+    from build_eval_dataset import SourcePaper, export_sources, finalize_dataset
+
+    abstract = (
+        "We investigate the response of an artificial material under controlled "
+        "external perturbations and establish a reproducible measurement protocol. "
+        "Independent measurements of the excitation spectrum identify a characteristic "
+        "energy scale and constrain its variation across the available temperature range."
+    )
+    fulltext = "Title\n" + abstract + "\n" + CONTEXT + "\n" + HIDDEN + "\nMethods\nDetails."
+    papers = tuple(SourcePaper(f"P{i:02}", f"A{i:02}", fulltext, abstract) for i in range(20))
+    output = tmp_path / "snapshot"
+    report = export_sources(papers, output, seed=17, repository_root=ROOT)
+    assert all(row["auto_extraction_status"] == "requires-split-review" for row in report["sources"])
+    assert all(row["start_reason"] == "untitled-body-after-matched-abstract" for row in report["sources"])
+    dataset = finalize_dataset(output, materialize(output), repository_root=ROOT)
+    assert len(dataset.cases) == 40
 
 
 @pytest.mark.parametrize("response, expected_reason", [
