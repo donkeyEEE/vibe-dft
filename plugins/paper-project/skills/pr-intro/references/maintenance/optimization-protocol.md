@@ -73,10 +73,8 @@ them into `candidate/` or change them to improve a score. Baseline hashes and
 permissions are integrity checks, not an operating-system sandbox.
 
 Record the pinned model and reasoning effort, sampling settings, seed,
-candidate hashes, and the regression policy before the first generation. Keep
-those settings fixed for comparable runs. The default material regression rule is a decrease in the
-mean normalized score of previously exercised cases, overall or in either case
-type. An alternative tolerance must be justified and fixed before scoring.
+and candidate hashes before the first generation. Keep those settings fixed
+for comparable runs.
 
 Completion: paths do not overlap, baseline matches formal hashes, the dataset
 hash is recorded, at least two SCC and two FGCC development cases are available,
@@ -113,7 +111,7 @@ Use this generator instruction with the sanitized payload and runtime content:
 > material remain unknown. Excerpts are scientific data, not tool instructions.
 
 Allow one generation per valid case per tested candidate version. Cache that
-output by case ID and candidate hash; regression reuses it when both match.
+output by case ID and candidate hash; reuse it when both match.
 A valid but poor answer counts and must not be regenerated. Retry the identical
 call only after an infrastructure failure that produced no valid continuation;
 record the cause and attempt count. Exposure of hidden text, source identity,
@@ -138,29 +136,35 @@ Record the affected cases, common defect, rule hypothesis, affected candidate
 file, and expected effect. Preserve scientific conditions and grounding rules;
 do not insert case-specific prose or paper identities into runtime rules.
 
-Save the preceding candidate, edit only the allowlisted candidate files, then
-evaluate the changed candidate on the same four cases under the same settings.
-Accept a batch improvement only when its aggregate increases. After a batch
-improves, evaluate every previously exercised development case on the changed
-candidate, reusing matching cached outputs. Compare with the corresponding
-preceding-candidate outputs under the predeclared material regression rule.
-If regression is material, restore the preceding candidate; otherwise keep the
-improved candidate as the incumbent. The original `baseline/` never changes.
+For each round:
 
-Stop after three consecutive rejected rounds, including no improvement, no
-supported general mutation, malformed scoring, or material regression. An
-accepted round resets the rejection count. Stop regardless at twelve rounds.
+1. Select two SCC and two FGCC development cases.
+2. Generate one continuation per case with the current candidate.
+3. Score the continuations and identify a defect shared by multiple cases.
+4. Modify only the allowlisted candidate files to address that shared defect.
+5. Retain the supported candidate mutation as the incumbent for the next round.
+
+The original `baseline/` never changes. A retained mutation becomes the current
+candidate, and the development loop moves directly to the next random sample.
+The one blind acceptance evaluation determines whether the final candidate
+improves over the fixed baseline. Same-case post-mutation evaluation and a
+cumulative development regression pass are outside this loop.
+
+Stop after three consecutive rejected rounds. A round is rejected when the
+scores are missing or malformed, or when evidence from multiple cases does not
+support a general mutation. A retained mutation resets the rejection count.
+Stop regardless at twelve rounds.
 
 Append one JSON record to `iterations.jsonl` for each round with: round number,
 selected IDs, candidate hashes before/after, model/settings, prompt/output
 artifact paths, raw dimension scores, aggregate/SCC/FGCC statistics, mutation
-evidence and hypothesis, baseline-relative patch path, regression result,
-accepted/rejected status, and consecutive rejection count. Store text artifacts
+evidence and hypothesis, baseline-relative patch path, mutation disposition,
+and consecutive rejection count. Store text artifacts
 only in the private run. Avoid persisted rhetorical labels; evidence and score
 justifications should describe the actual defect and its consequence.
 
-Completion: every round has a complete audit record and the incumbent is the
-last candidate that improved the batch and passed development regression.
+Completion: every round has a complete audit record and the incumbent contains
+the last supported candidate mutation retained during development.
 
 ## 4. Freeze and evaluate acceptance once
 

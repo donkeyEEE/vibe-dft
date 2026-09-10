@@ -1,6 +1,8 @@
 ---
 name: pr-intro
 description: Use when drafting or restructuring an evidence-grounded Introduction for a Physical Review journal, or when the user explicitly asks to optimize `pr-intro`.
+metadata:
+  version: "PRintro-v1"
 ---
 
 # Physical Review Introduction

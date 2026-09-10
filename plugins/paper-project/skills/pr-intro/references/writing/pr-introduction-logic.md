@@ -22,6 +22,19 @@ the six moves to paragraphs and shows the logical transition between them.
 Resolve any user-requested changes to that map before drafting prose. A
 single-paragraph request may proceed directly from the available-facts view.
 
+When the available facts contain background but no confirmed method or finding,
+continue with any supported six-move step: deepen the stated territory, narrow
+a gap already implied by the supplied concepts, explain its obstacle, or pose a
+bounded question. Keep that step within the named systems and effects; do not
+create a new material class, phenomenon, or application to manufacture progress.
+If choosing a gap, obstacle, or question in this sparse-evidence setting, name
+the specific relation or limitation implied by the supplied facts; a generic
+claim that understanding or control remains challenging is not a complete step.
+For a single-premise request with no fact packet, repeating that premise or
+turning it into an equivalent yes-or-no question is likewise incomplete. The
+chosen supported move may instead clarify an entailed condition or consequence,
+narrow an actual uncertainty, or state which evidence is missing.
+
 In restructuring, diagnose the existing paragraph functions against the six
 moves, preserve supported content, and identify material moves, merges, or
 deletions. Then write compact, evidence-led prose rather than imitating the
