@@ -1,7 +1,8 @@
 # DT002 SCF to band prototype
 
-Throwaway source for `WF-001/DT-002`. It is not a published skill and must not
-be merged into the production roster.
+Throwaway fixture for `WF-001/DT-002`. The nested `skills/calc-execute/` path
+mirrors the approved future skill seam without adding a seventh skill to the
+Calc Project plugin. This fixture must not be merged into the production roster.
 
 The probe separates one VASP SCF-to-band task into three kinds of source:
 
@@ -12,7 +13,7 @@ The probe separates one VASP SCF-to-band task into three kinds of source:
 Run the filesystem seam without VASP or a scheduler:
 
 ```bash
-bash plugins/calc-project/skills/calc-execute-prototype/scripts/vasp/smoke_scf_band.sh
+bash docs/superpowers/prototypes/wf001-dt002/skills/calc-execute/scripts/vasp/smoke_scf_band.sh
 ```
 
 The smoke selects and reads the stage-specific backend reference bundle, stages

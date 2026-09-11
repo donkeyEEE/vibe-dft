@@ -44,7 +44,7 @@
 <main>
   <p class="eyebrow">Throwaway prototype · WF-001 / DT-002</p>
   <h1>选择性加载 backend 知识，能否可靠推进 SCF → band？</h1>
-  <p class="lede">本原型检验一个具体 VASP 两阶段任务：throwaway <code>calc-execute-prototype/</code> 镜像未来 <code>calc-execute/</code> seam，执行者只为当前阶段加载 <code>references/backends/</code> 中需要的知识，同时从 owning-skill assets 取得输入模板、从 scripts 取得可执行检查。请观察：最小知识集合是否足以阻止错误顺序、遗漏 CHGCAR handoff 或把模板误当作物理参数权威。</p>
+  <p class="lede">本原型检验一个具体 VASP 两阶段任务：throwaway fixture 中的 <code>skills/calc-execute/</code> 镜像已批准的未来 seam，执行者只为当前阶段加载 <code>references/backends/</code> 中需要的知识，同时从 owning-skill assets 取得输入模板、从 scripts 取得可执行检查。请观察：最小知识集合是否足以阻止错误顺序、遗漏 CHGCAR handoff 或把模板误当作物理参数权威。</p>
   <div class="notice"><strong>非生产实现。</strong> 所有状态都在浏览器内存中；不会创建任务目录、运行 VASP、提交作业或写入 Tracker。</div>
 
   <section class="grid">
