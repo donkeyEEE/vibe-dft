@@ -1,0 +1,6 @@
+interface:
+  display_name: "Calc Setup"
+  short_description: "配置计算项目结构、Tracker 与稳定环境"
+  default_prompt: "$calc-setup 初始化或维护指定计算项目的稳定配置。"
+policy:
+  allow_implicit_invocation: false

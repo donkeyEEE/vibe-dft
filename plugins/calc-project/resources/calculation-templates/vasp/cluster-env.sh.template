@@ -1,5 +1,0 @@
-#!/bin/bash
-# VASP task environment. Replace paths from the verified project profile.
-source /etc/profile || return 1
-export VASP_EXE="<verified-vasp-executable>"
-export VASPKIT_EXE="<verified-vaspkit-executable>"

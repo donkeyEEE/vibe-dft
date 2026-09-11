@@ -1,0 +1,5 @@
+#!/bin/bash
+# Render exact executable paths from the verified project profile.
+source /etc/profile || return 1
+export WANNIER90_EXE="<verified-wannier90-executable>"
+export WANNIER90_MPI_LAUNCHER="mpirun"

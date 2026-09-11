@@ -1,0 +1,27 @@
+#!/bin/bash
+#PBS -N vasp-band
+#PBS -q manycores
+#PBS -l nodes=1:ppn=32
+#PBS -l walltime=144:00:00
+#PBS -S /bin/bash
+#PBS -V
+
+RUN_DIR="${PBS_O_WORKDIR:?missing PBS work directory}"
+INPUTS_DIR="$RUN_DIR/inputs"
+OUTPUTS_DIR="$RUN_DIR/outputs"
+LOGS_DIR="$RUN_DIR/logs"
+test -d "$INPUTS_DIR" && test -d "$OUTPUTS_DIR" && test -d "$LOGS_DIR" || exit 1
+source "$INPUTS_DIR/cluster-env.sh" || exit 1
+cd "$OUTPUTS_DIR" || exit 1
+
+test -z "$(find . -mindepth 1 -maxdepth 1 -print -quit)" || { echo "outputs directory is not empty" >&2; exit 1; }
+for file in INCAR POSCAR KPOINTS POTCAR CHGCAR vest2.py; do test -s "$INPUTS_DIR/$file" || { echo "missing band input: $file" >&2; exit 1; }; done
+test -x "$VASP_EXE" && test -x "$VASPKIT_EXE" && command -v mpirun >/dev/null 2>&1 || exit 1
+test -s "${PBS_NODEFILE:?missing PBS node file}" || exit 1
+cp -- "$INPUTS_DIR/INCAR" "$INPUTS_DIR/POSCAR" "$INPUTS_DIR/KPOINTS" "$INPUTS_DIR/POTCAR" "$INPUTS_DIR/CHGCAR" "$INPUTS_DIR/vest2.py" . || exit 1
+ulimit -s unlimited
+mpirun -machinefile "$PBS_NODEFILE" -np "$(wc -l < "$PBS_NODEFILE")" "$VASP_EXE" > "$LOGS_DIR/vasp.log" 2>&1 || exit 1
+printf '21\n211\n1\n' | "$VASPKIT_EXE" > "$LOGS_DIR/vaspkit.log" 2>&1 || exit 1
+test -s BAND.dat && test -s REFORMATTED_BAND_UP.dat && test -s REFORMATTED_BAND_DW.dat && test -s DOSCAR || exit 1
+printf '5\ny\n8\n' | python3 ./vest2.py > "$LOGS_DIR/vest2.log" 2>&1 || exit 1
+test -s bandrange_spin0.dat && test -s bandrange_spin1.dat || { echo "missing or empty spin-resolved VEST band ranges" >&2; exit 1; }

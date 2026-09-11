@@ -1,0 +1,44 @@
+#!/bin/bash
+#PBS -N vampire
+#PBS -q manycores
+#PBS -l nodes=1:ppn=32
+#PBS -l walltime=144:00:00
+#PBS -S /bin/bash
+#PBS -V
+
+RUN_DIR="${PBS_O_WORKDIR:?missing PBS work directory}"
+INPUTS_DIR="$RUN_DIR/inputs"
+OUTPUTS_DIR="$RUN_DIR/outputs"
+LOGS_DIR="$RUN_DIR/logs"
+test -d "$INPUTS_DIR" && test -d "$OUTPUTS_DIR" && test -d "$LOGS_DIR" || exit 1
+source "$INPUTS_DIR/cluster-env.sh" || exit 1
+cd "$OUTPUTS_DIR" || exit 1
+
+test -z "$(find . -mindepth 1 -maxdepth 1 -print -quit)" || { echo "outputs directory is not empty" >&2; exit 1; }
+for file in input vampire.UCF vampire.mat model-source.sha256 plot.py; do test -s "$INPUTS_DIR/$file" || { echo "missing VAMPIRE input: $file" >&2; exit 1; }; done
+test -x "$VAMPIRE_EXE" || exit 1
+grep -q '^output:temperature' "$INPUTS_DIR/input" && grep -q '^output:mean-magnetisation-length' "$INPUTS_DIR/input" && ! grep -q '^output:material-magnetisation' "$INPUTS_DIR/input" || { echo "unexpected VAMPIRE output columns" >&2; exit 1; }
+awk '
+function valid_digest(value) {
+    return length(value) == 64 && value ~ /^[[:xdigit:]]+$/
+}
+NF != 2 || !valid_digest($1) || ($2 != "vampire.UCF" && $2 != "vampire.mat") {
+    exit 1
+}
+{
+    seen[$2]++
+}
+END {
+    if (seen["vampire.UCF"] != 1 || seen["vampire.mat"] != 1) {
+        exit 1
+    }
+}
+' "$INPUTS_DIR/model-source.sha256" || { echo "invalid VAMPIRE model manifest" >&2; exit 1; }
+(cd "$INPUTS_DIR" && sha256sum -c -- model-source.sha256) > "$LOGS_DIR/model-check.log" 2>&1 || exit 1
+(cd "$INPUTS_DIR" && sha256sum vampire.UCF vampire.mat) > "$LOGS_DIR/model-source.sha256" || exit 1
+cp -- "$INPUTS_DIR/input" "$INPUTS_DIR/vampire.UCF" "$INPUTS_DIR/vampire.mat" "$INPUTS_DIR/plot.py" . || exit 1
+sha256sum vampire.UCF vampire.mat > model-copy.sha256 || exit 1
+cmp -s "$LOGS_DIR/model-source.sha256" model-copy.sha256 || { echo "VAMPIRE model copy differs from reviewed source" >&2; exit 1; }
+"$VAMPIRE_EXE" > "$LOGS_DIR/vampire.log" 2>&1 || exit 1
+python3 ./plot.py --input output --output M_vs_T.png > "$LOGS_DIR/vampire-plot.log" 2>&1 || exit 1
+test -s output && test -s M_vs_T.png || exit 1

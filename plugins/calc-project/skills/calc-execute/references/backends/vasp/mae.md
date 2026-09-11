@@ -1,0 +1,5 @@
+# VASP directional MAE execution
+
+Prepare two new Runs from the same explicitly named SCF `CHGCAR`, using `assets/templates/vasp/scf/run.pbs.template` with `__VASP_CHARGE_HANDOFF__` rendered as `CHGCAR`; the ordinary SCF variant renders it as `none`. For each MAE Run, the preparation body calls `copy_immutable EXACT_SCF_CHGCAR "$INPUTS_DIR/CHGCAR" || return 1`, and the validation body calls `test -s "$INPUTS_DIR/CHGCAR" || return 1` before review. The rendered PBS script names, checks, and copies that exact prepared `CHGCAR` into its private output working directory before invoking VASP. Require `ISTART=0`, `ICHARG=11`, `LSORBIT=.TRUE.`, `ISYM=-1`, the approved spinor `NBANDS`, and three `MAGMOM` components per ion in the `SAXIS` basis.
+
+Before either Run reaches review, compare the complete paired inputs. They must be byte-equivalent except for the approved `SAXIS` direction and unavoidable Run metadata. A changed cell, k mesh, cutoff, Hubbard array, convergence setting, charge source, magnetic order, or unapproved direction blocks and returns to `$calc-to-spec`. Preserve both Runs and report energy using the exact approved difference convention and units.

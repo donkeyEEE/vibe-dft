@@ -1,15 +1,15 @@
 {
   "name": "calc-project",
   "version": "0.1.0+codex.20260831080048",
-  "description": "\u8ba1\u7b97\u9879\u76ee\u7ba1\u7406\u5de5\u5177\u5e93\uff1a\u7ef4\u62a4\u9879\u76ee\u7ed3\u6784\u4e0e\u4efb\u52a1\u5143\u6570\u636e\uff0c\u6267\u884c\u53d7\u9650\u540c\u6b65\uff0c\u5e76\u63d0\u4f9b VASP\u3001Wannier90\u3001DMFT\u3001NAMD \u53ca\u78c1\u6027\u5de5\u4f5c\u6d41\u3002",
+  "description": "以六个显式接口管理计算项目配置、RQ、Spec、执行与瞬时只读评审。",
   "author": {
     "name": "donk"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Calc Project",
-    "shortDescription": "\u8ba1\u7b97\u9879\u76ee\u7ed3\u6784\u3001\u4efb\u52a1 YAML\u3001\u53d7\u9650\u540c\u6b65\u4e0e\u591a\u65b9\u6cd5\u5de5\u4f5c\u6d41\u7ba1\u7406",
-    "longDescription": "calc-project \u63d0\u4f9b\u5206\u5c42\u7684\u7814\u7a76\u8ba1\u7b97\u7ba1\u7406\u80fd\u529b\uff1acalc-project-structure \u7ba1\u7406\u7a33\u5b9a\u9879\u76ee\u9aa8\u67b6\uff1bcalc-task \u4ee5 calc-task.yaml \u7ba1\u7406\u5177\u4f53\u4efb\u52a1\u4e8b\u5b9e\uff1bcalc-sync \u6267\u884c\u53d7\u5ba1\u9605\u8ba1\u5212\u7ea6\u675f\u7684\u975e\u7834\u574f\u6027\u4f20\u8f93\uff1bcalc-workflows \u7ba1\u7406\u8de8\u9636\u6bb5\u4ea4\u63a5\uff1bVASP\u3001DMFT\u3001NAMD \u4e0e magnetic-workflow \u5206\u522b\u8d1f\u8d23\u65b9\u6cd5\u8f93\u5165\u3001\u68c0\u67e5\u548c\u4efb\u52a1\u672c\u5730\u6587\u4ef6\uff1bscript-management \u7ef4\u62a4\u6279\u51c6\u7684\u5171\u4eab\u4e0e skill \u6240\u5c5e\u6a21\u677f\u6e90\u3002\u63d2\u4ef6\u4e0d\u7ef4\u62a4\u9879\u76ee\u7ea7 README \u7d22\u5f15\uff0c\u4e5f\u4e0d\u521b\u5efa\u65e7\u5f0f calc-sync.yaml\u3002",
+    "shortDescription": "显式配置、RQ、Spec、执行、评审与路由接口",
+    "longDescription": "calc-project 提供六个显式调用接口：ask-dnk 只负责路由；calc-setup 管理稳定项目结构与配置；calc-rq 管理研究问题和 Decision Ticket；calc-to-spec 设计并发布当前科学 Spec；calc-execute 推进整份 ready 或 active Spec 的任务与 Run；calc-review 对一个准确的 prepared Run 快照执行瞬时只读评审。Spec 是任务 DAG、Run 记录、current Run、执行状态与闭合的唯一权威。",
     "developerName": "donk",
     "category": "Productivity",
     "capabilities": [
@@ -17,12 +17,12 @@
       "Write"
     ],
     "defaultPrompt": [
-      "\u5e2e\u6211\u521d\u59cb\u5316\u6216\u91cd\u6574\u4e00\u4e2a\u8ba1\u7b97\u9879\u76ee\u7ed3\u6784",
-      "\u5e2e\u6211\u521b\u5efa\u6216\u767b\u8bb0\u4e00\u4e2a\u5e26 calc-task.yaml \u7684\u8ba1\u7b97\u4efb\u52a1",
-      "\u5e2e\u6211\u68c0\u67e5 calc-task.yaml \u5e76\u89c4\u5212\u53d7\u9650\u7684\u670d\u52a1\u5668\u540c\u6b65",
-      "\u5e2e\u6211\u51c6\u5907\u6216\u68c0\u67e5 VASP\u3001Wannier90\u3001DMFT \u6216 NAMD \u5de5\u4f5c\u6d41",
-      "\u5e2e\u6211\u51c6\u5907 VASP-Wannier90-TB2J-VAMPIRE \u78c1\u6027\u8ba1\u7b97\u6d41\u6c34\u7ebf",
-      "\u5e2e\u6211\u7ef4\u62a4\u9879\u76ee\u6216\u63d2\u4ef6\u4e2d\u7684\u8ba1\u7b97\u6a21\u677f\u8d44\u4ea7"
+      "$ask-dnk 判断这项计算项目工作应进入哪个显式接口。",
+      "$calc-setup 初始化或维护指定计算项目的稳定配置。",
+      "$calc-rq 推进指定 RQ 或其 Decision Ticket。",
+      "$calc-to-spec 为指定 RQ 设计或替换一个 Spec。",
+      "$calc-execute 推进指定的 ready 或 active Spec。",
+      "$calc-review 只读评审指定 prepared Run 的准确快照。"
     ]
   }
 }

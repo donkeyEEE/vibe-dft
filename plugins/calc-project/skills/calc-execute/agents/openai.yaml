@@ -1,0 +1,6 @@
+interface:
+  display_name: "Calc Execute"
+  short_description: "推进已批准 Spec 的任务与 Run"
+  default_prompt: "$calc-execute 推进指定的 ready 或 active Spec。"
+policy:
+  allow_implicit_invocation: false

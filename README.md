@@ -6,7 +6,7 @@
 
 | 插件 | 功能 | 典型任务 |
 | --- | --- | --- |
-| [calc-project](plugins/calc-project/) | 科研计算项目与方法工作流 | 建立计算任务、准备输入、同步数据、维护模板 |
+| [calc-project](plugins/calc-project/) | 科研计算 RQ、Spec 与执行工作流 | 配置项目、设计 Spec、推进 Run、瞬时只读评审 |
 | [paper-project](plugins/paper-project/) | 文献证据与学术写作 | 整理文献、核查引用、润色论文与制作科学图件 |
 | [osm-project](plugins/osm-project/) | 个人项目进展记录 | 将当前会话整理为 Obsidian 项目日志 |
 | [skill-incubator](plugins/skill-incubator/) | 通用 skill 试验场 | 物理论文润色、演示文稿和学术评价 |
@@ -42,17 +42,14 @@ codex plugin list
 
 | Skill | 功能与适用场景 |
 | --- | --- |
-| [calc-project-structure](plugins/calc-project/skills/calc-project-structure/SKILL.md) | 初始化或整理计算项目目录、顶层文档和数据边界。 |
-| [calc-task](plugins/calc-project/skills/calc-task/SKILL.md) | 创建或维护具体计算任务的 `calc-task.yaml`，记录身份、路径、状态和索引。 |
-| [vasp-workflow](plugins/calc-project/skills/vasp-workflow/SKILL.md) | 准备和检查 VASP 输入、VASPkit 相关计算、PBS 脚本及普通能带结果。 |
-| [dmft-workflow](plugins/calc-project/skills/dmft-workflow/SKILL.md) | 准备 DFT+DMFT / solid_dmft 输入、关联子空间和后处理。 |
-| [magnetic-workflow](plugins/calc-project/skills/magnetic-workflow/SKILL.md) | 衔接 VASP → Wannier90 → TB2J → VAMPIRE 磁性计算流程。 |
-| [namd-workflow](plugins/calc-project/skills/namd-workflow/SKILL.md) | 准备或诊断 VASP 与 Hefei-NAMD / NAMDwithSOC 的快照、耦合和自旋接口。 |
-| [calc-workflows](plugins/calc-project/skills/calc-workflows/SKILL.md) | 组织跨方法工作流，准备 Wannier90、共享 PBS 和结果打包资源。 |
-| [calc-sync](plugins/calc-project/skills/calc-sync/SKILL.md) | 检查任务元数据与远端状态，对已确认的任务路径规划或执行非破坏性数据同步。 |
-| [script-management](plugins/calc-project/skills/script-management/SKILL.md) | 维护和验证可复用计算模板资产及其目录索引。 |
+| [ask-dnk](plugins/calc-project/skills/ask-dnk/SKILL.md) | 仅显式调用；只读取足够的项目上下文，将请求路由到正确 sibling。 |
+| [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 仅显式调用；初始化或维护稳定项目结构、Tracker 配置、数据边界与集群 profile。 |
+| [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 仅显式调用；管理一个 RQ 及其 Decision Tickets。 |
+| [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 仅显式调用；设计、批准并发布一个当前科学 Spec。 |
+| [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 仅显式调用；推进一整份 ready 或 active Spec 的任务、Run、同步、接收和闭合。 |
+| [calc-review](plugins/calc-project/skills/calc-review/SKILL.md) | 仅显式调用；对一个准确的 prepared Run 快照做瞬时只读预提交评审。 |
 
-常见分工：先用 `calc-project-structure` 建立项目，再用 `calc-task` 登记任务，交给对应方法 skill 准备计算输入；需要同步任务数据时使用 `calc-sync`。
+常见分工：不确定入口时显式调用 `ask-dnk`；配置进入 `calc-setup`，RQ 决策进入 `calc-rq`，科学设计进入 `calc-to-spec`，执行进入 `calc-execute`。`calc-execute` 在提交前调用 `calc-review`，而直接评审只产生当前诊断，不形成后续提交授权。
 
 ### paper-project：文献、论文与汇报
 
@@ -84,7 +81,7 @@ codex plugin list
 在已加载相应插件的会话中，可以显式指定 skill 并描述任务，例如：
 
 ```text
-$calc-project:calc-task 为这次 VASP 计算登记任务元数据。
+$calc-project:calc-execute 推进这份已批准 Spec 的 ready 任务。
 $skill-incubator:prl-polishing 润色下面的论文段落，保留论断的适用条件。
 $osm-project:log2ob 记录本次项目进展。
 ```

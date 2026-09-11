@@ -1,0 +1,43 @@
+#!/bin/bash
+#PBS -N wannier90
+#PBS -q manycores
+#PBS -l nodes=1:ppn=32
+#PBS -l walltime=144:00:00
+#PBS -S /bin/bash
+#PBS -V
+
+RUN_DIR="${PBS_O_WORKDIR:?missing PBS work directory}"
+INPUTS_DIR="$RUN_DIR/inputs"
+OUTPUTS_DIR="$RUN_DIR/outputs"
+LOGS_DIR="$RUN_DIR/logs"
+test -d "$INPUTS_DIR" && test -d "$OUTPUTS_DIR" && test -d "$LOGS_DIR" || exit 1
+source "$INPUTS_DIR/cluster-env.sh" || exit 1
+cd "$OUTPUTS_DIR" || exit 1
+
+test -z "$(find . -mindepth 1 -maxdepth 1 -print -quit)" || { echo "outputs directory is not empty" >&2; exit 1; }
+test -s "$INPUTS_DIR/wannier-run.env" || exit 1
+source "$INPUTS_DIR/wannier-run.env" || exit 1
+for variable in UP_DIS_WIN_MIN UP_DIS_WIN_MAX UP_DIS_FROZ_MIN UP_DIS_FROZ_MAX DN_DIS_WIN_MIN DN_DIS_WIN_MAX DN_DIS_FROZ_MIN DN_DIS_FROZ_MAX; do eval "value=\${$variable:-}"; test -n "$value" || { echo "missing approved Wannier window: $variable" >&2; exit 1; }; done
+for spin in 1 2; do for suffix in win amn mmn eig; do test -s "$INPUTS_DIR/wannier90.$spin.$suffix" || exit 1; done; done
+for file in bandrange_spin0.dat bandrange_spin1.dat REFORMATTED_BAND_UP.dat REFORMATTED_BAND_DW.dat DOSCAR plot_wannier_fit_up.py plot_wannier_fit_dn.py; do test -s "$INPUTS_DIR/$file" || exit 1; done
+cp -- "$INPUTS_DIR/wannier90.1.win" "$INPUTS_DIR/wannier90.1.amn" "$INPUTS_DIR/wannier90.1.mmn" "$INPUTS_DIR/wannier90.1.eig" "$INPUTS_DIR/wannier90.2.win" "$INPUTS_DIR/wannier90.2.amn" "$INPUTS_DIR/wannier90.2.mmn" "$INPUTS_DIR/wannier90.2.eig" "$INPUTS_DIR/bandrange_spin0.dat" "$INPUTS_DIR/bandrange_spin1.dat" "$INPUTS_DIR/REFORMATTED_BAND_UP.dat" "$INPUTS_DIR/REFORMATTED_BAND_DW.dat" "$INPUTS_DIR/DOSCAR" "$INPUTS_DIR/plot_wannier_fit_up.py" "$INPUTS_DIR/plot_wannier_fit_dn.py" . || exit 1
+set_win_value() { file=$1; key=$2; value=$3; if grep -Eq "^[[:space:]]*$key[[:space:]]*=" "$file"; then sed -i -E "s|^[[:space:]]*$key[[:space:]]*=.*|$key = $value|" "$file"; else printf '\n%s = %s\n' "$key" "$value" >> "$file"; fi; }
+set_win_value wannier90.1.win dis_win_min "$UP_DIS_WIN_MIN" || exit 1
+set_win_value wannier90.1.win dis_win_max "$UP_DIS_WIN_MAX" || exit 1
+set_win_value wannier90.1.win dis_froz_min "$UP_DIS_FROZ_MIN" || exit 1
+set_win_value wannier90.1.win dis_froz_max "$UP_DIS_FROZ_MAX" || exit 1
+set_win_value wannier90.1.win write_xyz true || exit 1
+set_win_value wannier90.2.win dis_win_min "$DN_DIS_WIN_MIN" || exit 1
+set_win_value wannier90.2.win dis_win_max "$DN_DIS_WIN_MAX" || exit 1
+set_win_value wannier90.2.win dis_froz_min "$DN_DIS_FROZ_MIN" || exit 1
+set_win_value wannier90.2.win dis_froz_max "$DN_DIS_FROZ_MAX" || exit 1
+set_win_value wannier90.2.win write_xyz true || exit 1
+launcher="${WANNIER90_MPI_LAUNCHER:-mpirun}"
+command -v "$launcher" >/dev/null 2>&1 && test -x "$WANNIER90_EXE" || exit 1
+"$launcher" "$WANNIER90_EXE" wannier90.1 > "$LOGS_DIR/wannier90-up.log" 2>&1 || exit 1
+"$launcher" "$WANNIER90_EXE" wannier90.2 > "$LOGS_DIR/wannier90-dn.log" 2>&1 || exit 1
+test -s wannier90.1.wout && test -s wannier90.2.wout || exit 1
+test -s wannier90.1_hr.dat && test -s wannier90.2_hr.dat && test -s wannier90.1_centres.xyz && test -s wannier90.2_centres.xyz && test -s wannier90.1_band.dat && test -s wannier90.2_band.dat || exit 1
+python3 plot_wannier_fit_up.py --emin "${PLOT_EMIN:?missing plot minimum}" --emax "${PLOT_EMAX:?missing plot maximum}" --vest-band REFORMATTED_BAND_UP.dat --output band_structure-up.png > "$LOGS_DIR/wannier-fit-up.log" 2>&1 || exit 1
+python3 plot_wannier_fit_dn.py --emin "$PLOT_EMIN" --emax "$PLOT_EMAX" --vest-band REFORMATTED_BAND_DW.dat --output band_structure-dn.png > "$LOGS_DIR/wannier-fit-dn.log" 2>&1 || exit 1
+test -s band_structure-up.png && test -s band_structure-dn.png || exit 1

@@ -19,13 +19,21 @@ Skill 是否允许 Codex 隐式选择的运行时策略；默认允许隐式调�
 
 ## Calc Project 计算插件术语
 
-`plugins/calc-project` 是可安装计算工作流插件，共享计算模板位于 [resources/](plugins/calc-project/resources/)。
+`plugins/calc-project` 是可安装计算工作流插件。运行时计算模板和确定性辅助脚本属于唯一消费者 `calc-execute`，不属于插件共享资源。
+
+**Decision Ticket**:
+RQ 决策过程中，为一个尚未解决且需要显式回答的问题建立的临时决策记录。答案被接受并写入 RQ 后即完成，不参与后续 Spec 或计算执行协调。
+_Avoid_: 计算任务，开发工单，长期进度记录
+
+**RQ Tracker**:
+每个 RQ 用于存放其已发布 Spec 与 Decision Ticket 的配置化存储约定；RQ 属于一条计算研究主线，本地 Markdown adapter 下对应 `<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，不是独立状态文档。
+_Avoid_: Tracker 数据库，进度缓存，session registry
 
 **计算工具脚本（Calculation Utility Script）**:
 计算项目中可复用的可执行工具资产，用于辅助计算工作，但不作为生成任务输入的来源。
 _Avoid_: 计算模板，任务专用脚本
 
-关键索引词，完整定义仍以[领域术语](plugins/calc-project/skills/calc-project-structure/references/project-context.md)。为准：计算项目、计算项目结构、数据根、计算线、工作流、计算任务、运行、计算模板、项目计算模板、插件计算模板。
+关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Decision Ticket、Spec、计算任务、运行、Run-local inputs、计算模板、项目计算模板、插件计算模板。
 
 ## Paper Project
 
@@ -61,7 +69,7 @@ _Avoid_: 训练数据集、临时样本集
 
 **插件共享资源（plugin-shared resource）**由同一插件内至少两个活动 skill 实际消费，位于 `plugins/<plugin>/resources/`。共享目录 README 记录消费者，但不提供运行时发现索引。
 
-Paper Project 不采用插件共享资源：即使另一插件中的 skill 使用相同内容，各插件也各自维护 skill-owned 副本，运行时不跨插件读取文件。Calc Project 的共享计算模板设计保持不变。
+Paper Project 不采用插件共享资源：即使另一插件中的 skill 使用相同内容，各插件也各自维护 skill-owned 副本，运行时不跨插件读取文件。Calc Project 当前也没有插件共享计算模板；所有运行时模板都与唯一消费者 `calc-execute` 共置。
 
 当前没有 formal、candidate 或 incubating 资源状态，也没有通用知识消费协议或项目初始化机制。历史材料只可留在历史文档或 Cangjie 明确标记为非执行的 `references/legacy/`。
 

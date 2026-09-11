@@ -5,338 +5,257 @@
 
 ## Purpose
 
-Define a cross-session coordination mechanism for calculation Specs under one research question (RQ). The mechanism exposes which Spec is being coordinated, what its current calculation frontier is, and what a replacement session must know. It does not own scientific results or external execution.
+Define how one RQ contains multiple published Specs without introducing a
+separate Tracker database or state document.
 
-This design depends on the confirmed domain decisions recorded in `/tmp/calc-project-object-responsibilities-handoff.md`. That temporary handoff is context rather than a repository contract; later domain and implementation specifications must incorporate the decisions they consume.
+## Model
 
-## Decision Summary
-
-- There is no standalone Tracker skill.
-- `calc-project-structure` configures the Tracker protocol once for a calculation project.
-- Each RQ has one Tracker document covering all Specs owned by that RQ.
-- Consumer skills read a repository-local configuration document and perform normalized Tracker operations directly.
-- The first backend is local Markdown. The protocol preserves a backend adapter seam without implementing other backends.
-- The Tracker is authoritative for Spec coordination claims, leases, and handoffs.
-- The calculation frontier and execution summaries are rebuildable views derived from Spec, task, and Run sources.
-- The Tracker is not authoritative for the RQ, Spec design, task acceptance, Run results, correction history, or external scheduler state.
-
-## Architecture
+The Tracker is the configured storage convention for one RQ. With the initial
+`local-markdown` adapter, each Tracker is
+`<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/`, containing `RQ.md`,
+published Specs under `specs/`, and Decision Tickets under
+`decision-tickets/`.
 
 ```text
-calculation project
-├─ Agent instruction pointer
-├─ Tracker protocol configuration
-└─ RQ
-   ├─ RQ Tracker
-   ├─ Spec A
-   │  └─ task DAG → tasks → Runs
-   └─ Spec B
-      └─ task DAG → tasks → Runs
+<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/
+├─ RQ.md
+├─ specs/
+│  └─ <spec-id>-<slug>.md
+└─ decision-tickets/
+   └─ <NN>-<slug>.md
 ```
 
-The RQ Tracker is the coordination entry point for all Specs owned by one RQ. Different Specs under the same RQ may be claimed by different sessions. A single Spec may have only one effective claim at a time. The claiming session may still submit multiple calculation-frontier tasks in parallel.
+There is no independent `tracker.md`, `specs.md`, registry, progress cache, or
+session-state file.
 
-## Authority Boundaries
+## Configuration
 
-| Fact | Authority |
-|---|---|
-| RQ identity, question, boundary, and accepted Spec impact | Upstream RQ document and its managing workflow |
-| Task DAG, conditions, Spec revisions, acceptance rules, and closure | Spec document |
-| Task identity, task state, inputs, and task acceptance | Task metadata |
-| Run input snapshot, outputs, logs, execution state, and current designation | Run metadata and directory |
-| Spec claim, lease, release, and session handoff | RQ Tracker |
-| Calculation frontier, active-Run summary, and attention summary | Rebuildable RQ Tracker views |
+`calc-setup` configures the project Tracker adapter and location convention.
+Consumer skills read that repository-local configuration; they do not guess an
+unconfigured location. The initial adapter is `local-markdown`.
 
-When a rebuildable Tracker view conflicts with an authoritative source, consumers rebuild the view. They must not modify the authoritative source to match the Tracker.
+## Spec Publication
 
-The Tracker does not diagnose computation failures, decide whether a scientific result is valid, alter the task DAG, approve a Spec revision, update the RQ, or control an external scheduler.
+The Tracker contains only:
 
-## Configuration Seam
+- a Spec published by `calc-to-spec` after user approval; or
+- an existing Spec the user explicitly asks to place in the current RQ.
 
-`calc-project-structure` configures the mechanism using the same policy/configuration separation used by Matt Skills for issue trackers. It presents the Agent pointer and Tracker protocol configuration for user approval before writing them.
+Publication writes the Spec into the configured RQ storage and adds its ID,
+title, and relative link to `RQ.md`. It does not scan the repository or adopt
+README files, ADRs, research notes, or ordinary design documents. Repeating
+publication of the same Spec is idempotent; an identity or RQ-ownership conflict
+stops the write.
 
-The Agent instruction points consumers to a repository-local configuration document. That document defines:
+The Spec document owns its current lifecycle, task graph, work, and closure. It
+keeps no revision history. To resume work, an agent opens the Spec and follows its task and Run
+references. The Tracker stores no claim, lease, handoff, takeover, active-Run
+summary, completion percentage, or current-task cache.
 
-- the configured backend;
-- how to locate the Tracker for an RQ;
-- the supported schema version;
-- concrete storage and locking rules;
-- normalized operation semantics.
+## Decision Tickets
 
-The normalized operations are:
+A Decision Ticket is a temporary record for one unresolved question in the RQ
+decision process. Once its answer is accepted and written into the RQ, the
+Ticket is complete and does not participate in Spec or execution coordination.
 
-```text
-create
-read
-register-spec
-claim-spec
-renew-claim
-release-spec
-recompute-frontier
-record-handoff
-mark-concluded
-```
+The pending-decisions view is produced on demand by reading the RQ and its
+Decision Tickets. It is not persisted as Tracker state. One user confirmation
+may accept the proposed Ticket answer and its exact corresponding RQ update.
 
-The initial backend is `local-markdown`. A consumer that cannot find or parse the Agent pointer or configuration stops its Tracker mutation and reports the configuration problem. It does not guess a location or initialize an implicit default. Switching backends is a configuration action owned by `calc-project-structure`.
+## Consumer Responsibilities
 
-## RQ Tracker Document
+- `calc-rq` creates the RQ storage and manages its Decision Tickets.
+- `calc-to-spec` publishes an approved Spec to the current RQ storage.
+- `calc-execute` reads a selected Spec, the referenced Run directories, and
+  current external state before advancing work.
+- `calc-review` remains a transient review of one prepared Run.
 
-The Tracker uses YAML frontmatter for machine-coordination state and fixed Markdown sections for human- and agent-readable views.
+The Tracker does not own scientific facts, execution facts, session state, or
+concurrency control for Spec, task, Run, or scheduler mutations.
 
-Illustrative frontmatter:
+## Failure Semantics
 
-```yaml
----
-tracker_schema: calc-rq-tracker/v1
-rq_id: RQ-001
-rq_path: path/to/rq.md
-tracker_revision: 12
-updated_at: 2026-09-11T15:30:00+08:00
-
-specs:
-  - spec_id: SPEC-001
-    path: path/to/spec-001.md
-    current_revision: 3
-    claim:
-      session_id: session-abc
-      claimed_at: 2026-09-11T14:00:00+08:00
-      renewed_at: 2026-09-11T15:00:00+08:00
-      expires_at: 2026-09-11T16:00:00+08:00
-    view_refreshed_at: 2026-09-11T15:29:00+08:00
----
-```
-
-Required Markdown sections:
-
-```markdown
-# RQ Tracker
-
-## Spec Overview
-## Calculation Frontiers
-## Active Runs
-## Needs Attention
-## Session Handoffs
-## Recent Coordination Events
-```
-
-Document rules:
-
-- `tracker_revision` increments on every successful mutation.
-- Stable IDs and paths are both stored: IDs preserve identity, while paths locate sources.
-- The document does not copy complete DAGs, task inputs, logs, correction diagnoses, or scientific conclusions.
-- Frontiers are grouped by Spec and identify tasks by stable ID and path.
-- `Needs Attention` is a rebuildable coordination summary. Details remain in the owning Spec, task, or Run source.
-- Coordination events are limited to registration, claim, renewal, release, takeover, handoff, frontier rebuild, and Spec closure.
-- Times use timezone-qualified ISO 8601 values.
-
-The final filename and path rule are configured rather than hard-coded here because the upstream RQ storage design remains separate.
-
-## Spec Lifecycle and Coordination Claims
-
-The Spec document owns its lifecycle:
-
-```text
-draft → ready → active → concluded
-```
-
-The Tracker owns coordination claim state:
-
-```text
-unclaimed ↔ claimed
-             ↓
-           expired
-```
-
-The Tracker derives a human-facing display from the two sources:
-
-| Spec lifecycle | Claim | Display |
-|---|---|---|
-| draft | none | not-ready |
-| ready | none | available |
-| ready or active | effective | claimed |
-| ready or active | expired | takeover-needed |
-| active | deliberately released | paused |
-| concluded | none | concluded |
-
-Claim protocol:
-
-1. Re-read the Tracker and target Spec before claiming.
-2. Claim only a ready or active Spec with no effective claim.
-3. Permit at most one effective claim per Spec.
-4. Renew the lease while coordinating the Spec.
-5. Do not cancel an external job or alter a Run merely because a lease expires.
-6. Before takeover, the new consumer checks existing Runs and scheduler state as part of its own execution responsibility.
-7. On release, record a minimal handoff: completed coordination work, referenced active Runs, outstanding attention, and the next intended action.
-8. On Spec closure, release the claim and retain the last handoff and closure coordination event.
-
-Different Specs under the same RQ may hold claims concurrently. The RQ is not an execution lock.
-
-## Concurrency Control
-
-`tracker_revision` detects stale edits but does not prevent two writers from producing the same next revision. The local Markdown backend therefore uses a short-lived write lock for each Tracker mutation:
-
-```text
-acquire Tracker write lock
-→ re-read tracker_revision
-→ validate operation preconditions
-→ write and validate a temporary document
-→ atomically replace the Tracker
-→ release lock
-```
-
-The write lock protects one file mutation; it is not the long-lived Spec claim. Lock records identify their holder and creation time. The backend configuration defines the stale-lock threshold and recovery procedure. Recovering a stale write lock records a coordination event.
-
-On revision conflict, the consumer discards its proposed document, reads the latest state, and reapplies the semantic operation. It never resolves the conflict by blindly overwriting the newer Tracker.
-
-## Calculation Frontier
-
-The calculation frontier is the set of tasks that are scientifically and technically ready to execute at a given moment. A task is in the frontier only when all of the following hold:
-
-- its Spec is ready or active;
-- the task is not cancelled, paused, or superseded;
-- every upstream task has a valid current Run outcome;
-- the task activation condition evaluates to true;
-- the task has no valid current Run satisfying its current definition;
-- no active Run is already expected to satisfy that task.
-
-Condition states are:
-
-- `true`: the task may enter the frontier;
-- `false`: the task is currently skipped by condition;
-- `undecidable`: more upstream outcomes are required.
-
-The frontier may contain multiple tasks. Resource quotas, queue capacity, and user priority decide which frontier tasks are submitted; they do not change frontier membership.
-
-Consumers recompute the frontier after:
-
-- a Spec revision takes effect;
-- a task is accepted, cancelled, paused, or superseded;
-- a Run starts, ends, loses validity, or becomes current;
-- an activation condition changes;
-- a Spec claim is taken over;
-- an explicit frontier refresh is requested.
-
-Recomputing the frontier modifies only the Tracker view. It does not validate scientific results or alter source states.
-
-## Relationship to Correction
-
-Correction is deliberately outside Tracker authority.
-
-- Run metadata and logs own execution errors and observations.
-- Task metadata owns suspect, needs-review, acceptance invalidation, recomputation reason, and current-Run changes.
-- Spec revisions own approved changes to scientific commitments, replacement tasks, and DAG structure.
-- The Tracker may show a derived `Needs Attention` summary when those facts affect coordination or frontier membership.
-- Detailed diagnosis, root cause, repair steps, and recomputation history are not Tracker events.
-
-The task DAG remains acyclic. Correcting an upstream task does not create a back edge. When a task's scientific commitment remains unchanged, correction creates a new Run under the same task. When the commitment changes, an approved Spec revision creates a replacement task and adjusts current DAG dependencies. Iterative scientific algorithms are encapsulated inside one task and use Runs as their smallest execution units.
-
-## Consumer Contracts
-
-### `calc-project-structure`
-
-- Detects existing Agent instructions and Tracker configuration.
-- Presents the proposed pointer and configuration for approval.
-- Writes or updates the configuration without duplicating instruction blocks.
-- Does not act as the runtime Tracker coordinator.
-
-### Upstream RQ management workflow
-
-- Creates the RQ Tracker when it creates an approved RQ.
-- Reads concluded Spec impact through links from the Tracker.
-- Updates the RQ only after user approval.
-- Does not change Spec DAGs, tasks, or Runs.
-
-### `to-spec`
-
-- Reads the RQ and its Tracker.
-- Creates a Spec draft and stable task declarations.
-- Registers the Spec after user approval makes it ready.
-- Does not create task directories, implement inputs, create Runs, or claim the Spec.
-
-### `implement`
-
-- Reads configuration, Tracker, Spec, tasks, and Runs.
-- Atomically claims the whole Spec.
-- Recomputes the frontier and may submit multiple frontier tasks in parallel.
-- Updates task and Run authorities before refreshing the Tracker view.
-- Renews the claim and records a handoff on release.
-- Does not approve a design revision or an overwrite-style recomputation.
-
-### Future correction capability
-
-Its final skill boundary remains intentionally undesigned. Any future consumer follows the same Tracker configuration and only refreshes Tracker views when correction facts affect coordination. It records correction facts in their owning task, Run, or Spec source.
-
-### Spec closure
-
-The executing workflow first writes the Spec's single immutable closure record and changes the Spec lifecycle to concluded. It then releases the Tracker claim, refreshes views, and records `spec-concluded`. The Tracker links to the closure but does not copy the primary judgment. The upstream RQ workflow separately handles the proposed impact on the RQ.
-
-## Tracker Failure Semantics
-
-Tracker failure behavior is limited to coordination:
-
-- Missing or unparseable configuration: stop the Tracker operation and report it.
-- Missing RQ Tracker: do not infer or rebuild it; defer to the upstream RQ creation workflow.
-- Write-lock conflict: do not write; retry from the newest document or report the conflict.
-- Changed `tracker_revision`: discard the stale proposal and reapply the semantic operation.
-- Syntactically damaged Tracker: stop writes and report the damage; do not modify other domain sources.
-- Expired lease: display the expired claim; external-state checks belong to the session attempting takeover.
-- Stale frontier view: a consumer may recompute it from authoritative sources.
-
-There is no general Tracker audit operation. Domain validation, path repair, DAG validation, correction diagnosis, and scheduler reconciliation belong to their corresponding workflows.
+- Missing or invalid Tracker configuration stops publication or lookup.
+- A missing RQ storage location is handled by `calc-rq`, not inferred by a
+  consumer.
+- A malformed or conflicting Spec stops publication without changing another
+  domain document.
+- Missing or conflicting task and Run records in the Spec stop execution; they
+  are not repaired through the Tracker.
 
 ## Acceptance Criteria
 
-### Configuration
-
-- Consumers locate the protocol through the Agent instruction pointer.
-- Missing or invalid configuration prevents mutation.
-- The initial implementation accepts only the local Markdown backend.
-
-### Creation and registration
-
-- An RQ has at most one Tracker.
-- Re-registering the same Spec is idempotent.
-- A Spec owned by another RQ cannot be registered.
-- A draft may be displayed but cannot be claimed; a ready Spec is available.
-
-### Claims and leases
-
-- Concurrent claims for one Spec yield at most one success.
-- Different Specs can be claimed by different sessions.
-- Only the holder renews a claim.
-- Lease expiry changes coordination state only.
-- Release clears the claim and preserves a minimal handoff.
-
-### Concurrent mutation
-
-- Locking plus revision checks prevent silent overwrite.
-- Conflicts are reapplied against the latest document.
-- Interrupted writes do not leave a partially written Tracker.
-
-### Frontier view
-
-- Independent ready tasks can appear together.
-- Changes in upstream current Runs can refresh the view.
-- The view is rebuildable from authoritative sources.
-- Refreshing it does not alter Spec, task, or Run facts.
-
-### Handoff and closure
-
-- A replacement session can identify the claim state, frontier, active-Run references, attention summary, and next coordination action.
-- A concluded Spec has no effective claim.
-- Closure is linked rather than copied.
-- The Tracker does not formally update the RQ.
-
-### Explicit exclusions
-
-Tracker tests do not assert scientific input quality, Run-result correctness, DAG scientific validity, scheduler execution, correction diagnosis, or whether an RQ should change.
+- Each RQ resolves to one configured Tracker location.
+- Only explicitly published Specs appear in that location.
+- A new session can open a published Spec and reconstruct current work from its
+  task and Run records plus the referenced calculation directories.
+- Pending decisions can be presented without persisted Ticket coordination
+  state.
+- No independent Tracker document or duplicated progress state is required.
 
 ## Non-Goals
 
-- Implementing a standalone Tracker skill.
-- Supporting GitHub, GitLab, Jira, or another remote backend in the first version.
-- Replacing Spec, task, or Run authorities with one database-like document.
-- Managing correction details or scientific evidence.
-- Controlling or reconciling external jobs.
-- Designing the future correction skill.
-- Finalizing RQ storage paths or the complete Calc Project skill roster.
+- Repository scanning or automatic Spec adoption.
+- Spec claims, leases, handoffs, or session recovery records.
+- Cached task frontier, current-task, active-Run, or attention views.
+- Scientific validation, scheduler control, or correction diagnosis.
+
+## Markdown File Conventions
+
+Domain artifacts use plain Markdown with a title, `ID`, `Status`, and only the
+headings needed by that artifact. There is no frontmatter, shared base schema,
+format version, general validator, or error-code taxonomy.
+
+The target layout is:
+
+```text
+<project-root>/01<main-line-slug>/01-rqs/RQ-001-<slug>/
+├── RQ.md
+├── decision-tickets/01-<slug>.md
+└── specs/SPEC-001-<slug>.md
+
+<data-root>/<project-defined-line>/TASK-001-<slug>/
+├── calc-sync.yaml
+└── RUN-001-<slug>/
+    ├── inputs/
+    │   ├── run.sh
+    │   ├── run.pbs
+    │   └── <scientific inputs>
+    ├── outputs/
+    └── logs/
+```
+
+The target structure removes required `PROJECT_PLAN.md`, `01-研究计划/`, and
+`NOTE-doing.md`. Existing-project migration is out of scope.
+
+IDs are scoped to their parent: `RQ-NNN` within a main-line, `DT-NNN` and
+`SPEC-NNN` within an RQ, `TASK-NNN` within a Spec, and `RUN-NNN` within a task.
+They are stable and not reused. Same-parent references use IDs; cross-level
+references use relative paths. Names may append a slug.
+
+### RQ.md
+
+```markdown
+# <RQ title>
+
+ID: RQ-001
+Status: active
+
+## Question
+## Boundary
+## Success Criterion
+## Decisions
+## Specs
+
+- [SPEC-001: <title>](specs/SPEC-001-<slug>.md)
+```
+
+RQ status is `active | concluded`. `Specs` contains only each explicitly
+published Spec's ID, title, and relative link.
+
+### Decision Ticket
+
+```markdown
+# <decision question title>
+
+ID: DT-001
+Status: open
+Blocked by:
+
+## Question
+```
+
+Status is `open | resolved`. `Blocked by` lists IDs in the same RQ and may be
+empty. Resolution adds `## Answer`, whose accepted answer is also reflected in
+`RQ.md`. Directory location expresses RQ ownership.
+
+### Spec
+
+```markdown
+# <Spec title>
+
+ID: SPEC-001
+Status: ready
+RQ: ../RQ.md
+
+## Judgment
+
+## Tasks
+
+### TASK-001: <title>
+
+Status: pending
+Path: <data-root-relative-task-path>
+Blocked by:
+Condition: always
+
+Purpose: <task purpose>
+
+Acceptance: <acceptance condition>
+
+#### Runs
+
+| Run | Status | Current | Path | Result |
+|---|---|---|---|---|
+| RUN-001 | prepared | no | <relative path> | — |
+```
+
+Spec status is `ready | active | concluded`. Task status is `pending | current
+| completed | skipped | cancelled | needs-review`; independent tasks may be
+current together. A task has at most one current Run.
+
+Run status is `prepared | submitted | finished | failed | cancelled`;
+`submitted` covers queueing and execution. Full inputs, outputs, and logs remain
+in the Run directory.
+
+Dependency and condition rules are limited to three:
+
+1. `Blocked by` lists task IDs from the same Spec; dependencies are acyclic.
+2. `Condition` is `always` or one natural-language sentence based on recorded
+   upstream results.
+3. A task stays pending until dependencies and condition permit it; false makes
+   it skipped, while ambiguity returns to `calc-to-spec`.
+
+The Spec owns task purpose, DAG position, high-level status, Runs,
+current-Run designation, and concise execution record. There is no `TASK.md`,
+`RUN.md`, or task-domain YAML.
+
+An approved Spec change overwrites the same file; the Spec keeps no revision
+history. After closure approval, set it to `concluded` and add:
+
+```markdown
+## Closure
+
+Judgment: <final judgment>
+Evidence: <accepted tasks and Runs>
+RQ impact: <proposed RQ update>
+```
+
+`RQ impact` remains a proposal until `calc-rq` updates the RQ.
+
+### Run Inputs and Synchronization
+
+Every Run owns its input snapshot; there is no task-level `inputs/`. `run.sh`
+provides `prepare`, `validate`, and `submit` actions. The sequence is:
+
+```text
+prepare → validate → calc-review → submit unchanged inputs
+```
+
+`calc-sync.yaml` is the only structured exception and is tool configuration,
+not a domain artifact:
+
+```yaml
+local: <project-relative-task-path>
+server: <host:/absolute/task/path>
+exclude:
+  - "*.h5"
+  - WAVECAR
+  - CHGCAR
+```
+
+### Action Checks
+
+Before a write, the responsible skill checks only that the needed headings and
+`ID`/`Status` exist, references resolve uniquely, and the current state permits
+the action. Failure stops that action and is reported in plain language.

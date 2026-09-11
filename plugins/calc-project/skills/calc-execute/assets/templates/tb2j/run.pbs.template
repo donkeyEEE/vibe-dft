@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -N tb2j
+#PBS -q manycores
+#PBS -l nodes=1:ppn=32
+#PBS -l walltime=144:00:00
+#PBS -S /bin/bash
+#PBS -V
+
+RUN_DIR="${PBS_O_WORKDIR:?missing PBS work directory}"
+INPUTS_DIR="$RUN_DIR/inputs"
+OUTPUTS_DIR="$RUN_DIR/outputs"
+LOGS_DIR="$RUN_DIR/logs"
+test -d "$INPUTS_DIR" && test -d "$OUTPUTS_DIR" && test -d "$LOGS_DIR" || exit 1
+source "$INPUTS_DIR/cluster-env.sh" || exit 1
+cd "$OUTPUTS_DIR" || exit 1
+
+test -z "$(find . -mindepth 1 -maxdepth 1 -print -quit)" || { echo "outputs directory is not empty" >&2; exit 1; }
+for file in POSCAR OUTCAR wannier90.1_hr.dat wannier90.2_hr.dat wannier90.1_centres.xyz wannier90.2_centres.xyz; do test -s "$INPUTS_DIR/$file" || { echo "missing TB2J handoff: $file" >&2; exit 1; }; done
+command -v conda >/dev/null 2>&1 && test -n "$TB2J_CONDA_ENV" || exit 1
+cp -- "$INPUTS_DIR/POSCAR" "$INPUTS_DIR/OUTCAR" "$INPUTS_DIR/wannier90.1_hr.dat" "$INPUTS_DIR/wannier90.2_hr.dat" "$INPUTS_DIR/wannier90.1_centres.xyz" "$INPUTS_DIR/wannier90.2_centres.xyz" . || exit 1
+SCF_EFERMI=$(awk '/E-fermi[[:space:]]*:/ { value=$3 } END { print value }' OUTCAR) || exit 1
+printf '%s\n' "$SCF_EFERMI" | grep -Eq '^-?[0-9]+([.][0-9]+)?$' || { echo "missing declared SCF Fermi energy" >&2; exit 1; }
+conda run -n "$TB2J_CONDA_ENV" wann2J.py --posfile POSCAR --rcut "__TB2J_RCUT__" --efermi "$SCF_EFERMI" --kmesh __TB2J_KMESH__ --elements "__TB2J_ELEMENTS__" --prefix_up wannier90.1 --prefix_down wannier90.2 --emin "__TB2J_EMIN__" --emax "__TB2J_EMAX__" > "$LOGS_DIR/tb2j.log" 2>&1 || exit 1
+test -s TB2J_results/exchange.out && test -s TB2J_results/Vampire/vampire.UCF && test -s TB2J_results/Vampire/vampire.mat && test -s TB2J_results/Vampire/input || { echo "missing TB2J exchange or VAMPIRE handoff" >&2; exit 1; }

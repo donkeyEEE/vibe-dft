@@ -1,0 +1,6 @@
+interface:
+  display_name: "Calc RQ"
+  short_description: "管理研究问题与 Decision Ticket"
+  default_prompt: "$calc-rq 推进指定 RQ 或其 Decision Ticket。"
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,4 @@
+#!/bin/bash
+# Render the exact environment from the verified project profile.
+source /etc/profile || return 1
+export TB2J_CONDA_ENV="<verified-tb2j-conda-environment>"

@@ -1,0 +1,486 @@
+[
+  {
+    "source": ".codex-plugin/plugin.json",
+    "targets": [
+      ".codex-plugin/plugin.json"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "resources/calculation-templates/ACCEPTANCE.md",
+    "targets": [],
+    "reason": "Historical acceptance prose is replaced by executable owner-local asset tests."
+  },
+  {
+    "source": "resources/calculation-templates/README.md",
+    "targets": [],
+    "reason": "The shared-template catalog is obsolete after all runtime templates move to their single owner."
+  },
+  {
+    "source": "resources/calculation-templates/common/prepare_and_submit.sh.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/common/run.sh.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "resources/calculation-templates/common/prepare_run.sh.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/common/run.sh.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "resources/calculation-templates/common/submit_run.sh.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/common/run.sh.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "resources/calculation-templates/common/validate_run.sh.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/common/run.sh.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "resources/calculation-templates/vasp/cluster-env.sh.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/vasp/cluster-env.sh.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "resources/calculation-templates/vasp/run_vasp.pbs.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/vasp/scf/run.pbs.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "resources/calculation-templates/vasp/run_vasp_band.pbs.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/vasp/band/run.pbs.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/INDEX.md",
+    "targets": [],
+    "reason": "Owner-local pointers and executable tests replace the stale plugin-level catalog."
+  },
+  {
+    "source": "scripts/common/compare_incar_parameters.sh",
+    "targets": [
+      "skills/calc-execute/scripts/vasp/compare_incar_parameters.sh"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/common/probe-cluster-env.sh",
+    "targets": [
+      "skills/calc-execute/scripts/probe-run-environment.sh"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/common/verify_cluster_profile.sh",
+    "targets": [
+      "skills/calc-setup/scripts/verify_cluster_profile.sh"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/maintenance/report_context_inventory.py",
+    "targets": [],
+    "reason": "The maintainer-only approximate report has no six-skill runtime or acceptance consumer."
+  },
+  {
+    "source": "scripts/sync/sync_calc_data.py",
+    "targets": [
+      "skills/calc-execute/scripts/sync/sync_calc_data.py"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/vampire/pack_magnetic_results.sh",
+    "targets": [
+      "skills/calc-execute/scripts/vampire/pack_magnetic_results.sh"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/vampire/plot.py",
+    "targets": [
+      "skills/calc-execute/scripts/vampire/plot.py"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/vasp/plot_vasp_band.py",
+    "targets": [
+      "skills/calc-execute/scripts/vasp/plot_vasp_band.py"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/wannier/plot_wannier_fit_dn.py",
+    "targets": [
+      "skills/calc-execute/scripts/wannier90/plot_wannier_fit_dn.py"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/wannier/plot_wannier_fit_up.py",
+    "targets": [
+      "skills/calc-execute/scripts/wannier90/plot_wannier_fit_up.py"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/wannier/vest2.py",
+    "targets": [
+      "skills/calc-execute/scripts/wannier90/vest2.py"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "scripts/wannier/wannier-run.env",
+    "targets": [
+      "skills/calc-execute/assets/templates/wannier90/wannier-run.env.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-project-structure/SKILL.md",
+    "targets": [
+      "skills/calc-setup/SKILL.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-project-structure/references/calculation-note-template.md",
+    "targets": [],
+    "reason": "RQ and Spec replace the duplicated task/status matrix authority."
+  },
+  {
+    "source": "skills/calc-project-structure/references/cluster-software-profiles.md",
+    "targets": [
+      "skills/calc-setup/references/cluster-software-profiles.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-project-structure/references/project-context.md",
+    "targets": [
+      "skills/calc-setup/references/project-context.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-project-structure/references/project-structure.md",
+    "targets": [
+      "skills/calc-setup/references/project-structure.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-project-structure/references/workflow-template.md",
+    "targets": [],
+    "reason": "The approved Spec replaces parallel WORKFLOW.md state."
+  },
+  {
+    "source": "skills/calc-sync/SKILL.md",
+    "targets": [
+      "skills/calc-execute/SKILL.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-sync/references/cli.md",
+    "targets": [
+      "skills/calc-execute/references/sync.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-sync/references/remote-completion.md",
+    "targets": [
+      "skills/calc-execute/references/remote-completion.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-task/SKILL.md",
+    "targets": [
+      "skills/calc-to-spec/SKILL.md",
+      "skills/calc-execute/SKILL.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-task/references/calc-task-schema.md",
+    "targets": [
+      "skills/calc-to-spec/SKILL.md",
+      "skills/calc-execute/SKILL.md",
+      "skills/calc-execute/references/sync.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-workflows/SKILL.md",
+    "targets": [
+      "skills/ask-dnk/SKILL.md",
+      "skills/calc-to-spec/SKILL.md",
+      "skills/calc-execute/SKILL.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-workflows/references/multi-task-notes.md",
+    "targets": [],
+    "reason": "The approved Spec replaces parallel workflow and task-note state."
+  },
+  {
+    "source": "skills/calc-workflows/references/pbs.md",
+    "targets": [
+      "skills/calc-execute/references/pbs.md",
+      "skills/calc-review/references/pbs.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-workflows/references/template-copy-preflight.md",
+    "targets": [
+      "skills/calc-execute/references/run-preparation.md",
+      "skills/calc-review/references/pre-submit.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/calc-workflows/references/workflow-handoff.md",
+    "targets": [],
+    "reason": "Sibling transitions and the approved Spec replace WORKFLOW.md handoff state."
+  },
+  {
+    "source": "skills/dmft-workflow/SKILL.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/dmft.md",
+      "skills/calc-execute/references/backends/dmft/common.md",
+      "skills/calc-review/references/backends/dmft.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/dmft-workflow/references/dmft-workflow.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/dmft.md",
+      "skills/calc-execute/references/backends/dmft/common.md",
+      "skills/calc-execute/references/backends/dmft/postprocessing.md",
+      "skills/calc-review/references/backends/dmft.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/SKILL.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/magnetic.md",
+      "skills/calc-execute/references/backends/vasp/common.md",
+      "skills/calc-execute/references/backends/wannier90/common.md",
+      "skills/calc-execute/references/backends/tb2j/common.md",
+      "skills/calc-execute/references/backends/vampire/common.md",
+      "skills/calc-review/references/backends/vasp-magnetic.md",
+      "skills/calc-review/references/backends/wannier90.md",
+      "skills/calc-review/references/backends/tb2j.md",
+      "skills/calc-review/references/backends/vampire.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/assets/templates/tb2j/cluster-env.sh.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/tb2j/cluster-env.sh.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/assets/templates/tb2j/run_tb2j.pbs.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/tb2j/run.pbs.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/assets/templates/vampire/cluster-env.sh.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/vampire/cluster-env.sh.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/assets/templates/vampire/run_vampire.pbs.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/vampire/run.pbs.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/assets/templates/wannier/cluster-env.sh.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/vasp/wannier-prerun/cluster-env.sh.template",
+      "skills/calc-execute/assets/templates/wannier90/cluster-env.sh.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/assets/templates/wannier/run_vasp_wannier_prerun.pbs.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/vasp/wannier-prerun/run.pbs.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/assets/templates/wannier/run_wannier90.pbs.template",
+    "targets": [
+      "skills/calc-execute/assets/templates/wannier90/run.pbs.template"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/references/energy-mapping.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/energy-mapping.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/references/magnetic-handoff-preflight.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/magnetic.md",
+      "skills/calc-review/references/backends/vasp-magnetic.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/references/magnetic-pipeline.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/magnetic.md",
+      "skills/calc-execute/references/backends/vasp/common.md",
+      "skills/calc-execute/references/backends/wannier90/common.md",
+      "skills/calc-execute/references/backends/tb2j/common.md",
+      "skills/calc-execute/references/backends/vampire/common.md",
+      "skills/calc-review/references/backends/vasp-magnetic.md",
+      "skills/calc-review/references/backends/wannier90.md",
+      "skills/calc-review/references/backends/tb2j.md",
+      "skills/calc-review/references/backends/vampire.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/references/reference-cases.md",
+    "targets": [],
+    "reason": "Project-specific historical FGET/FGAT paths are not portable plugin knowledge."
+  },
+  {
+    "source": "skills/magnetic-workflow/references/tb2j-vampire-interface.md",
+    "targets": [
+      "skills/calc-execute/references/backends/vampire/handoff.md",
+      "skills/calc-review/references/backends/vampire.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/magnetic-workflow/references/wannier-window-selection.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/wannier90.md",
+      "skills/calc-review/references/backends/wannier90.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/namd-workflow/SKILL.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/namd.md",
+      "skills/calc-execute/references/backends/namd/common.md",
+      "skills/calc-review/references/backends/namd.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/namd-workflow/agents/openai.yaml",
+    "targets": [
+      "skills/ask-dnk/agents/openai.yaml",
+      "skills/calc-setup/agents/openai.yaml",
+      "skills/calc-rq/agents/openai.yaml",
+      "skills/calc-to-spec/agents/openai.yaml",
+      "skills/calc-execute/agents/openai.yaml",
+      "skills/calc-review/agents/openai.yaml"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/namd-workflow/references/namdwithsoc-interface.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/namd.md",
+      "skills/calc-execute/references/backends/namd/namdwithsoc.md",
+      "skills/calc-review/references/backends/namd.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/script-management/SKILL.md",
+    "targets": [],
+    "reason": "The accepted six interfaces contain no public template-maintenance entry point."
+  },
+  {
+    "source": "skills/script-management/references/templating-from-completed-workflow.md",
+    "targets": [],
+    "reason": "Historical Runs never become defaults automatically; source maintenance is ordinary repository work."
+  },
+  {
+    "source": "skills/vasp-workflow/SKILL.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/vasp.md",
+      "skills/calc-execute/references/backends/vasp/common.md",
+      "skills/calc-review/references/backends/vasp.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/vasp-workflow/references/mae-workflow.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/vasp-mae.md",
+      "skills/calc-execute/references/backends/vasp/mae.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/vasp-workflow/references/vasp-parameters.md",
+    "targets": [
+      "skills/calc-to-spec/references/backends/vasp.md",
+      "skills/calc-execute/references/backends/vasp/common.md",
+      "skills/calc-review/references/backends/vasp.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "skills/vasp-workflow/references/vaspkit.md",
+    "targets": [
+      "skills/calc-execute/references/backends/vasp/common.md",
+      "skills/calc-execute/references/backends/vasp/scf.md",
+      "skills/calc-execute/references/backends/vasp/band.md",
+      "skills/calc-execute/references/backends/vasp/wannier-prerun.md"
+    ],
+    "reason": ""
+  },
+  {
+    "source": "tests/resources/test_calculation_templates.py",
+    "targets": [
+      "skills/calc-execute/tests/test_run_inputs.py",
+      "skills/calc-execute/tests/test_vasp_assets.py",
+      "skills/calc-execute/tests/test_magnetic_assets.py"
+    ],
+    "reason": ""
+  }
+]

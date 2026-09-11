@@ -1,0 +1,5 @@
+# TB2J to VAMPIRE handoff
+
+The exact accepted TB2J `TB2J_results/Vampire/` files are the source. During `run.sh prepare`, copy `vampire.UCF` and `vampire.mat` individually through `copy_immutable SOURCE DESTINATION || return 1`. Create `input` in a private temporary path from the exact TB2J source, changing only `output:material-magnetisation` into the two approved named outputs, then copy it immutably. Any other model/input difference blocks.
+
+Create `model-source.sha256` from the named TB2J source UCF and material files before review, stage it immutably, and verify it against the prepared copies. The manifest has exactly two entries: one valid SHA-256 digest followed by the bare name `vampire.UCF`, and one followed by the bare name `vampire.mat`. Duplicate, omitted, additional, absolute, or directory-qualified names block before VAMPIRE executes. Record the exact source-to-copy paths and checksums. A later source, prepared-model, manifest, or environment change invalidates review; prepare never overwrites a differing destination.

@@ -1,0 +1,4 @@
+#!/bin/bash
+# Render the exact executable path from the verified project profile.
+source /etc/profile || return 1
+export VAMPIRE_EXE="<verified-vampire-executable>"

@@ -1,5 +1,0 @@
-#!/bin/bash
-# TB2J task environment. Replace the Conda environment from the verified profile.
-source /etc/profile || return 1
-source ~/.bashrc || return 1
-export TB2J_CONDA_ENV="tb2j"

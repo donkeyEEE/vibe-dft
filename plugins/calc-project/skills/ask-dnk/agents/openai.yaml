@@ -1,0 +1,6 @@
+interface:
+  display_name: "Ask DNK"
+  short_description: "路由 Calc Project 的显式工作请求"
+  default_prompt: "$ask-dnk 判断这项计算项目工作应进入哪个显式接口。"
+policy:
+  allow_implicit_invocation: false

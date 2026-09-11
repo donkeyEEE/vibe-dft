@@ -1,0 +1,6 @@
+#!/bin/bash
+# Render exact executable paths from the verified project profile.
+source /etc/profile || return 1
+export VASP_EXE="<verified-vasp-executable>"
+export VASPKIT_EXE="<verified-vaspkit-executable>"
+export WANNIER90_EXE="<verified-wannier90-executable>"

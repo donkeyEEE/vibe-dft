@@ -1,0 +1,99 @@
+#!/bin/bash
+
+INPUTS_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)" || exit 1
+RUN_DIR="$(CDPATH= cd -- "$INPUTS_DIR/.." && pwd)" || exit 1
+OUTPUTS_DIR="$RUN_DIR/outputs"
+LOGS_DIR="$RUN_DIR/logs"
+FINGERPRINT_SOURCE="__FINGERPRINT_SOURCE__"
+
+test -d "$INPUTS_DIR" && test -d "$OUTPUTS_DIR" && test -d "$LOGS_DIR" || {
+    echo "incomplete Run directory: $RUN_DIR" >&2
+    exit 1
+}
+
+copy_immutable() {
+    source_path="${1:?missing declared upstream source}"
+    destination_path="${2:?missing declared input destination}"
+
+    test ! -L "$source_path" && test -f "$source_path" || {
+        echo "missing or linked upstream source: $source_path" >&2
+        return 1
+    }
+    destination_parent="$(dirname -- "$destination_path")" || return 1
+    test -d "$destination_parent" || {
+        echo "missing input destination directory: $destination_parent" >&2
+        return 1
+    }
+    destination_parent="$(CDPATH= cd -- "$destination_parent" && pwd -P)" || return 1
+    case "$destination_parent/" in
+        "$INPUTS_DIR/"*) ;;
+        *) echo "input destination escapes this Run: $destination_path" >&2; return 1 ;;
+    esac
+    test ! -L "$destination_path" || {
+        echo "linked input destination refused: $destination_path" >&2
+        return 1
+    }
+    if test -e "$destination_path"; then
+        test -f "$destination_path" && cmp -s -- "$source_path" "$destination_path" || {
+            echo "existing destination differs: $destination_path" >&2
+            return 1
+        }
+        return 0
+    fi
+
+    command -v rsync >/dev/null 2>&1 || {
+        echo "rsync is unavailable for server-side preparation" >&2
+        return 1
+    }
+    rsync -a --ignore-existing -- "$source_path" "$destination_path" || return 1
+    test ! -L "$destination_path" && test -f "$destination_path" \
+        && cmp -s -- "$source_path" "$destination_path" || {
+        echo "prepared destination does not match source: $destination_path" >&2
+        return 1
+    }
+}
+
+prepare_run() {
+    copy_immutable "$FINGERPRINT_SOURCE" "$INPUTS_DIR/fingerprint_run.py" || return 1
+    __PREPARE_BODY__
+}
+
+validate_run() {
+    test -f "$INPUTS_DIR/run.pbs" || {
+        echo "missing PBS script: $INPUTS_DIR/run.pbs" >&2
+        return 1
+    }
+    test -f "$INPUTS_DIR/fingerprint_run.py" || {
+        echo "missing fingerprint helper: $INPUTS_DIR/fingerprint_run.py" >&2
+        return 1
+    }
+    command -v qsub >/dev/null 2>&1 || {
+        echo "qsub is unavailable" >&2
+        return 1
+    }
+    __VALIDATE_BODY__
+    python3 "$INPUTS_DIR/fingerprint_run.py" "$INPUTS_DIR"
+}
+
+case "${1:-}" in
+    prepare)
+        test "$#" -eq 1 || { echo "usage: $0 prepare" >&2; exit 2; }
+        prepare_run
+        ;;
+    validate)
+        test "$#" -eq 1 || { echo "usage: $0 validate" >&2; exit 2; }
+        validate_run
+        ;;
+    submit)
+        test "$#" -le 2 || { echo "usage: $0 submit EXPECTED_DIGEST" >&2; exit 2; }
+        reviewed_digest="${2:?missing reviewed input digest}"
+        actual_digest="$(python3 "$INPUTS_DIR/fingerprint_run.py" "$INPUTS_DIR")" || exit 1
+        test "$actual_digest" = "$reviewed_digest" || { echo 'input snapshot changed' >&2; exit 1; }
+        cd "$RUN_DIR" || exit 1
+        qsub -o "$LOGS_DIR/pbs.stdout" -e "$LOGS_DIR/pbs.stderr" "$INPUTS_DIR/run.pbs"
+        ;;
+    *)
+        echo "usage: $0 prepare|validate|submit [EXPECTED_DIGEST]" >&2
+        exit 2
+        ;;
+esac

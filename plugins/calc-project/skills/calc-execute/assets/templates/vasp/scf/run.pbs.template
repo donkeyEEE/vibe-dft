@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -N vasp-scf
+#PBS -q manycores
+#PBS -l nodes=1:ppn=32
+#PBS -l walltime=144:00:00
+#PBS -S /bin/bash
+#PBS -V
+
+RUN_DIR="${PBS_O_WORKDIR:?missing PBS work directory}"
+INPUTS_DIR="$RUN_DIR/inputs"
+OUTPUTS_DIR="$RUN_DIR/outputs"
+LOGS_DIR="$RUN_DIR/logs"
+test -d "$INPUTS_DIR" && test -d "$OUTPUTS_DIR" && test -d "$LOGS_DIR" || exit 1
+source "$INPUTS_DIR/cluster-env.sh" || exit 1
+cd "$OUTPUTS_DIR" || exit 1
+
+VASP_CHARGE_HANDOFF="__VASP_CHARGE_HANDOFF__"
+test -z "$(find . -mindepth 1 -maxdepth 1 -print -quit)" || { echo "outputs directory is not empty" >&2; exit 1; }
+for file in INCAR POSCAR KPOINTS POTCAR; do test -s "$INPUTS_DIR/$file" || { echo "missing VASP input: $file" >&2; exit 1; }; done
+case "$VASP_CHARGE_HANDOFF" in
+    none) ;;
+    CHGCAR) test -s "$INPUTS_DIR/CHGCAR" || { echo "missing approved MAE charge handoff: CHGCAR" >&2; exit 1; } ;;
+    *) echo "invalid VASP charge-handoff rendering: $VASP_CHARGE_HANDOFF" >&2; exit 1 ;;
+esac
+test -x "$VASP_EXE" && command -v mpirun >/dev/null 2>&1 || exit 1
+test -s "${PBS_NODEFILE:?missing PBS node file}" || exit 1
+cp -- "$INPUTS_DIR/INCAR" "$INPUTS_DIR/POSCAR" "$INPUTS_DIR/KPOINTS" "$INPUTS_DIR/POTCAR" . || exit 1
+case "$VASP_CHARGE_HANDOFF" in CHGCAR) cp -- "$INPUTS_DIR/CHGCAR" ./CHGCAR || exit 1 ;; esac
+ulimit -s unlimited
+mpirun -machinefile "$PBS_NODEFILE" -np "$(wc -l < "$PBS_NODEFILE")" "$VASP_EXE" > "$LOGS_DIR/vasp.log" 2>&1 || exit 1
+test -s OUTCAR || { echo "missing or empty VASP OUTCAR" >&2; exit 1; }
