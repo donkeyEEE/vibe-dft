@@ -116,7 +116,8 @@ const BackendLoadingModel = (() => {
         next.scf.run = "submitted"; next.scf.status = "submitted"; return note(next, "SCF 已提交；review 没有创建任何计算输出。");
       case "finish-scf":
         if (next.scf.run !== "submitted") return fail(next, "拒绝接受 SCF：必须先提交，并同步运行证据。");
-        next.scf.run = "current-valid"; next.scf.chgcar = true; next.scf.status = "accepted"; next.band.status = "frontier";
+        next.scf.run = "current-valid"; next.scf.chgcar = true; next.scf.status = "accepted";
+        if (next.band.status !== "needs-review") { next.band.status = "frontier"; if (next.band.run === "invalid") next.band.run = "none"; }
         return note(next, "SCF current Run 有效且 CHGCAR 可用；band task 现在进入 frontier。");
       case "load-band":
         next.focus = "band"; next.band.knowledge = true; next.scf.knowledge = false;
@@ -143,8 +144,10 @@ const BackendLoadingModel = (() => {
       case "invalidate-scf":
         if (next.scf.run !== "current-valid") return fail(next, "没有可失效的 SCF current Run。");
         next.scf.run = "invalid"; next.scf.chgcar = false; next.scf.prepared = false; next.scf.reviewed = false; next.scf.status = "declared";
-        next.band.status = next.band.run === "current-valid" ? "needs-review" : "blocked"; next.spec = "active";
-        return note(next, "SCF current Run 已失效；band 被移出 frontier，既有 band 结果转为 needs-review。");
+        if (next.band.run === "current-valid") next.band.status = "needs-review";
+        else { next.band.status = "blocked"; next.band.run = next.band.run === "submitted" ? "invalid" : next.band.run; next.band.prepared = false; next.band.reviewed = false; }
+        next.spec = "active";
+        return note(next, "SCF current Run 已失效；既有 band 结果转为 needs-review，未完成的 band chain 失效并须重新准备。");
       default: return fail(next, "未知动作。")
     }
   }
