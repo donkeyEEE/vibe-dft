@@ -25,3 +25,13 @@
 - 保留用户已有改动；提交只包含当前任务范围。
 - 变更完成前运行与范围相称的测试。
 - 安装、发布、删除源仓库或改写外部环境需要用户明确授权。
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs are tracked as local Markdown files under `.scratch/`. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+This repository uses a single-context domain documentation layout. See `docs/agents/domain.md`.
