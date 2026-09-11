@@ -7,11 +7,12 @@ Codex 插件。插件中的技能通过 `paper-project:<skill-name>` 命名空�
 
 - `big-paper-helper`：规划、起草、修改和审计材料计算类中文博士论文。
 - [pr-intro](skills/pr-intro/SKILL.md)：Draft or restructure evidence-grounded Physical Review Introductions.
-- `prl-polishing`：按 claim、evidence、boundary 和 consequence 逻辑逐段审阅或润色物理学论文。
 - `prl-figure`：创建、修改和审查投稿级科学图件。
 - `citation-validator`：检查 DOCX 稿件中的引用是否真正支持相邻主张。
 - `zo2notes`：把 Zotero 文献转成项目内中文阅读笔记。
 其余可用技能以安装后 `codex plugin list` 和 Codex 技能列表为准。
+
+Paper Project 的写作参考资料均位于对应 skill 的 `references/`，插件根目录不维护共享 `resources/`。通用物理论文逐段润色已迁移到 Skill Incubator 的 `prl-polishing`。
 
 ## 运行依赖
 

@@ -1,0 +1,40 @@
+name: paper2ppt
+version: 4.0.0
+description: Academic paper analysis and interaction that hands minimal source materials to the bundled sibling PPT Master.
+
+always_load:
+  - references/paper-writing/write-terminology-ledger.md
+  - static/core/principles.md
+  - static/core/toolchain.md
+  - static/core/workflow.md
+  - static/core/output-and-quality.md
+
+workflow: workflows/paper-to-deck.md
+
+axes:
+  paper_type:
+    detect: Use the user's framing first; otherwise classify the dominant argument.
+    values:
+      discovery: static/fragments/paper_type/discovery.md
+      methods: static/fragments/paper_type/methods.md
+      resource: static/fragments/paper_type/resource.md
+      clinical: static/fragments/paper_type/clinical.md
+      materials: static/fragments/paper_type/materials.md
+      review: static/fragments/paper_type/review.md
+    default: discovery
+    multi: false
+
+handoff:
+  builder: scripts/build_material_handoff.py
+  source_normalization_skill: ../liteparse/SKILL.md
+  figure_assets: scripts/figure_assets.py
+  consumer_skill: ../ppt-master/SKILL.md
+
+references:
+  on_demand:
+    - path: references/figure-assets.md
+    - path: references/artifact-ownership.md
+    - path: references/self-review.md
+    - path: references/rendering-boundary.md
+    - path: workflows/revise-deck.md
+    - path: workflows/failure-recovery.md

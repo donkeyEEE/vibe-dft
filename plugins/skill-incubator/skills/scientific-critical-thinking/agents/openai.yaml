@@ -1,0 +1,4 @@
+interface:
+  display_name: "材料科学批判性审查"
+  short_description: "依据来源证据严谨审查材料物理主张、研究局限和替代解释"
+  default_prompt: "使用 $scientific-critical-thinking 根据可用的文献证据批判性审查这项材料物理主张。"

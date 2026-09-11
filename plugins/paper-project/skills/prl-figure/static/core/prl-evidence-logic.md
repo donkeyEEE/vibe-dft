@@ -60,4 +60,4 @@ Before selecting an archetype or palette, verify:
 4. Model assumptions and sensitivity are visible where they change interpretation.
 5. Quantitative criteria and uncertainty survive at final size.
 
-These rules synthesize the PRL shared cards tagged `task/figure`; consult the individual card when a task turns on its specific caveat.
+These rules synthesize the skill-owned PRL cards tagged `task/figure`; consult the individual card when a task turns on its specific caveat.

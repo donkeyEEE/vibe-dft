@@ -6,6 +6,7 @@ SKILL_ROOT = ROOT / "plugins/paper-project/skills/pr-intro"
 SKILL = SKILL_ROOT / "SKILL.md"
 INTRO_LOGIC = "references/writing/pr-introduction-logic.md"
 SOURCE_BOUNDARIES = "references/writing/source-boundaries.md"
+INTERACTION_PROTOCOL = "references/writing/interaction-protocol.md"
 
 
 def test_router_keeps_maintenance_explicit():
@@ -20,9 +21,36 @@ def test_router_keeps_maintenance_explicit():
 def test_router_names_existing_writing_references():
     text = SKILL.read_text(encoding="utf-8")
 
-    for relative_path in (INTRO_LOGIC, SOURCE_BOUNDARIES):
+    for relative_path in (INTRO_LOGIC, SOURCE_BOUNDARIES, INTERACTION_PROTOCOL):
         assert relative_path in text
         assert (SKILL_ROOT / relative_path).is_file()
+
+
+def test_interaction_protocol_preserves_stable_locators_and_user_decisions():
+    protocol = (SKILL_ROOT / INTERACTION_PROTOCOL).read_text(encoding="utf-8")
+    normalized = " ".join(protocol.split())
+    normalized_lower = normalized.lower()
+
+    for requirement in (
+        "P1",
+        "revision map",
+        "one unresolved paragraph per turn",
+        "complete original paragraph",
+        "C1",
+        "Before",
+        "After",
+        "Why",
+        "Accept",
+        "Reject",
+        "Revise",
+        "Keep original",
+        "Skip for now",
+    ):
+        assert requirement in normalized
+    for requirement in ("single paragraph", "one-shot"):
+        assert requirement in normalized_lower
+    assert "Do not assemble" in protocol
+    assert "Do not invent" in protocol
 
 
 def test_ordinary_route_excludes_evaluation_and_maintenance_content():

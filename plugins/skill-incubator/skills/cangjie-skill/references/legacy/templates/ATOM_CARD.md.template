@@ -1,0 +1,22 @@
+---
+name: {{registered-prefix}}-{{atomic-topic}}
+type: {{approved-type}}
+tags: [{{registered-tag-1}}, {{registered-tag-2}}]
+updated_at: {{YYYY-MM-DD}}
+---
+
+# {{Card title}}
+
+{{正文首段：一条完整、可独立理解、可复用的原子主张。}}
+
+## Explanation
+
+{{可选：解释机制、适用条件、公式或推导。}}
+
+## Caveats
+
+{{可选：边界、反例或不确定性。}}
+
+## References
+
+{{可选：来源定位或引用；不得加入 frontmatter。}}

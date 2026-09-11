@@ -199,8 +199,8 @@ def assert_bundle_contract(bundle_root: Path, version: str) -> None:
         marketplace_path,
         bundled_plugin / ".codex-plugin/plugin.json",
         bundled_plugin / "README.md",
-        bundled_plugin / "skills/prl-polishing/SKILL.md",
-        bundled_plugin / "resources/paper-writing/README.md",
+        bundled_plugin / "skills/pr-intro/SKILL.md",
+        bundled_plugin / "skills/prl-figure/SKILL.md",
         bundle_root / "README.md",
         bundle_root / "MANIFEST.sha256",
     ]

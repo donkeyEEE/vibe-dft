@@ -7,6 +7,7 @@
 - [calc-project](plugins/calc-project/)：科研计算项目结构、任务元数据、数据同步与 VASP、DMFT、NAMD、磁性计算工作流。计算输入与计算模板维护进入此插件。
 - [paper-project](plugins/paper-project/)：文献整理、论文与学位论文写作、引用核验和科学图件。研究证据与学术表达任务进入此插件。
 - [osm-project](plugins/osm-project/)：将当前对话中的项目进展整理为草稿，经确认后写入 Obsidian Daily Note。用户要求记录项目日志时进入此插件。
+- [skill-incubator](plugins/skill-incubator/)：维护尚未形成独立插件边界的可安装 skill，包括通用物理论文润色与演示文稿工作流。
 
 上游来源和常用 skill 功能见 [README.md](README.md)。插件的 `skills/*/SKILL.md` 目录集合是 Skill roster；选择具体 skill 时读取其 `SKILL.md`。调用策略以该 skill 的 `agents/openai.yaml` 为准。
 
@@ -16,6 +17,7 @@
 - 修改 skill 的隐式调用能力时，更新其 `agents/openai.yaml`；默认允许隐式调用，只有仅限用户显式调用的入口才声明 `allow_implicit_invocation: false`。
 - 新增或删除 skill 时，直接修改所属插件的 `skills/` 目录并按普通代码审查验证；仓库不维护 skill 生命周期状态或独立 roster 清单。
 - 修改 skill 所属资源、插件共享资源、计算模板或其消费路径时，读取 `CONTEXT.md` 的 Paper Project、Calc Project 和 Plugin Resources 章节。
+- Paper Project 的写作资源全部与 consuming skill 共置于 `references/`，不使用插件级 `resources/`。
 
 ## 仓库规则
 

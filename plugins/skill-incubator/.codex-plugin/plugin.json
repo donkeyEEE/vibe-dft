@@ -1,0 +1,28 @@
+{
+  "name": "skill-incubator",
+  "version": "0.1.0",
+  "description": "An installable experimentation ground for skills that have not yet formed an independent plugin boundary.",
+  "author": {
+    "name": "donk"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Skill Incubator",
+    "shortDescription": "Installable experimentation ground for evolving skills",
+    "longDescription": "Skill Incubator packages evolving skills for normal installation, invocation, and release while their long-term plugin boundary remains a maintainer decision. It currently covers physics-manuscript polishing, presentations, reviewer responses, scholarly evaluation, scientific critical thinking, and an explicit-only knowledge-distillation entry point.",
+    "developerName": "donk",
+    "category": "Productivity",
+    "capabilities": [
+      "Research",
+      "Presentations",
+      "Write",
+      "Evaluation"
+    ],
+    "defaultPrompt": [
+      "Use paper2ppt to turn this scientific paper into presentation-ready source material",
+      "Use ppt-master to create, fill, or enhance an editable PowerPoint presentation",
+      "Use prl-polishing to review and revise this physics manuscript paragraph by paragraph",
+      "Use the appropriate incubating skill to evaluate research or prepare a reviewer response"
+    ]
+  }
+}

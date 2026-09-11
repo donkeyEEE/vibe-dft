@@ -29,7 +29,7 @@ _Avoid_: 计算模板，任务专用脚本
 
 ## Paper Project
 
-`plugins/paper-project` 面向学术研究与论文工作；多个活动 skill 共用的写作资源位于插件内 [resources/](plugins/paper-project/resources/)。
+`plugins/paper-project` 面向学术研究与论文工作；写作资源全部下放到实际消费它们的 skill 的 `references/`，不保留插件级 `resources/`。
 
 **遮蔽续写测试（Masked Continuation Evaluation）**:
 向受测 agent 只提供 Introduction 的可见前文与候选 skill，由其生成被遮蔽的后续论证；评估以修辞功能、科学内容兼容性、信息密度和无虚构为主，不要求逐字复现原文。
@@ -61,8 +61,14 @@ _Avoid_: 训练数据集、临时样本集
 
 **插件共享资源（plugin-shared resource）**由同一插件内至少两个活动 skill 实际消费，位于 `plugins/<plugin>/resources/`。共享目录 README 记录消费者，但不提供运行时发现索引。
 
+Paper Project 不采用插件共享资源：即使另一插件中的 skill 使用相同内容，各插件也各自维护 skill-owned 副本，运行时不跨插件读取文件。Calc Project 的共享计算模板设计保持不变。
+
 当前没有 formal、candidate 或 incubating 资源状态，也没有通用知识消费协议或项目初始化机制。历史材料只可留在历史文档或 Cangjie 明确标记为非执行的 `references/legacy/`。
 
 ## OSM Project
 
 `plugins/osm-project` 维护 Obsidian Self-Management（OSM）的项目日志工作流。
+
+## Skill Incubator
+
+`plugins/skill-incubator` 是可安装的通用 skill 试验场，收纳尚未形成独立插件边界的工作流。`prl-polishing` 在此继续提供通用物理论文逐段润色；Physical Review Introduction 的专用写作与重构由 Paper Project 的 `pr-intro` 负责。

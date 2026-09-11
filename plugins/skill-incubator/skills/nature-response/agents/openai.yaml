@@ -1,0 +1,4 @@
+interface:
+  display_name: "审稿回复与返修信"
+  short_description: "起草、审校并完善逐点审稿回复、返修说明、编辑附信与修订包"
+  default_prompt: "使用 $nature-response 根据编辑决定信和审稿意见起草逐点回复与返修信。"

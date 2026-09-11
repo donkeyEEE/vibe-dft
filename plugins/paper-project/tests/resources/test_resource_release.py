@@ -41,16 +41,17 @@ def release_files(tmp_path: Path) -> set[str]:
         return set(package.getnames())
 
 
-def test_release_contains_resources_without_retired_knowledge(
+def test_release_contains_skill_owned_resources_without_retired_knowledge(
     release_files: set[str],
 ) -> None:
     """Catch release packaging that omits live resources or ships retired data."""
-    assert PREFIX + "resources/paper-writing/README.md" in release_files
     assert (
         PREFIX
-        + "skills/prl-polishing/references/paper-writing/write-reader-question-sequence.md"
+        + "skills/prl-figure/references/paper-writing/write-prl-model-to-validation-pairing.md"
         in release_files
     )
+    assert not any(name.startswith(PREFIX + "resources/") for name in release_files)
+    assert not any(name.startswith(PREFIX + "skills/prl-polishing/") for name in release_files)
     assert PREFIX + "skills/cangjie-skill/SKILL.md" not in release_files
     for relative in (
         "skills/zo2notes/scripts/runtime_config.py",
@@ -85,6 +86,7 @@ def test_pr_intro_runtime_files_ship_without_local_eval_data(
         "references/maintenance/scoring-rubric.md",
         "references/writing/pr-introduction-logic.md",
         "references/writing/source-boundaries.md",
+        "references/writing/interaction-protocol.md",
         "scripts/build_eval_dataset.py",
         "scripts/eval_model.py",
         "scripts/prepare_optimization_run.py",

@@ -1,0 +1,95 @@
+# Interactive Introduction Review
+
+Use this protocol for drafting or restructuring an Introduction while keeping
+the author in control of every substantive change. The available-facts view,
+six-move argument, and source boundaries govern every phase. Do not invent
+scientific content, evidence, sources, or citations to complete a move.
+
+## Choose the mode
+
+- **Interactive review:** default for two or more paragraphs or a complete
+  Introduction.
+- **Single paragraph:** start directly with the paragraph review.
+- **Direct mode:** use only when the user explicitly requests a one-shot
+  revision, a complete final version, or no intermediate confirmation.
+
+If paragraph boundaries are unreliable, segment by inferential job and say so.
+Assign stable paragraph IDs (`P1`, `P2`, ...) and retain them throughout the
+review.
+
+## Phase A: revision map
+
+For a multi-paragraph Introduction, first show a revision map without rewriting
+the prose. For each paragraph, report:
+
+- its stable paragraph ID;
+- its current role in the six-move argument;
+- its main structural or evidentiary problem;
+- the proposed scope (`light`, `moderate`, or `structural`);
+- the intended action, including any move, merge, split, or deletion;
+- any evidence risk or unresolved need.
+
+Ask the user to confirm or adjust the map. Begin paragraph revision only after
+confirmation unless the user explicitly asks to start immediately.
+
+## Phase B: one paragraph at a time
+
+Review exactly one unresolved paragraph per turn unless the user explicitly
+requests a batch.
+
+### B1: selectable located changes
+
+Show the complete original paragraph. Assign its sentences stable source-order
+IDs (`O1`, `O2`, ...) without altering or omitting their text.
+
+Then present each independently selectable change with stable IDs (`C1`, `C2`,
+...) in this form:
+
+### C<n> — <purpose>
+
+**Original location**
+
+List every affected `O<n>` ID, sentence number, and a short exact anchor.
+
+**Before**
+
+Reproduce every affected original sentence completely and in source order.
+
+**After**
+
+Give the complete replacement sentence or sentences. Use no ellipses or
+changed-words-only excerpts.
+
+**Why**
+
+Tie the reason to the paragraph's inferential role, argument transition,
+evidence, source boundary, terminology, or language. Name supplied evidence
+when it motivates a scientific change.
+
+**Decision**
+
+- `Accept C<n>` locks the complete After text.
+- `Reject C<n>` locks the complete Before text.
+- `Revise C<n>: <instruction>` keeps only that change open.
+
+Do not assemble or display a proposed paragraph until all its changes have
+been accepted, rejected, or revised to resolution.
+
+### B2: paragraph decision
+
+Assemble the paragraph from its resolved changes, then offer:
+
+- `Accept` — lock the assembled paragraph.
+- `Revise` — keep it open and apply the requested revision.
+- `Keep original` — lock the exact original paragraph and discard its changes.
+- `Skip for now` — leave it unresolved and continue to another paragraph.
+
+A locked original remains verbatim unless the user explicitly reopens it.
+Retain all paragraph, sentence, and change IDs throughout the review.
+
+## Phase C: consolidation
+
+Consolidate the complete Introduction only after all paragraph decisions are
+resolved. Preserve accepted ordering and locked originals. Return the
+consolidated prose, material structural changes, and unresolved evidence needs.
+If the user explicitly requests an incomplete snapshot, label it as partial.

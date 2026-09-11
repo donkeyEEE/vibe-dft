@@ -2,8 +2,8 @@ from pathlib import Path
 
 
 PLUGIN = Path(__file__).resolve().parents[2]
-SHARED = PLUGIN / "resources" / "paper-writing"
-POLISHING = PLUGIN / "skills" / "prl-polishing" / "references" / "paper-writing"
+ROOT = PLUGIN.parents[1]
+POLISHING = ROOT / "plugins" / "skill-incubator" / "skills" / "prl-polishing" / "references" / "paper-writing"
 FIGURE = PLUGIN / "skills" / "prl-figure" / "references" / "paper-writing"
 
 EXPECTED_SHARED = {
@@ -44,24 +44,26 @@ def markdown_files(root: Path) -> set[str]:
     return {path.name for path in root.glob("*.md") if path.name != "README.md"}
 
 
-def test_active_paper_resources_have_one_declared_owner() -> None:
-    """Catch missing, duplicated, or accidentally retained paper resources."""
-    assert markdown_files(SHARED) == EXPECTED_SHARED
-    assert markdown_files(POLISHING) == EXPECTED_POLISHING
-    assert markdown_files(FIGURE) == EXPECTED_FIGURE
+def test_paper_project_has_only_skill_owned_resources() -> None:
+    """Every active paper-writing card belongs to each consuming skill."""
+    assert not (PLUGIN / "resources").exists()
+    assert markdown_files(POLISHING) == EXPECTED_POLISHING | EXPECTED_SHARED
+    assert markdown_files(FIGURE) == EXPECTED_FIGURE | EXPECTED_SHARED
 
 
-def test_shared_paper_resources_declare_real_consumers() -> None:
-    """Catch a plugin-shared source becoming an ownerless resource dump."""
-    declaration = (SHARED / "README.md").read_text(encoding="utf-8")
-    assert "prl-polishing" in declaration
-    assert "prl-figure" in declaration
-    assert "paper2ppt" not in declaration
+def test_consumer_manifests_use_only_skill_local_paper_resources() -> None:
+    for skill in (POLISHING.parents[1], FIGURE.parents[1]):
+        manifest = (skill / "manifest.yaml").read_text(encoding="utf-8")
+        assert "../../resources/" not in manifest
+        for name in EXPECTED_SHARED:
+            relative = f"references/paper-writing/{name}"
+            assert relative in manifest
+            assert (skill / relative).is_file()
 
 
 def test_retained_paper_resources_keep_card_metadata() -> None:
     """Catch a move that strips the evidence-card identity and provenance."""
-    for root in (SHARED, POLISHING, FIGURE):
+    for root in (POLISHING, FIGURE):
         for resource in root.glob("*.md"):
             if resource.name == "README.md":
                 continue

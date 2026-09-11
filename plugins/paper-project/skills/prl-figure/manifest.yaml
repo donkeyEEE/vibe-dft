@@ -11,13 +11,13 @@ description: >
 always_load:
   - references/paper-writing/journal-physical-review-figure-preparation.md
   - references/paper-writing/journal-physical-review-supplemental-material.md
-  - ../../resources/paper-writing/write-prl-model-to-validation-pairing.md
-  - ../../resources/paper-writing/write-prl-figure-prerequisite-signature-consequence.md
-  - ../../resources/paper-writing/write-prl-quantitative-claim-with-criterion.md
-  - ../../resources/paper-writing/write-prl-main-text-supplement-evidence-allocation.md
-  - ../../resources/paper-writing/write-prl-prediction-condition-observable-bridge.md
-  - ../../resources/paper-writing/write-prl-mechanism-control-comparator.md
-  - ../../resources/paper-writing/write-prl-computational-sensitivity-as-result.md
+  - references/paper-writing/write-prl-model-to-validation-pairing.md
+  - references/paper-writing/write-prl-figure-prerequisite-signature-consequence.md
+  - references/paper-writing/write-prl-quantitative-claim-with-criterion.md
+  - references/paper-writing/write-prl-main-text-supplement-evidence-allocation.md
+  - references/paper-writing/write-prl-prediction-condition-observable-bridge.md
+  - references/paper-writing/write-prl-mechanism-control-comparator.md
+  - references/paper-writing/write-prl-computational-sensitivity-as-result.md
   # Skill-local core
   - static/core/contract.md
   - static/core/prl-evidence-logic.md

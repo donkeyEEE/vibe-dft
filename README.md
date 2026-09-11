@@ -1,6 +1,6 @@
 # YZ Skills
 
-面向科研计算、学术写作与个人项目日志的 Codex 插件集合。本仓库集中维护三个插件及其 skill、脚本、模板和参考资料，每个 `plugins/<plugin-name>/` 目录都是独立的插件发布单元。
+面向科研计算、学术写作与个人项目日志的 Codex 插件集合。本仓库集中维护四个插件及其 skill、脚本、模板和参考资料，每个 `plugins/<plugin-name>/` 目录都是独立的插件发布单元。
 
 ## 插件一览
 
@@ -9,6 +9,7 @@
 | [calc-project](plugins/calc-project/) | 科研计算项目与方法工作流 | 建立计算任务、准备输入、同步数据、维护模板 |
 | [paper-project](plugins/paper-project/) | 文献证据与学术写作 | 整理文献、核查引用、润色论文与制作科学图件 |
 | [osm-project](plugins/osm-project/) | 个人项目进展记录 | 将当前会话整理为 Obsidian 项目日志 |
+| [skill-incubator](plugins/skill-incubator/) | 通用 skill 试验场 | 物理论文润色、演示文稿和学术评价 |
 
 ## 安装
 
@@ -27,6 +28,7 @@ codex plugin marketplace add "$(pwd)"
 codex plugin add calc-project@yz-skills
 codex plugin add paper-project@yz-skills
 codex plugin add osm-project@yz-skills
+codex plugin add skill-incubator@yz-skills
 codex plugin list
 ```
 
@@ -61,7 +63,6 @@ codex plugin list
 | [liteparse](plugins/paper-project/skills/liteparse/SKILL.md) | 提取 PDF、Office 文档和图片中的文字、版面坐标，支持 OCR 与页面渲染。 |
 | [citation-validator](plugins/paper-project/skills/citation-validator/SKILL.md) | 检查 Word 稿件中的引用是否支持对应论断，结合 Zotero 文献评估支持程度。 |
 | [pr-intro](plugins/paper-project/skills/pr-intro/SKILL.md) | Draft or restructure evidence-grounded Physical Review Introductions. |
-| [prl-polishing](plugins/paper-project/skills/prl-polishing/SKILL.md) | 按论断、证据、适用边界与物理意义组织科研文字，支持润色、重构和中英翻译。 |
 | [big-paper-helper](plugins/paper-project/skills/big-paper-helper/SKILL.md) | 规划、撰写、整合或审查计算材料领域的中文学位论文。 |
 | [prl-figure](plugins/paper-project/skills/prl-figure/SKILL.md) | 制作、审查和导出面向投稿的科学图件，组织多面板证据与验证结果。 |
 | [yuanzhuo-skill](plugins/paper-project/skills/yuanzhuo-skill/SKILL.md) | 组织人物视角的独立分析、交叉提问与主持式圆桌讨论。 |
@@ -70,13 +71,21 @@ codex plugin list
 
 [log2ob](plugins/osm-project/skills/log2ob/SKILL.md) 将当前会话中的任务、进展、结论、未决事项和恢复入口整理成项目状态草稿，经用户确认后写入 Obsidian Daily Note。适合完成一段工作后记录进展，或为下一次继续工作保留入口。
 
+### skill-incubator：试验中通用工作流
+
+| Skill | 功能与适用场景 |
+| --- | --- |
+| [prl-polishing](plugins/skill-incubator/skills/prl-polishing/SKILL.md) | 按论断、证据、适用边界与物理意义组织科研文字，支持润色、重构和中英翻译。 |
+| [paper2ppt](plugins/skill-incubator/skills/paper2ppt/SKILL.md) | 将科研论文组织为可交付给 PPT Master 的演示素材。 |
+| [ppt-master](plugins/skill-incubator/skills/ppt-master/SKILL.md) | 创建、填充和验证可编辑演示文稿。 |
+
 ## 使用与维护入口
 
 在已加载相应插件的会话中，可以显式指定 skill 并描述任务，例如：
 
 ```text
 $calc-project:calc-task 为这次 VASP 计算登记任务元数据。
-$paper-project:prl-polishing 润色下面的论文段落，保留论断的适用条件。
+$skill-incubator:prl-polishing 润色下面的论文段落，保留论断的适用条件。
 $osm-project:log2ob 记录本次项目进展。
 ```
 

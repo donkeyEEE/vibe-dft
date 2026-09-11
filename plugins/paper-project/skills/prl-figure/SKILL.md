@@ -34,11 +34,10 @@ Only continue to the Python/R backend gate for plotting, charting, data visualiz
 
 Read [manifest.yaml](manifest.yaml). It declares the `backend` axis, the allowed values, and the file paths each value maps to.
 
-Read every exact skill-owned and plugin-shared resource listed under
-`always_load`. Read shared resources from the current plugin tree on each
-invocation. If an optional shared resource is unavailable or malformed, warn
-and continue without substituting another resource source. A missing
-skill-owned reference is a plugin packaging defect. The local
+Read every exact skill-owned reference listed under `always_load` from the
+current skill tree on each invocation. If an optional reference is unavailable
+or malformed, warn and continue without substituting another resource source.
+A missing declared reference is a plugin packaging defect. The local
 `static/core/prl-evidence-logic.md` integrates the reusable figure workflow;
 individual references retain their evidence and caveats.
 
