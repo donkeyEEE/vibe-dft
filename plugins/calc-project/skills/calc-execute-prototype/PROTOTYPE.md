@@ -15,7 +15,8 @@ Run the filesystem seam without VASP or a scheduler:
 bash plugins/calc-project/skills/calc-execute-prototype/scripts/vasp/smoke_scf_band.sh
 ```
 
-The smoke stages representative SCF and band task inputs under a temporary
-directory, creates a representative server-side SCF `CHGCAR`, copies it into
-the band Run boundary, and verifies the declared inputs and output handoff. It
-does not claim to validate material parameters, execute VASP, or submit PBS.
+The smoke selects and reads the stage-specific backend reference bundle, stages
+representative SCF and band task inputs under a temporary directory, creates a
+representative server-side SCF `CHGCAR`, copies it into the band Run boundary,
+and verifies the declared inputs and output handoff. It does not claim to
+validate material parameters, execute VASP, or submit PBS.

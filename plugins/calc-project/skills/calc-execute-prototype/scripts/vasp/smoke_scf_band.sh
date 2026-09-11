@@ -5,6 +5,22 @@ PROTOTYPE_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)"
 WORK_ROOT="$(mktemp -d)"
 trap 'rm -rf -- "$WORK_ROOT"' EXIT
 
+SCF_KNOWLEDGE="$(bash "$PROTOTYPE_ROOT/scripts/vasp/select_backend_knowledge.sh" scf)"
+BAND_KNOWLEDGE="$(bash "$PROTOTYPE_ROOT/scripts/vasp/select_backend_knowledge.sh" band)"
+echo "$SCF_KNOWLEDGE" | grep -q '/common.md$'
+echo "$SCF_KNOWLEDGE" | grep -q '/scf.md$'
+! echo "$SCF_KNOWLEDGE" | grep -q '/band.md$'
+echo "$BAND_KNOWLEDGE" | grep -q '/common.md$'
+echo "$BAND_KNOWLEDGE" | grep -q '/band.md$'
+echo "$BAND_KNOWLEDGE" | grep -q '/handoff.md$'
+! echo "$BAND_KNOWLEDGE" | grep -q '/scf.md$'
+while IFS= read -r knowledge_file; do
+    grep -q '^# ' "$knowledge_file"
+done <<EOF
+$SCF_KNOWLEDGE
+$BAND_KNOWLEDGE
+EOF
+
 for stage in scf band; do
     mkdir -p "$WORK_ROOT/$stage/inputs" "$WORK_ROOT/$stage/run-001"
     sed -e 's/__SYSTEM__/demo/' -e 's/__ENCUT__/520/' -e 's/__ISPIN__/2/' \
@@ -27,4 +43,4 @@ printf 'representative band data\n' > "$WORK_ROOT/band/run-001/BAND.dat"
 bash "$PROTOTYPE_ROOT/scripts/vasp/validate_stage.sh" band \
     "$WORK_ROOT/band/inputs" "$WORK_ROOT/band/run-001"
 
-echo "SCF to band staging and handoff smoke passed"
+echo "Selective knowledge loading, staging, and SCF to band handoff smoke passed"

@@ -104,15 +104,16 @@ const BackendLoadingModel = (() => {
         return note(next, "仅加载 VASP 通用检查、SCF 规则和集群 profile；未加载 band path 或后处理知识。");
       case "prepare-scf":
         if (!next.scf.knowledge) return fail(next, "拒绝准备 SCF：当前阶段尚未加载 SCF backend 知识。");
-        next.scf.prepared = true; next.scf.status = "prepared";
+        if (next.scf.status !== "declared") return fail(next, "拒绝准备 SCF：SCF 不在当前 frontier。");
+        next.scf.prepared = true; next.scf.reviewed = false; next.scf.run = "none"; next.scf.status = "prepared";
         return note(next, "SCF snapshot 已准备；模板值只作为已批准基线，材料参数仍来自任务声明。");
       case "review-scf":
         if (!next.scf.prepared) return fail(next, "拒绝评审 SCF：不存在 exact prepared snapshot。");
         next.scf.reviewed = true;
         return note(next, "SCF snapshot 通过瞬时 pre-submit review。");
       case "submit-scf":
-        if (!next.scf.reviewed) return fail(next, "拒绝提交 SCF：snapshot 未评审。");
-        next.scf.run = "submitted"; return note(next, "SCF 已提交；review 没有创建任何计算输出。");
+        if (!next.scf.reviewed || next.scf.status !== "prepared") return fail(next, "拒绝提交 SCF：exact prepared snapshot 未评审。");
+        next.scf.run = "submitted"; next.scf.status = "submitted"; return note(next, "SCF 已提交；review 没有创建任何计算输出。");
       case "finish-scf":
         if (next.scf.run !== "submitted") return fail(next, "拒绝接受 SCF：必须先提交，并同步运行证据。");
         next.scf.run = "current-valid"; next.scf.chgcar = true; next.scf.status = "accepted"; next.band.status = "frontier";
@@ -124,15 +125,16 @@ const BackendLoadingModel = (() => {
         if (next.band.status !== "frontier") return fail(next, "拒绝准备 band：SCF 尚无有效 current Run，band 不在 frontier。");
         if (!next.band.knowledge) return fail(next, "拒绝准备 band：当前阶段尚未加载 band backend 知识。");
         if (!next.scf.chgcar) return fail(next, "拒绝准备 band：声明的上游 CHGCAR 不可用。");
-        next.band.prepared = true; next.band.status = "prepared";
+        next.band.prepared = true; next.band.reviewed = false; next.band.run = "none"; next.band.status = "prepared";
         return note(next, "Band snapshot 已准备；CHGCAR 只在服务器端复制到 Run，不进入模板、Git 或本地同步。");
       case "review-band":
         if (!next.band.prepared) return fail(next, "拒绝评审 band：不存在 exact prepared snapshot。");
         next.band.reviewed = true;
         return note(next, "Band snapshot 通过评审：ICHARG、路径 KPOINTS、task 103、PBS 配对与上游 CHGCAR 一致。");
       case "submit-band":
-        if (!next.band.reviewed) return fail(next, "拒绝提交 band：snapshot 未评审。");
-        next.band.run = "submitted"; return note(next, "Band 已提交；等待 scheduler 完成与结果同步。");
+        if (next.scf.run !== "current-valid" || next.band.status !== "prepared") return fail(next, "拒绝提交 band：任务已离开 frontier 或上游 SCF 已失效。");
+        if (!next.band.reviewed) return fail(next, "拒绝提交 band：exact prepared snapshot 未评审。");
+        next.band.run = "submitted"; next.band.status = "submitted"; return note(next, "Band 已提交；等待 scheduler 完成与结果同步。");
       case "finish-band":
         if (next.band.run !== "submitted") return fail(next, "拒绝接受 band：必须先提交，并同步运行证据。");
         if (next.scf.run !== "current-valid") return fail(next, "拒绝接受 band：其依赖的 SCF current Run 已失效。");
@@ -157,13 +159,13 @@ const BackendLoadingModel = (() => {
     if (state.focus === "scf") return {
       reference: "backends/vasp/common.md + scf.md",
       asset: "assets/templates/vasp/scf/",
-      script: "scripts/vasp/validate_stage.sh",
+      script: "scripts/vasp/select_backend_knowledge.sh + validate_stage.sh",
       excluded: "band path、BAND.dat 后处理、其他 backend"
     };
     if (state.focus === "band") return {
       reference: "backends/vasp/common.md + band.md + handoff.md",
       asset: "assets/templates/vasp/band/",
-      script: "scripts/vasp/validate_stage.sh + smoke_scf_band.sh",
+      script: "scripts/vasp/select_backend_knowledge.sh + validate_stage.sh + smoke_scf_band.sh",
       excluded: "SCF KPOINTS 生成规则、其他 backend"
     };
     return { reference:"无", asset:"无", script:"无", excluded:"全部 backend 知识" };
