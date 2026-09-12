@@ -218,7 +218,7 @@ h2 {
 .architecture-arrow { text-align: center; font-weight: 750; }
 .architecture-arrow::before { content: "↓ "; color: var(--green); }
 .architecture-plugins, .architecture-leaves { display: grid; gap: 10px; }
-.architecture-plugins { grid-template-columns: repeat(4, 1fr); }
+.architecture-plugins { grid-template-columns: repeat(3, 1fr); }
 .architecture-leaves { grid-template-columns: repeat(3, 1fr); }
 .architecture-plugins span, .architecture-leaves span {
   padding: 12px;
@@ -253,6 +253,15 @@ h2 {
 .plugin-card dt { margin-top: 10px; color: var(--green); font-size: 0.78rem; font-weight: 850; }
 .plugin-card dd { margin: 3px 0 0; color: #4e574d; font-size: 0.88rem; }
 .roster { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 0; }
+
+.section-intro { max-width: 900px; margin: -4px 0 18px; color: #4e574d; }
+.boundary-table td:first-child { min-width: 130px; font-weight: 750; }
+.workflow-example { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.workflow-example article { position: relative; padding: 22px 16px 16px; border: 1px solid rgba(32, 37, 31, 0.1); border-radius: 16px; background: var(--panel); }
+.workflow-example h3 { margin: 8px 0; font-size: 1rem; }
+.workflow-example p { margin: 0; color: #4e574d; font-size: 0.86rem; }
+.step { display: inline-grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; background: var(--green); color: #fff; font-size: 0.78rem; font-weight: 850; }
+.workflow-chain { margin-top: 16px; }
 
 .timeline { position: relative; padding-left: 23px; }
 .timeline::before { position: absolute; inset: 8px auto 10px 5px; width: 2px; background: var(--line); content: ""; }
@@ -315,6 +324,7 @@ code { padding: 0.12em 0.36em; border-radius: 5px; background: rgba(32, 37, 31, 
   .architecture-plugins { grid-template-columns: 1fr 1fr; }
   .architecture-leaves { grid-template-columns: 1fr; }
   .authority-chain { flex-wrap: wrap; }
+  .workflow-example { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 560px) {
@@ -322,6 +332,7 @@ code { padding: 0.12em 0.36em; border-radius: 5px; background: rgba(32, 37, 31, 
   .hero { border-radius: 20px; }
   .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
   .bar-row { grid-template-columns: 92px 1fr 66px; }
+  .workflow-example { grid-template-columns: 1fr; }
 }
 
 @media print {
@@ -332,5 +343,8 @@ code { padding: 0.12em 0.36em; border-radius: 5px; background: rgba(32, 37, 31, 
   .nav { display: none; }
   section { margin: 30px 0; }
   .card, .verdict, .table-wrap, .event { break-inside: avoid; }
+  .boundary-wrap { break-inside: auto; }
+  .boundary-table thead { display: table-header-group; }
+  .boundary-table tr { break-inside: avoid; }
   a { color: inherit; text-decoration: none; }
 }

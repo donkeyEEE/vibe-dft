@@ -24,9 +24,9 @@
     <nav class="nav" aria-label="简报目录">
       <a href="#summary">执行摘要</a>
       <a href="#architecture">仓库架构</a>
-      <a href="#plugins">插件边界</a>
+      <a href="#plugins">Skill 边界</a>
       <a href="#timeline">时间线</a>
-      <a href="#features">功能</a>
+      <a href="#features">示例流程</a>
       <a href="#status">开发状态</a>
       <a href="#tests">测试</a>
       <a href="#tokens">Token</a>
@@ -48,14 +48,14 @@
     </section>
 
     <section id="architecture">
-      <div class="section-head"><span class="section-no">02 / ARCHITECTURE</span><h2>仓库架构</h2></div>
-      <div class="architecture-flow" aria-label="仓库架构关系">
-        <div class="architecture-root"><strong>yz-skills</strong><span>Codex 插件与 skill 的源仓库</span></div>
-        <div class="architecture-arrow">独立发布单元</div>
+      <div class="section-head"><span class="section-no">02 / ARCHITECTURE</span><h2>Calc Project 架构</h2></div>
+      <div class="architecture-flow" aria-label="Calc Project 架构关系">
+        <div class="architecture-root"><strong>calc-project</strong><span>一个以研究问题和可审计 Run 为中心的计算工作流插件</span></div>
+        <div class="architecture-arrow">六个显式入口</div>
         <div class="architecture-plugins">
-          <span>calc-project</span><span>paper-project</span><span>osm-project</span><span>skill-incubator</span>
+          <span>ask-dnk</span><span>calc-setup</span><span>calc-rq</span><span>calc-to-spec</span><span>calc-execute</span><span>calc-review</span>
         </div>
-        <div class="architecture-arrow">每个插件内部</div>
+        <div class="architecture-arrow">持久权威与按需资源</div>
         <div class="architecture-leaves">
           <span><strong>manifest</strong> 定义插件身份与能力</span>
           <span><strong>skills/*</strong> 构成可调用入口 roster</span>
@@ -63,7 +63,7 @@
         </div>
       </div>
       <div class="grid grid-3" style="margin-top:16px">
-        <article class="card"><h3>发布边界</h3><p>插件目录 <code>plugins/&lt;name&gt;/</code> 是发布单元；仓库根目录负责导航、统一约束、测试和 marketplace 注册，不把四个插件揉成一个运行时包。</p></article>
+        <article class="card"><h3>调用边界</h3><p>六个入口均为显式调用。<code>$ask-dnk</code> 仅在请求含混时路由；它不是必经前门，也不替用户自动调用 sibling。</p></article>
         <article class="card"><h3>资源所有权</h3><p>单一 skill 使用的资料与该 skill 共置。只有至少两个活动 skill 实际消费的资源才进入插件级共享区，消费者必须声明精确相对路径。</p></article>
         <article class="card"><h3>渐进披露</h3><p><code>SKILL.md</code> 保留入口契约与路由，分支知识按需读取；脚本和运行资产不因进入发布包就自动进入模型上下文。</p></article>
       </div>
@@ -74,33 +74,22 @@
     </section>
 
     <section id="plugins">
-      <div class="section-head"><span class="section-no">03 / PLUGINS</span><h2>四个插件的功能划分</h2></div>
-      <div class="grid grid-2 plugin-grid">
-        <article class="card plugin-card">
-          <p class="plugin-kicker">COMPUTATION · 6 SKILLS</p><h3>calc-project</h3>
-          <p>把科研计算从问题定义推进到可审查、可执行、可闭环的 Run。</p>
-          <dl><dt>负责</dt><dd>项目配置、RQ 与 Decision Ticket、Spec 发布、任务 DAG、Run 执行、瞬时评审和非破坏同步。</dd><dt>不负责</dt><dd>论文写作、文献证据库、通用项目日志，以及未经授权的真实集群提交或同步。</dd></dl>
-          <p class="roster"><code>ask-dnk</code> <code>calc-setup</code> <code>calc-rq</code> <code>calc-to-spec</code> <code>calc-execute</code> <code>calc-review</code></p>
-        </article>
-        <article class="card plugin-card">
-          <p class="plugin-kicker">RESEARCH WRITING · 8 SKILLS</p><h3>paper-project</h3>
-          <p>覆盖从证据获取、研究笔记到论文表达、引用核验、科学图件和人物视角讨论的学术产出链。</p>
-          <dl><dt>负责</dt><dd>文献解析与综述、Zotero 笔记、PR/学位论文写作、引用支持度核验、PRL 图件和 persona deliberation。</dd><dt>不负责</dt><dd>计算输入准备、任务/Run 状态管理和通用演示文稿制作；写作资源与 consuming skill 共置，不使用插件级资源池。</dd></dl>
-          <p class="roster"><code>liteparse</code> <code>literature-review</code> <code>zo2notes</code> <code>pr-intro</code> <code>big-paper-helper</code> <code>citation-validator</code> <code>prl-figure</code> <code>yuanzhuo-skill</code></p>
-        </article>
-        <article class="card plugin-card">
-          <p class="plugin-kicker">PROJECT LOG · 1 SKILL</p><h3>osm-project</h3>
-          <p>把当前对话中已经发生的项目进展转成可确认、可追溯的 Obsidian 日志。</p>
-          <dl><dt>负责</dt><dd>提炼会话事实、生成日志草稿、取得用户确认，并写入当天的 Obsidian Daily Note。</dd><dt>不负责</dt><dd>泛用笔记管理、无确认自动落盘、项目任务执行或替代其他插件保存领域状态。</dd></dl>
-          <p class="roster"><code>log2ob</code></p>
-        </article>
-        <article class="card plugin-card">
-          <p class="plugin-kicker">INCUBATION · 7 SKILLS</p><h3>skill-incubator</h3>
-          <p>承载可安装、可使用，但尚未形成稳定独立插件边界的实验性能力。</p>
-          <dl><dt>负责</dt><dd>物理论文润色、论文到演示文稿、PPT 制作、审稿回复、学者评价、科学批判思维和知识蒸馏入口。</dd><dt>不负责</dt><dd>冒充成熟领域插件；能力边界稳定后应再评估拆分或迁移，而不是永久堆积。</dd></dl>
-          <p class="roster"><code>prl-polishing</code> <code>paper2ppt</code> <code>ppt-master</code> <code>nature-response</code> <code>scholar-evaluation</code> <code>scientific-critical-thinking</code> <code>cangjie-skill</code></p>
-        </article>
+      <div class="section-head"><span class="section-no">03 / BOUNDARIES</span><h2>Calc Project 六个 Skill 的功能边界</h2></div>
+      <p class="section-intro">六个入口按“路由、稳定配置、研究问题、科学设计、执行、瞬时审查”分工。它们只通过已落盘的权威文档和精确身份交接，不以会话记忆或隐式调用传递状态。</p>
+      <div class="table-wrap boundary-wrap">
+        <table class="boundary-table">
+          <thead><tr><th>Skill</th><th>何时使用</th><th>唯一负责</th><th>明确不负责 / 交给谁</th></tr></thead>
+          <tbody>
+            <tr><td><code>$ask-dnk</code></td><td>目标不清楚，或不知道应进入哪个入口。</td><td>解析项目身份，选择一个目标 sibling 和一个候选 sibling，说明未完成的用户动作。</td><td>不提供科学建议、不改写文档、不自动调用其他 skill；正确入口已知时直接使用该入口。</td></tr>
+            <tr><td><code>$calc-setup</code></td><td>初始化或调整项目结构、数据边界、Tracker 或软件/集群 profile。</td><td>稳定项目配置及其验证证据。</td><td>不创建 RQ、Decision Ticket、Spec、任务或 Run；不提交作业、同步数据或验证可变 Run 环境。</td></tr>
+            <tr><td><code>$calc-rq</code></td><td>创建、修订或检查一个研究问题，或逐一解决其 Decision Ticket。</td><td><code>RQ.md</code> 与临时 Decision Ticket 的生命周期；已闭环 Spec 对 RQ 的正式影响。</td><td>不设计 Spec、不生成输入、不推进执行；科学设计与 DAG 交给 <code>$calc-to-spec</code>。</td></tr>
+            <tr><td><code>$calc-to-spec</code></td><td>已接受的 RQ 需要形成一个主科学判断、任务 DAG、条件和验收/停止规则。</td><td>当前 Spec 的科学承诺、任务声明、依赖、条件、验收与停止规则。</td><td>不创建任务目录或 Run，不改物理数据或执行状态；Run 记录和推进交给 <code>$calc-execute</code>。</td></tr>
+            <tr><td><code>$calc-execute</code></td><td>一个 ready/active Spec 需要准备、验证、提交、跟踪、同步、验收或闭环。</td><td>从 Spec 推导 ready frontier，创建不可变 Run 快照，记录执行证据、Run 状态与当前 Run。</td><td>不补猜科学值或修改 DAG/验收规则；设计歧义回到 <code>$calc-to-spec</code>，稳定配置问题回到 <code>$calc-setup</code>。</td></tr>
+            <tr><td><code>$calc-review</code></td><td>一个已准备的精确 Run 在提交前需要独立、只读的预检。</td><td>对当前链中相同输入、资源和目标环境返回 <code>pass</code>、<code>pass_with_warnings</code> 或 <code>block</code>。</td><td>不写入 Spec/Run/缓存，不修复、不提交、不同步，也不授权提交；阻断项按归属回交 execute、to-spec 或 setup。</td></tr>
+          </tbody>
+        </table>
       </div>
+      <p class="note"><strong>状态边界：</strong><code>RQ.md</code> 是研究问题权威，Spec 是任务、DAG、Run 与闭环的唯一持久权威；review 返回只在当前执行链内有效。任何输入、资源、交接或环境变化都要求重新验证和审查。</p>
     </section>
 
     <section id="timeline">
@@ -119,15 +108,17 @@
     </section>
 
     <section id="features">
-      <div class="section-head"><span class="section-no">05 / CAPABILITIES</span><h2>六个 Calc Skill 的职责</h2></div>
-      <div class="grid grid-3">
-        <article class="card skill"><h3><code>$ask-dnk</code></h3><p class="owner">入口澄清</p><p>当用户意图、目标或具体 RQ 不清楚时，先收敛问题与下一步，不替其他 skill 做隐式执行。</p></article>
-        <article class="card skill"><h3><code>$calc-setup</code></h3><p class="owner">稳定配置</p><p>初始化或调整项目结构、软件配置和稳定上下文；配置变更需明确批准并保持幂等。</p></article>
-        <article class="card skill"><h3><code>$calc-rq</code></h3><p class="owner">研究问题</p><p>创建和维护 RQ、Decision Ticket 与结论状态；通过真实外部 grilling/domain-modeling 链推进问题澄清。</p></article>
-        <article class="card skill"><h3><code>$calc-to-spec</code></h3><p class="owner">设计权威</p><p>把已经解决的判断发布为完整 Spec，管理任务 DAG、状态、路径、验收和 Run 表；批准不豁免文档完整性。</p></article>
-        <article class="card skill"><h3><code>$calc-execute</code></h3><p class="owner">执行协调</p><p>准备、校验、审查、提交、跟踪、同步和验收 Run；通过后端参考资料按需加载具体计算知识。</p></article>
-        <article class="card skill"><h3><code>$calc-review</code></h3><p class="owner">瞬时审查</p><p>对一个精确 Run 的输入快照、环境、资源和交接做只读审查；审查结果不持久化为第二套状态。</p></article>
+      <div class="section-head"><span class="section-no">05 / EXAMPLE</span><h2>工作流示例：磁性交换参数到居里温度</h2></div>
+      <p class="section-intro">目标是回答“该候选二维磁体的交换参数是否支持指定温区内的铁磁有序？”以下是一个 VASP → Wannier90 → TB2J → VAMPIRE 链的示例；它说明谁能推进什么，而不是替代具体科学参数和批准。</p>
+      <div class="workflow-example" aria-label="Calc Project 示例工作流">
+        <article><span class="step">1</span><h3>澄清与配置</h3><p><code>$ask-dnk</code> 在请求含混时路由；若项目目录、数据边界或集群 profile 缺失，<code>$calc-setup</code> 提出并在批准后写入稳定配置。</p></article>
+        <article><span class="step">2</span><h3>建立 RQ</h3><p><code>$calc-rq</code> 创建 RQ，明确材料、温区、成功判据和边界；需要决定磁序或比较标准时，用 Decision Ticket 逐一提案并获批。</p></article>
+        <article><span class="step">3</span><h3>发布可执行 Spec</h3><p><code>$calc-to-spec</code> 将被接受的判断写成一个 Spec：VASP 基态与 Wannier 交接、TB2J 交换参数、VAMPIRE 温度扫描的 DAG，以及每步输入、依赖和验收标准。</p></article>
+        <article><span class="step">4</span><h3>准备并审查 Run</h3><p><code>$calc-execute</code> 为 ready task 创建新的不可变 Run 快照，验证输入与 PBS；随后在同一执行链调用 <code>$calc-review</code>。只有相同快照得到 pass/pass_with_warnings 且提交范围已获授权，才能提交。</p></article>
+        <article><span class="step">5</span><h3>推进、验收与闭环</h3><p><code>$calc-execute</code> 依据日志、调度与产物证据推进 VASP→Wannier90→TB2J→VAMPIRE，按 Spec 验收。若需要改科学判断，回到 <code>$calc-to-spec</code>；若完成，先获批关闭 Spec，再由 <code>$calc-rq</code> 单独提议 RQ 结论影响。</p></article>
       </div>
+      <div class="authority-chain workflow-chain"><span>RQ 与决定</span><b>→</b><span>Spec：DAG 与验收</span><b>→</b><span>每个 Run：prepare → review → authorized submit</span><b>→</b><span>证据验收与关闭</span></div>
+      <p class="note"><strong>关键回路：</strong><code>$calc-review</code> 若返回 <code>block</code>，不会留下新的状态；执行问题返回 <code>$calc-execute</code>，科学/DAG 问题返回 <code>$calc-to-spec</code>，稳定环境问题返回 <code>$calc-setup</code>。修复形成新快照后才可重新审查。</p>
     </section>
 
     <section id="status">
