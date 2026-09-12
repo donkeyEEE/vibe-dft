@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>WF-001 Calc Project 六 Skill 重构｜工作简报</title>
+  <link rel="stylesheet" href="../assets/work-brief.css">
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <p class="eyebrow">Engineering Brief · WF-001</p>
+      <h1>Calc Project<br>六 Skill 重构工作简报</h1>
+      <p class="dek">一次从九个传统工作流入口转向六个研究问题接口的完整替换。核心结果不是“目录改名”，而是建立了从 RQ 决策、Spec 发布、Run 执行、瞬时审查到安全同步的单一权威链。</p>
+      <div class="meta">
+        <span class="status-pill">G0–G5 全部通过</span>
+        <span>实施周期：2026-09-11—2026-09-12</span>
+        <span>实现提交：<code>c21f0b4</code></span>
+        <span>本地集成：<code>main@1316104</code></span>
+      </div>
+    </header>
+
+    <nav class="nav" aria-label="简报目录">
+      <a href="#summary">执行摘要</a>
+      <a href="#architecture">仓库架构</a>
+      <a href="#plugins">插件边界</a>
+      <a href="#timeline">时间线</a>
+      <a href="#features">功能</a>
+      <a href="#status">开发状态</a>
+      <a href="#tests">测试</a>
+      <a href="#tokens">Token</a>
+      <a href="#limits">边界</a>
+    </nav>
+
+    <section id="summary">
+      <div class="section-head"><span class="section-no">01 / OVERVIEW</span><h2>执行摘要</h2></div>
+      <div class="grid grid-4">
+        <article class="card metric"><strong>6</strong><span>显式调用的核心 skill</span></article>
+        <article class="card metric"><strong>79</strong><span>最终运行时文件</span></article>
+        <article class="card metric"><strong>148</strong><span>源码测试全部通过</span></article>
+        <article class="card metric"><strong>45/45</strong><span>最终行为场景通过</span></article>
+      </div>
+      <div class="verdict" style="margin-top:16px">
+        <div class="big">已集成本地 main</div>
+        <p>候选实现已经完成、提交并经独立审查通过，随后合并到本地 <code>main</code>。开发分支与主分支当前指向同一提交；尚未推送远端、安装或发布插件，也没有访问真实集群或执行真实数据同步。</p>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <div class="section-head"><span class="section-no">02 / ARCHITECTURE</span><h2>仓库架构</h2></div>
+      <div class="architecture-flow" aria-label="仓库架构关系">
+        <div class="architecture-root"><strong>yz-skills</strong><span>Codex 插件与 skill 的源仓库</span></div>
+        <div class="architecture-arrow">独立发布单元</div>
+        <div class="architecture-plugins">
+          <span>calc-project</span><span>paper-project</span><span>osm-project</span><span>skill-incubator</span>
+        </div>
+        <div class="architecture-arrow">每个插件内部</div>
+        <div class="architecture-leaves">
+          <span><strong>manifest</strong> 定义插件身份与能力</span>
+          <span><strong>skills/*</strong> 构成可调用入口 roster</span>
+          <span><strong>references / assets / scripts</strong> 与消费方共置或由共享消费者持有</span>
+        </div>
+      </div>
+      <div class="grid grid-3" style="margin-top:16px">
+        <article class="card"><h3>发布边界</h3><p>插件目录 <code>plugins/&lt;name&gt;/</code> 是发布单元；仓库根目录负责导航、统一约束、测试和 marketplace 注册，不把四个插件揉成一个运行时包。</p></article>
+        <article class="card"><h3>资源所有权</h3><p>单一 skill 使用的资料与该 skill 共置。只有至少两个活动 skill 实际消费的资源才进入插件级共享区，消费者必须声明精确相对路径。</p></article>
+        <article class="card"><h3>渐进披露</h3><p><code>SKILL.md</code> 保留入口契约与路由，分支知识按需读取；脚本和运行资产不因进入发布包就自动进入模型上下文。</p></article>
+      </div>
+      <div class="authority-chain" aria-label="Calc Project 权威链">
+        <span>研究问题 RQ</span><b>→</b><span>设计权威 Spec</span><b>→</b><span>具体任务 / Run</span><b>→</b><span>执行与闭环</span>
+      </div>
+      <p class="note"><strong>Calc Project 的关键约束：</strong>Spec 是 DAG、任务、Run、当前 Run、执行状态与闭环结论的唯一持久权威；<code>calc-review</code> 只生成瞬时只读判断，不建立第二套状态系统。</p>
+    </section>
+
+    <section id="plugins">
+      <div class="section-head"><span class="section-no">03 / PLUGINS</span><h2>四个插件的功能划分</h2></div>
+      <div class="grid grid-2 plugin-grid">
+        <article class="card plugin-card">
+          <p class="plugin-kicker">COMPUTATION · 6 SKILLS</p><h3>calc-project</h3>
+          <p>把科研计算从问题定义推进到可审查、可执行、可闭环的 Run。</p>
+          <dl><dt>负责</dt><dd>项目配置、RQ 与 Decision Ticket、Spec 发布、任务 DAG、Run 执行、瞬时评审和非破坏同步。</dd><dt>不负责</dt><dd>论文写作、文献证据库、通用项目日志，以及未经授权的真实集群提交或同步。</dd></dl>
+          <p class="roster"><code>ask-dnk</code> <code>calc-setup</code> <code>calc-rq</code> <code>calc-to-spec</code> <code>calc-execute</code> <code>calc-review</code></p>
+        </article>
+        <article class="card plugin-card">
+          <p class="plugin-kicker">RESEARCH WRITING · 8 SKILLS</p><h3>paper-project</h3>
+          <p>覆盖从证据获取、研究笔记到论文表达、引用核验、科学图件和人物视角讨论的学术产出链。</p>
+          <dl><dt>负责</dt><dd>文献解析与综述、Zotero 笔记、PR/学位论文写作、引用支持度核验、PRL 图件和 persona deliberation。</dd><dt>不负责</dt><dd>计算输入准备、任务/Run 状态管理和通用演示文稿制作；写作资源与 consuming skill 共置，不使用插件级资源池。</dd></dl>
+          <p class="roster"><code>liteparse</code> <code>literature-review</code> <code>zo2notes</code> <code>pr-intro</code> <code>big-paper-helper</code> <code>citation-validator</code> <code>prl-figure</code> <code>yuanzhuo-skill</code></p>
+        </article>
+        <article class="card plugin-card">
+          <p class="plugin-kicker">PROJECT LOG · 1 SKILL</p><h3>osm-project</h3>
+          <p>把当前对话中已经发生的项目进展转成可确认、可追溯的 Obsidian 日志。</p>
+          <dl><dt>负责</dt><dd>提炼会话事实、生成日志草稿、取得用户确认，并写入当天的 Obsidian Daily Note。</dd><dt>不负责</dt><dd>泛用笔记管理、无确认自动落盘、项目任务执行或替代其他插件保存领域状态。</dd></dl>
+          <p class="roster"><code>log2ob</code></p>
+        </article>
+        <article class="card plugin-card">
+          <p class="plugin-kicker">INCUBATION · 7 SKILLS</p><h3>skill-incubator</h3>
+          <p>承载可安装、可使用，但尚未形成稳定独立插件边界的实验性能力。</p>
+          <dl><dt>负责</dt><dd>物理论文润色、论文到演示文稿、PPT 制作、审稿回复、学者评价、科学批判思维和知识蒸馏入口。</dd><dt>不负责</dt><dd>冒充成熟领域插件；能力边界稳定后应再评估拆分或迁移，而不是永久堆积。</dd></dl>
+          <p class="roster"><code>prl-polishing</code> <code>paper2ppt</code> <code>ppt-master</code> <code>nature-response</code> <code>scholar-evaluation</code> <code>scientific-critical-thinking</code> <code>cangjie-skill</code></p>
+        </article>
+      </div>
+    </section>
+
+    <section id="timeline">
+      <div class="section-head"><span class="section-no">04 / TIMELINE</span><h2>工作时间线</h2></div>
+      <div class="timeline">
+        <article class="event"><time>09-11 · 定义</time><div><h3>确认 WF-001 设计与 13 项实施计划</h3><p>固定六入口、RQ/Spec/Run 权威模型、批准边界、同步保护、资源迁移与一次性原子提交策略。</p></div></article>
+        <article class="event"><time>09-11 · 基线</time><div><h3>隔离工作树与迁移清单</h3><p>锁定基线提交，保留原工作区的两处用户修改及两个历史归档；建立 65 个旧源路径到新结构的迁移核对表。</p></div></article>
+        <article class="event"><time>09-11 · 接口</time><div><h3>完成 setup、RQ、Spec 三层入口</h3><p>建立项目配置、Decision Ticket、RQ 文档与完整 Spec 发布/替换流程，明确批准必须绑定具体提案。</p></div></article>
+        <article class="event"><time>09-11 · 执行</time><div><h3>集中 Run、后端、审查和同步能力</h3><p>整合 VASP、Wannier90、TB2J、VAMPIRE、DMFT 与 NAMD 资源；加入输入指纹、不可变复制、PBS 守卫和非破坏同步。</p></div></article>
+        <article class="event"><time>09-12 · 行为验收</time><div><h3>13 个场景族与真实模型调用</h3><p>构建隔离 App Server 验收设施，使用真实候选 skill 和外部依赖链，在模拟集群/同步端点上验证授权、拒绝、提交和状态转换。</p></div></article>
+        <article class="event"><time>09-12 · 打包</time><div><h3>安全发布包与解压验证</h3><p>校验精确 roster、运行时文件、权限与路径；拒绝软硬链接、路径穿越、未知文件和科学输出进入发布包。</p></div></article>
+        <article class="event"><time>09-12 · 审查修复</time><div><h3>补齐 DT004 文档形状守卫</h3><p>最终审查发现批准后的畸形 RQ/Spec 仍可能进入执行。修复后增加三个缺字段负例并重跑 45 个受影响场景。</p></div></article>
+        <article class="event"><time>09-12 · 交付</time><div><h3>原子提交与干净副本 G5 验证</h3><p>形成单一提交 <code>c21f0b4</code>；在 detached 干净工作树中重新测试、打包、解压和行为验收，独立交付审查无遗留问题。</p></div></article>
+      </div>
+      <p class="note">记录只提供日期级时间戳，因此时间线按可验证的执行阶段排列，不虚构小时级起止时间。</p>
+    </section>
+
+    <section id="features">
+      <div class="section-head"><span class="section-no">05 / CAPABILITIES</span><h2>六个 Calc Skill 的职责</h2></div>
+      <div class="grid grid-3">
+        <article class="card skill"><h3><code>$ask-dnk</code></h3><p class="owner">入口澄清</p><p>当用户意图、目标或具体 RQ 不清楚时，先收敛问题与下一步，不替其他 skill 做隐式执行。</p></article>
+        <article class="card skill"><h3><code>$calc-setup</code></h3><p class="owner">稳定配置</p><p>初始化或调整项目结构、软件配置和稳定上下文；配置变更需明确批准并保持幂等。</p></article>
+        <article class="card skill"><h3><code>$calc-rq</code></h3><p class="owner">研究问题</p><p>创建和维护 RQ、Decision Ticket 与结论状态；通过真实外部 grilling/domain-modeling 链推进问题澄清。</p></article>
+        <article class="card skill"><h3><code>$calc-to-spec</code></h3><p class="owner">设计权威</p><p>把已经解决的判断发布为完整 Spec，管理任务 DAG、状态、路径、验收和 Run 表；批准不豁免文档完整性。</p></article>
+        <article class="card skill"><h3><code>$calc-execute</code></h3><p class="owner">执行协调</p><p>准备、校验、审查、提交、跟踪、同步和验收 Run；通过后端参考资料按需加载具体计算知识。</p></article>
+        <article class="card skill"><h3><code>$calc-review</code></h3><p class="owner">瞬时审查</p><p>对一个精确 Run 的输入快照、环境、资源和交接做只读审查；审查结果不持久化为第二套状态。</p></article>
+      </div>
+    </section>
+
+    <section id="status">
+      <div class="section-head"><span class="section-no">06 / STATUS</span><h2>当前开发状态</h2></div>
+      <div class="grid grid-2">
+        <article class="card"><h3>已完成</h3><ul class="compact"><li>九个旧入口替换为六个显式入口。</li><li>Spec 成为任务、DAG、Run、执行与闭环的唯一权威。</li><li>11 个计算后端/阶段资源包完成迁移与绑定。</li><li>同步采用精确清单、方向和配置批准，保护大文件与旧 Run 输入。</li><li>原子提交、发布包、行为证据与独立审查均已完成。</li></ul></article>
+        <article class="card"><h3>当前保留状态</h3><ul class="compact"><li>主分支：<code>main@1316104</code></li><li>开发分支：<code>implement/wf001-calc-roster@1316104</code></li><li>开发工作树：<code>.worktrees/yz-skills1.0</code></li><li>最终包 SHA-256：<code>bc176e22…a27</code></li><li>运行时清单摘要：<code>3ee8a823…64</code></li></ul></article>
+      </div>
+      <div class="table-wrap" style="margin-top:16px">
+        <table>
+          <thead><tr><th>事项</th><th>状态</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>源码实现</td><td>完成</td><td>168 个文件发生 Git 层面的创建、删除、修改或重命名；净增 7,788 行、删除 2,753 行。</td></tr>
+            <tr><td>独立代码审查</td><td>通过</td><td>最终 DT004 问题已修复；后续复审及交付审查均无 Critical、Important 或 Minor。</td></tr>
+            <tr><td>本地合并</td><td>完成</td><td>实现已进入本地 <code>main</code>，并保留同提交的开发分支与独立工作树。</td></tr>
+            <tr><td>推送 / 安装 / 发布</td><td>未执行</td><td>这些操作仍处于明确授权边界之外，不代表开发未完成。</td></tr>
+            <tr><td>真实集群与真实同步</td><td>未执行</td><td>行为测试使用网络隔离环境与模拟 qsub、ssh、rsync 端点。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tests">
+      <div class="section-head"><span class="section-no">07 / VERIFICATION</span><h2>测试与验收</h2></div>
+      <div class="grid grid-4">
+        <article class="card metric"><strong>148</strong><span>干净提交源码测试</span></article>
+        <article class="card metric"><strong>145</strong><span>解压发布包测试</span></article>
+        <article class="card metric"><strong>940</strong><span>已核对原始工具调用</span></article>
+        <article class="card metric"><strong>1 + 1</strong><span>精确提交与精确同步正例</span></article>
+      </div>
+      <div class="table-wrap" style="margin-top:16px">
+        <table>
+          <thead><tr><th>测试层</th><th>覆盖内容</th><th>结果</th></tr></thead>
+          <tbody>
+            <tr><td>结构与契约</td><td>六入口 roster、metadata、路径、文档形状、迁移清单、后端资源绑定</td><td>148 / 148</td></tr>
+            <tr><td>发布包</td><td>79 个运行时文件、权限、链接/路径穿越/未知内容拒绝、源路径泄漏检查</td><td>145 / 145</td></tr>
+            <tr><td>行为场景</td><td>批准发布、拒绝畸形 Spec、DAG 推进、Run 交接、审查、提交、同步、失效、修复与闭环</td><td>45 / 45</td></tr>
+            <tr><td>负向安全</td><td>缺 Acceptance / Path / Purpose、旧摘要提交、越权、过期同步计划、旧输入覆盖、符号链接</td><td>均触发预期阻断</td></tr>
+            <tr><td>证据完整性</td><td>候选源/副本清单、文件变化、broker 返回、qsub 与 rsync 实际副作用</td><td>940 条调用均有内容与响应</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">G5 中发现并保留了三次“正例夹具不完整或模型审查漏检”的历史记录。修正夹具后只重跑因果相关的 S08/S09 正例，旧结果未被覆盖或冒充为通过证据。</p>
+    </section>
+
+    <section id="tokens">
+      <div class="section-head"><span class="section-no">08 / TOKEN HEALTH</span><h2>是否出现 Token 爆炸？</h2></div>
+      <div class="verdict">
+        <div class="big">未发现结构性爆炸</div>
+        <p>六个入口没有在一次调用中自动加载全部 79 个运行时文件。入口正文合计 25,053 字节，参考资料按任务分支读取；真正显著膨胀的是本次开发与验收会话——13 项任务、45 个模型场景和 940 条工具调用累计了大量证据。这是测试编排成本，不等同于最终 skill 的日常上下文成本。</p>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:16px">
+        <article class="card">
+          <h3>入口正文体积</h3>
+          <div class="bar-row"><span class="bar-label">calc-execute</span><span class="bar-track"><span class="bar-fill" style="--w:100%"></span></span><span class="bar-value">8,245 B</span></div>
+          <div class="bar-row"><span class="bar-label">calc-to-spec</span><span class="bar-track"><span class="bar-fill" style="--w:78%"></span></span><span class="bar-value">6,440 B</span></div>
+          <div class="bar-row"><span class="bar-label">calc-rq</span><span class="bar-track"><span class="bar-fill" style="--w:49%"></span></span><span class="bar-value">3,998 B</span></div>
+          <div class="bar-row"><span class="bar-label">calc-review</span><span class="bar-track"><span class="bar-fill" style="--w:35%"></span></span><span class="bar-value">2,866 B</span></div>
+          <div class="bar-row"><span class="bar-label">calc-setup</span><span class="bar-track"><span class="bar-fill" style="--w:24%"></span></span><span class="bar-value">1,981 B</span></div>
+          <div class="bar-row"><span class="bar-label">ask-dnk</span><span class="bar-track"><span class="bar-fill" style="--w:18%"></span></span><span class="bar-value">1,523 B</span></div>
+          <p class="note">约算而非 tokenizer 实测：按英文技术文本常用的 4 字符/token 粗估，六份入口全部同时读取约 6.3k token；正常单入口调用明显低于此数。</p>
+        </article>
+        <article class="card">
+          <h3>上下文分层</h3>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><td>始终可见的入口正文</td><td>25.1 KB</td></tr>
+                <tr><td>按分支读取的 references</td><td>74.0 KB</td></tr>
+                <tr><td>运行资产与脚本</td><td>99.9 KB</td></tr>
+                <tr><td>运行时总文件</td><td>79</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="note">assets/scripts 是执行资源，不应因为“属于 skill”就自动进入模型上下文。风险评估要看一次具体路径实际读取了什么，而不是把发布包总大小换算成 token。</p>
+        </article>
+      </div>
+
+      <div class="grid grid-3" style="margin-top:16px">
+        <article class="card risk"><span class="label">低风险</span><h3>入口数量与显式调用</h3><p>从九个入口收敛到六个，全部设置为显式调用，降低误触发和无关 skill 同时进入上下文的概率。</p></article>
+        <article class="card risk"><span class="label">受控</span><h3>渐进披露</h3><p>后端、PBS、同步和修复规则放入 references，主入口通过具体任务分支读取，符合“公共步骤内联、分支知识外置”的结构。</p></article>
+        <article class="card risk watch"><span class="label">需观察</span><h3>calc-execute 热点</h3><p>它承担 134 行入口、38.7 KB references 和多后端路由。复杂跨后端任务可能连续读取多份资料，是最可能产生上下文增长的区域。</p></article>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>结论与建议</h3>
+        <ul class="compact">
+          <li><strong>当前结论：</strong>没有证据显示日常 skill 调用发生 token 爆炸；有证据显示开发验收过程的上下文和证据量很大。</li>
+          <li><strong>不要误判：</strong>79 个包文件、282 KB 测试代码和历史 trace 不会自动成为一次运行的 prompt。</li>
+          <li><strong>重点监控：</strong>记录每次调用读取的 reference 文件数、累计字节和后端分支；尤其观察 <code>calc-execute</code> 是否跨分支过读。</li>
+          <li><strong>触发优化：</strong>若常规单后端请求持续读取无关后端资料，或入口正文继续增长，再按执行阶段/后端分支细化指针，而不是先拆成更多公共 skill。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="limits">
+      <div class="section-head"><span class="section-no">09 / BOUNDARIES</span><h2>已知边界与下一步</h2></div>
+      <div class="grid grid-2">
+        <article class="card"><h3>已知边界</h3><ul class="compact"><li>行为验收中的 qsub、ssh、rsync 均为隔离模拟端点。</li><li>18 个未受最终修复影响的历史场景没有针对最终包重复运行；报告没有声称 63 项全部重新执行。</li><li>模型审查可能漏检夹具缺陷，最终结论依赖模型判断与机械守卫的组合。</li><li>token 数为基于字节的透明粗估；环境未安装 tokenizer，没有伪装成精确计量。</li></ul></article>
+        <article class="card"><h3>建议的下一步</h3><ol class="compact"><li>如要进入使用阶段，由你另行决定是否推送、安装或发布。</li><li>首次真实项目采用只读/准备模式，记录 reference 实际加载量与关键决策。</li><li>在真实集群提交前再次核对配置、队列、可执行文件与输入摘要。</li><li>累积 5–10 个真实任务后复盘 <code>calc-execute</code> 的上下文读取路径，再决定是否进一步瘦身。</li></ol></article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p><strong>证据来源：</strong>当前仓库 manifest、skill roster、README/CONTEXT 架构规则，WF-001 实施计划、Task 11–13 验收报告、最终修复与独立复审记录，以及实现提交 <code>c21f0b40ec3e9eb32e0ec076b2aa7a34673ef7bb</code> 的运行时文件统计。</p>
+      <p>详细交付记录：<a href="../.superpowers/sdd/2026-09-11-calc-roster-replacement/task-13-report.md">task-13-report.md</a>。如需解释任一栏目、核对某个行为场景，或把简报改为管理层/技术评审版本，请继续询问。</p>
+    </footer>
+  </main>
+</body>
+</html>
