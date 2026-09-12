@@ -105,9 +105,14 @@ single immutable `concluded`/`## Closure` write. Later formal RQ impact is a
 separate `$calc-rq` proposal and approval.
 
 Stop for a required approval, an explicit pause, a complex diagnosis or design
-change, an unjustified empty frontier, or while awaiting external work unless
-the invocation is an active monitoring request. A later invocation resumes
-from the same current authorities and external state.
+change, an unjustified empty frontier, or while awaiting external work. An
+active Calculation Monitor is the wait mechanism, not permission for periodic
+agent polling: ordinary goal continuation does not resume scheduler work. Only
+a complete `PBS_JOB_LEFT_QSTAT` message for the recorded Run or an explicit
+user status request opens the remote-completion path. Follow the monitor
+reference when a persistent goal continues while that external wait remains.
+A later eligible invocation resumes from the same current authorities and
+external state.
 
 ## Exact backend bundles
 
