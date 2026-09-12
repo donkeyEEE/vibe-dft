@@ -51,6 +51,48 @@ codex plugin list
 
 常见分工：不确定入口时显式调用 `ask-dnk`；配置进入 `calc-setup`，RQ 决策进入 `calc-rq`，科学设计进入 `calc-to-spec`，执行进入 `calc-execute`。`calc-execute` 在提交前调用 `calc-review`，而直接评审只产生当前诊断，不形成后续提交授权。
 
+#### 当前架构（WF-001）
+
+Calc Project 采用六个显式接口和一条单向权威链。`ask-dnk` 只负责推荐入口；其余接口各自拥有一类变更，避免用平行状态文件复制研究或执行事实。
+
+```text
+                         ┌──────────────┐
+                         │   ask-dnk    │  路由建议
+                         └──────┬───────┘
+              ┌─────────────────┼─────────────────┐
+              ▼                 ▼                 ▼
+        ┌───────────┐     ┌───────────┐     ┌──────────────┐
+        │ calc-setup│ ──▶ │  calc-rq  │ ──▶ │ calc-to-spec │
+        └───────────┘     └───────────┘     └──────┬───────┘
+                                                   ▼
+                                            ┌──────────────┐
+                                            │ calc-execute │
+                                            └──────┬───────┘
+                                                   │ 精确 Run 快照
+                                                   ▼
+                                            ┌─────────────┐
+                                            │ calc-review │  瞬时只读
+                                            └─────────────┘
+```
+
+| 权威对象 | 唯一事实源 | 负责接口 |
+| --- | --- | --- |
+| 项目结构、Tracker adapter、数据边界与集群 profile | 项目稳定配置 | `calc-setup` |
+| RQ、Decision Ticket 与已接受的 RQ 决策 | `RQ.md` 与 `decision-tickets/` | `calc-rq` |
+| 科学判断、任务 DAG、条件与验收规则 | 发布后的 Spec | `calc-to-spec` |
+| 任务状态、Run 记录、输入快照、输出与执行证据 | Spec 与对应 Run 目录 | `calc-execute` |
+| 提交前判断 | 当前 prepared Run 的瞬时审查结果 | `calc-review` |
+
+每个 RQ 的本地 Markdown Tracker 目录包含 `RQ.md`、`decision-tickets/` 和 `specs/`；不存在独立 Tracker 数据库、进度缓存或 session registry。Spec 是任务、DAG、Run、执行状态与闭环的协调权威，Run 目录保存不可变 `inputs/`、私有 `outputs/` 和 `logs/`。正常提交链为：
+
+```text
+prepare → validate → calc-review → submit unchanged inputs
+```
+
+运行时采用渐进披露：六个 `SKILL.md` 保留公共步骤，具体后端、PBS、同步与修复规则位于 owning skill 的 `references/`，模板和确定性脚本与唯一消费者共置。一次任务只读取命中分支所需的资料，不把完整发布包自动注入上下文。
+
+详细约束见 [RQ Tracker 设计](docs/superpowers/specs/2026-09-11-calc-rq-tracker-design.md)；完整替换的实施与验收方案见 [WF-001 实施计划](docs/superpowers/plans/2026-09-11-calc-roster-replacement.md)。当前实现已通过源码、解压包与隔离行为验收，但尚未作为新的版本标签发布。
+
 ### paper-project：文献、论文与汇报
 
 | Skill | 功能与适用场景 |
