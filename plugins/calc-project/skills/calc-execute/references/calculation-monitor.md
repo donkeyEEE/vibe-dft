@@ -55,10 +55,12 @@ unavailable, report an exact manual status command for the submitted job.
 
 ## Wake-up semantics
 
-The monitor executes fixed `ssh HOST qstat JOB_ID` argv. Status zero waits one
-interval; any nonzero status immediately triggers one `codex queue` attempt.
-The monitor does not distinguish queue disappearance from SSH, scheduler, or
-authentication failure and does not query accounting.
+The monitor executes a fixed SSH query that loads `/etc/profile` before running
+`qstat JOB_ID`, so configured Torque commands are available in the
+non-interactive remote session. Status zero waits one interval; any nonzero
+status immediately triggers one `codex queue` attempt. The monitor does not
+distinguish queue disappearance from SSH, scheduler, or authentication failure
+and does not query accounting.
 
 The delivered message adds `PBS_JOB_LEFT_QSTAT`, host, job ID, exact Spec, and
 exact Run before the caller-selected text. Treat it only as a wake-up signal.

@@ -76,7 +76,7 @@ def test_requires_existing_absolute_spec_and_run(load_script, tmp_path):
         monitor.parse_args(argv)
 
 
-def test_qstat_uses_separate_argv_and_zero_waits(load_script, tmp_path):
+def test_qstat_loads_remote_profile_and_zero_waits(load_script, tmp_path):
     monitor = load_script(SCRIPT)
     config = monitor.parse_args(valid_argv(tmp_path))
     calls = []
@@ -91,8 +91,16 @@ def test_qstat_uses_separate_argv_and_zero_waits(load_script, tmp_path):
 
     assert status == 7
     assert calls == [
-        ["ssh", "mu01", "qstat", "123.mu01"],
-        ["ssh", "mu01", "qstat", "123.mu01"],
+        [
+            "ssh",
+            "mu01",
+            "source /etc/profile >/dev/null 2>&1 && exec qstat 123.mu01",
+        ],
+        [
+            "ssh",
+            "mu01",
+            "source /etc/profile >/dev/null 2>&1 && exec qstat 123.mu01",
+        ],
     ]
     assert sleeps == [30.0]
 

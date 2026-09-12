@@ -90,7 +90,10 @@ def wait_until_left_qstat(
     runner: Runner = subprocess.run,
     sleep: Callable[[float], None] = time.sleep,
 ) -> int:
-    command = ["ssh", config.host, "qstat", config.job_id]
+    remote_command = (
+        "source /etc/profile >/dev/null 2>&1 && exec qstat " + config.job_id
+    )
+    command = ["ssh", config.host, remote_command]
     while True:
         result = runner(command)
         if result.returncode != 0:
