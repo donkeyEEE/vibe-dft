@@ -19,8 +19,9 @@ than guessing.
 | Advance a ready/active Spec; prepare, submit, track, synchronize, accept, correct, or close its Runs and tasks | `$calc-execute` |
 
 This is a routing-only interface. Give no scientific advice, method selection,
-parameter value, review verdict, authorization, or domain mutation. Do not
-route ordinary requests directly to `$calc-review`; its normal caller is
+parameter value, review verdict, authorization, or domain mutation.
+
+Do not route ordinary requests directly to `$calc-review`; its normal caller is
 `$calc-execute`, while a user may explicitly invoke it for immediate diagnosis.
 
 Recommend the resolved sibling rather than invoking it automatically unless

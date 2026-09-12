@@ -6,7 +6,7 @@
 
 | 插件 | 功能 | 典型任务 |
 | --- | --- | --- |
-| [calc-project](plugins/calc-project/) | 科研计算 RQ、Spec 与执行工作流 | 配置项目、设计 Spec、推进 Run、瞬时只读评审 |
+| [calc-project](plugins/calc-project/) | 科研计算 RQ、Spec、执行与作业监控工作流 | 配置项目、设计 Spec、推进 Run、监控 PBS 作业、瞬时只读评审 |
 | [paper-project](plugins/paper-project/) | 文献证据与学术写作 | 整理文献、核查引用、润色论文与制作科学图件 |
 | [osm-project](plugins/osm-project/) | 个人项目进展记录 | 将当前会话整理为 Obsidian 项目日志 |
 | [skill-incubator](plugins/skill-incubator/) | 通用 skill 试验场 | 物理论文润色、演示文稿和学术评价 |
@@ -46,10 +46,12 @@ codex plugin list
 | [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 仅显式调用；初始化或维护稳定项目结构、Tracker 配置、数据边界与集群 profile。 |
 | [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 仅显式调用；管理一个 RQ 及其 Decision Tickets。 |
 | [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 仅显式调用；设计、批准并发布一个当前科学 Spec。 |
-| [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 仅显式调用；推进一整份 ready 或 active Spec 的任务、Run、同步、接收和闭合。 |
+| [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 仅显式调用；推进一整份 ready 或 active Spec 的任务、Run、同步、接收和闭合，并可按需启动本地计算监控器。 |
 | [calc-review](plugins/calc-project/skills/calc-review/SKILL.md) | 仅显式调用；对一个准确的 prepared Run 快照做瞬时只读预提交评审。 |
 
 常见分工：不确定入口时显式调用 `ask-dnk`；配置进入 `calc-setup`，RQ 决策进入 `calc-rq`，科学设计进入 `calc-to-spec`，执行进入 `calc-execute`。`calc-execute` 在提交前调用 `calc-review`，而直接评审只产生当前诊断，不形成后续提交授权。
+
+`calc-execute` 提交 PBS 作业并记录 job ID 后，可按用户要求启动本地计算监控器。监控器等待该 job ID 离开 `qstat`，随后用预设消息请求恢复原 Codex 线程；恢复后的 `calc-execute` 再核验调度器 accounting、日志和输出。监控器只承担临时协调，不将“离开队列”解释为计算成功，也不保存额外的 Run 状态。
 
 #### 当前架构（WF-001）
 
