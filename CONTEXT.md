@@ -33,6 +33,10 @@ _Avoid_: Tracker 数据库，进度缓存，session registry
 计算项目中可复用的可执行工具资产，用于辅助计算工作，但不作为生成任务输入的来源。
 _Avoid_: 计算模板，任务专用脚本
 
+**计算监控器（Calculation Monitor）**:
+由一次已记录的调度器提交启动、在本地独立等待该 Run 的作业离开活动队列并请求恢复原 Codex 线程的临时协调进程。它不判断 Run 成功，也不保存 Spec、Run 或科学验收状态。
+_Avoid_: watcher，完成判定器，Run 状态数据库
+
 关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Decision Ticket、Spec、计算任务、运行、Run-local inputs、计算模板、项目计算模板、插件计算模板。
 
 ## Paper Project

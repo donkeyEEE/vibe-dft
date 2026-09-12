@@ -39,6 +39,8 @@ REQUIRED_DT005_ASSETS = (
     "skills/calc-execute/assets/templates/vampire/cluster-env.sh.template",
     "skills/calc-execute/assets/templates/vampire/run.pbs.template",
     "skills/calc-execute/scripts/fingerprint_run.py",
+    "skills/calc-execute/scripts/calculation-monitor.py",
+    "skills/calc-execute/references/calculation-monitor.md",
     "skills/calc-execute/scripts/probe-run-environment.sh",
     "skills/calc-execute/scripts/sync/sync_calc_data.py",
     "skills/calc-execute/scripts/vasp/compare_incar_parameters.sh",

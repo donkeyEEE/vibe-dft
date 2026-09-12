@@ -77,6 +77,12 @@ scheduler response and job identity in the Run logs and update the Spec Run row
 to `submitted` only from that evidence. A digest proves byte identity, not
 review or authorization.
 
+When post-submission monitoring or continuation was explicitly requested in
+this execution chain, read [Calculation Monitor](references/calculation-monitor.md)
+after the Spec records the Run as `submitted`, then launch its optional local
+service. Monitoring launch failure leaves the submitted Run unchanged; report
+the recorded job ID and the exact manual status command instead.
+
 For upload or result synchronization, read [reviewed
 synchronization](references/sync.md) and consume only its current reviewed plan.
 For tracking and receipt, read [remote

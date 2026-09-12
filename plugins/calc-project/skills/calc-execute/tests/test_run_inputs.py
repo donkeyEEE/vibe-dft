@@ -13,6 +13,7 @@ import pytest
 SCRIPT = "skills/calc-execute/scripts/fingerprint_run.py"
 TEMPLATE = "skills/calc-execute/assets/templates/common/run.sh.template"
 PROBE = "skills/calc-execute/scripts/probe-run-environment.sh"
+MONITOR_REFERENCE = "skills/calc-execute/references/calculation-monitor.md"
 
 
 def test_execution_gate_requires_complete_authorities_before_mutation(plugin_root):
@@ -32,6 +33,31 @@ def test_execution_gate_requires_complete_authorities_before_mutation(plugin_roo
         "Run ID, `Status`, `Current`, `Path`, and `Result`",
     ):
         assert field in text
+
+
+def test_calculation_monitor_is_conditional_and_post_submission(plugin_root):
+    skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(encoding="utf-8")
+    skill_flat = " ".join(skill.split())
+    reference_path = plugin_root / MONITOR_REFERENCE
+
+    assert reference_path.is_file()
+    assert "references/calculation-monitor.md" in skill
+    assert "explicitly requested" in skill
+    assert skill_flat.index("update the Spec Run row to `submitted`") < skill_flat.index(
+        "references/calculation-monitor.md"
+    )
+
+    reference = reference_path.read_text(encoding="utf-8")
+    for contract in (
+        "scripts/calculation-monitor.py",
+        "CODEX_THREAD_ID",
+        "systemd-run --user",
+        "--collect",
+        "--setenv=PATH=",
+        "StandardOutput=null",
+        "StandardError=null",
+    ):
+        assert contract in reference
 
 
 def _expected_fingerprint(files: dict[str, bytes]) -> str:
