@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DT002 · SCF → Band backend knowledge loading</title>
+  <style>
+    :root { color-scheme: dark; --bg:#101514; --panel:#17201e; --line:#31423d; --ink:#edf4f0; --muted:#9fb0aa; --accent:#70d6ad; --warn:#f1bf69; --bad:#ff8b8b; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { width:min(1180px,94vw); margin:34px auto 60px; }
+    h1,h2,h3,p { margin-top:0; } h1 { font-size:clamp(28px,4vw,46px); line-height:1.05; letter-spacing:-.03em; }
+    h2 { font-size:19px; } h3 { font-size:15px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
+    .eyebrow { color:var(--accent); font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+    .lede { max-width:900px; font-size:17px; color:#c8d5d0; }
+    .notice { border-left:4px solid var(--warn); padding:11px 15px; background:#241f16; color:#f8ddb0; margin:20px 0 28px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; }
+    .wide { grid-column:1/-1; }
+    dl { display:grid; grid-template-columns:145px 1fr; gap:7px 12px; margin:0; }
+    dt { color:var(--muted); } dd { margin:0; font-weight:650; overflow-wrap:anywhere; }
+    code { color:#b8f2d8; font:13px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace; }
+    ul { margin:7px 0 0; padding-left:20px; } li+li { margin-top:4px; }
+    button { border:1px solid #49675e; border-radius:8px; color:var(--ink); background:#20302c; padding:10px 13px; font:inherit; font-weight:650; cursor:pointer; }
+    button:hover { border-color:var(--accent); } button:disabled { cursor:not-allowed; opacity:.4; }
+    .primary { background:var(--accent); color:#0b1d16; border-color:var(--accent); }
+    .danger { border-color:#714747; color:#ffc0c0; }
+    .actions { display:flex; flex-wrap:wrap; gap:9px; }
+    .pill { display:inline-block; border:1px solid var(--line); border-radius:999px; padding:2px 8px; font-size:12px; }
+    .ready { color:var(--accent); } .blocked { color:var(--warn); } .error { color:var(--bad); }
+    .event { margin-top:12px; padding:10px 12px; border-radius:8px; background:#111816; border:1px solid #263530; }
+    .event strong { color:var(--accent); }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .tab[aria-selected="true"] { background:var(--accent); border-color:var(--accent); color:#0b1d16; }
+    .steps { display:flex; flex-wrap:wrap; gap:9px; margin-top:14px; }
+    .step.done { border-color:var(--accent); color:var(--accent); background:transparent; }
+    .step.current { box-shadow:0 0 0 2px rgba(112,214,173,.22); }
+    .table { width:100%; border-collapse:collapse; } .table th,.table td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+    .table th { color:var(--muted); font-weight:500; }
+    @media (max-width:760px) { .grid { grid-template-columns:1fr; } dl { grid-template-columns:1fr; gap:0; } dd { margin-bottom:9px; } }
+  </style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Throwaway prototype · WF-001 / DT-002</p>
+  <h1>选择性加载 backend 知识，能否可靠推进 SCF → band？</h1>
+  <p class="lede">本原型检验一个具体 VASP 两阶段任务：throwaway fixture 中的 <code>skills/calc-execute/</code> 镜像已批准的未来 seam，执行者只为当前阶段加载 <code>references/backends/</code> 中需要的知识，同时从 owning-skill assets 取得输入模板、从 scripts 取得可执行检查。请观察：最小知识集合是否足以阻止错误顺序、遗漏 CHGCAR handoff 或把模板误当作物理参数权威。</p>
+  <div class="notice"><strong>非生产实现。</strong> 所有状态都在浏览器内存中；不会创建任务目录、运行 VASP、提交作业或写入 Tracker。</div>
+
+  <section class="grid">
+    <article class="card">
+      <h2>Spec 与 frontier</h2>
+      <dl id="specState"></dl>
+    </article>
+    <article class="card">
+      <h2>当前动作</h2>
+      <p id="lastEvent" class="event">尚未执行动作。</p>
+      <div class="actions" id="actions"></div>
+    </article>
+    <article class="card">
+      <h2>SCF task</h2>
+      <dl id="scfState"></dl>
+    </article>
+    <article class="card">
+      <h2>Band task</h2>
+      <dl id="bandState"></dl>
+    </article>
+    <article class="card wide">
+      <h2>本阶段加载边界</h2>
+      <table class="table">
+        <thead><tr><th>层</th><th>已加载</th><th>为什么</th></tr></thead>
+        <tbody id="loadingState"></tbody>
+      </table>
+    </article>
+    <article class="card wide">
+      <h2>Guided walkthroughs</h2>
+      <div class="tabs" id="tabs"></div>
+      <p id="scenarioDescription"></p>
+      <div class="steps" id="steps"></div>
+    </article>
+  </section>
+</main>
+<script>
+// Portable logic module: pure state + transition. The page below is only a shell.
+const BackendLoadingModel = (() => {
+  const initialState = () => ({
+    spec: "active",
+    focus: "none",
+    scf: { status: "declared", knowledge: false, prepared: false, reviewed: false, run: "none", chgcar: false },
+    band: { status: "blocked", knowledge: false, prepared: false, reviewed: false, run: "none", bandDat: false },
+    last: { kind: "info", text: "尚未执行动作。" }
+  });
+
+  const fail = (state, text) => ({ ...state, last: { kind: "error", text } });
+  const note = (state, text) => ({ ...state, last: { kind: "ok", text } });
+  const copy = state => ({ ...state, scf: { ...state.scf }, band: { ...state.band } });
+
+  function transition(state, action) {
+    let next = copy(state);
+    switch (action) {
+      case "reset": return initialState();
+      case "load-scf":
+        next.focus = "scf"; next.scf.knowledge = true; next.band.knowledge = false;
+        return note(next, "仅加载 VASP 通用检查、SCF 规则和集群 profile；未加载 band path 或后处理知识。");
+      case "prepare-scf":
+        if (!next.scf.knowledge) return fail(next, "拒绝准备 SCF：当前阶段尚未加载 SCF backend 知识。");
+        if (next.scf.status !== "declared") return fail(next, "拒绝准备 SCF：SCF 不在当前 frontier。");
+        next.scf.prepared = true; next.scf.reviewed = false; next.scf.run = "none"; next.scf.status = "prepared";
+        return note(next, "SCF snapshot 已准备；模板值只作为已批准基线，材料参数仍来自任务声明。");
+      case "review-scf":
+        if (!next.scf.prepared) return fail(next, "拒绝评审 SCF：不存在 exact prepared snapshot。");
+        next.scf.reviewed = true;
+        return note(next, "SCF snapshot 通过瞬时 pre-submit review。");
+      case "submit-scf":
+        if (!next.scf.reviewed || next.scf.status !== "prepared") return fail(next, "拒绝提交 SCF：exact prepared snapshot 未评审。");
+        next.scf.run = "submitted"; next.scf.status = "submitted"; return note(next, "SCF 已提交；review 没有创建任何计算输出。");
+      case "finish-scf":
+        if (next.scf.run !== "submitted") return fail(next, "拒绝接受 SCF：必须先提交，并同步运行证据。");
+        next.scf.run = "current-valid"; next.scf.chgcar = true; next.scf.status = "accepted";
+        if (next.band.status !== "needs-review") { next.band.status = "frontier"; if (next.band.run === "invalid") next.band.run = "none"; }
+        return note(next, "SCF current Run 有效且 CHGCAR 可用；band task 现在进入 frontier。");
+      case "load-band":
+        next.focus = "band"; next.band.knowledge = true; next.scf.knowledge = false;
+        return note(next, "卸载 SCF-only 生成规则；加载 band INCAR 差异、KPATH、CHGCAR handoff、task 103 与 BAND.dat 验收知识。");
+      case "prepare-band":
+        if (next.band.status !== "frontier") return fail(next, "拒绝准备 band：SCF 尚无有效 current Run，band 不在 frontier。");
+        if (!next.band.knowledge) return fail(next, "拒绝准备 band：当前阶段尚未加载 band backend 知识。");
+        if (!next.scf.chgcar) return fail(next, "拒绝准备 band：声明的上游 CHGCAR 不可用。");
+        next.band.prepared = true; next.band.reviewed = false; next.band.run = "none"; next.band.status = "prepared";
+        return note(next, "Band snapshot 已准备；CHGCAR 只在服务器端复制到 Run，不进入模板、Git 或本地同步。");
+      case "review-band":
+        if (!next.band.prepared) return fail(next, "拒绝评审 band：不存在 exact prepared snapshot。");
+        next.band.reviewed = true;
+        return note(next, "Band snapshot 通过评审：ICHARG、路径 KPOINTS、task 103、PBS 配对与上游 CHGCAR 一致。");
+      case "submit-band":
+        if (next.scf.run !== "current-valid" || next.band.status !== "prepared") return fail(next, "拒绝提交 band：任务已离开 frontier 或上游 SCF 已失效。");
+        if (!next.band.reviewed) return fail(next, "拒绝提交 band：exact prepared snapshot 未评审。");
+        next.band.run = "submitted"; next.band.status = "submitted"; return note(next, "Band 已提交；等待 scheduler 完成与结果同步。");
+      case "finish-band":
+        if (next.band.run !== "submitted") return fail(next, "拒绝接受 band：必须先提交，并同步运行证据。");
+        if (next.scf.run !== "current-valid") return fail(next, "拒绝接受 band：其依赖的 SCF current Run 已失效。");
+        next.band.run = "current-valid"; next.band.bandDat = true; next.band.status = "accepted"; next.spec = "concludable";
+        return note(next, "Band Run 产出非空 BAND.dat 并满足任务验收；Spec 可以提出 closure，但本原型不会写 closure。");
+      case "invalidate-scf":
+        if (next.scf.run !== "current-valid") return fail(next, "没有可失效的 SCF current Run。");
+        next.scf.run = "invalid"; next.scf.chgcar = false; next.scf.prepared = false; next.scf.reviewed = false; next.scf.status = "declared";
+        if (next.band.run === "current-valid") next.band.status = "needs-review";
+        else { next.band.status = "blocked"; next.band.run = next.band.run === "submitted" ? "invalid" : next.band.run; next.band.prepared = false; next.band.reviewed = false; }
+        next.spec = "active";
+        return note(next, "SCF current Run 已失效；既有 band 结果转为 needs-review，未完成的 band chain 失效并须重新准备。");
+      default: return fail(next, "未知动作。")
+    }
+  }
+
+  function frontier(state) {
+    if (state.scf.run !== "current-valid") return state.scf.status === "declared" ? ["SCF"] : [];
+    if (state.band.run !== "current-valid" && state.band.status === "frontier") return ["Band"];
+    return [];
+  }
+
+  function loading(state) {
+    if (state.focus === "scf") return {
+      reference: "backends/vasp/common.md + scf.md",
+      asset: "assets/templates/vasp/scf/",
+      script: "scripts/vasp/select_backend_knowledge.sh + validate_stage.sh",
+      excluded: "band path、BAND.dat 后处理、其他 backend"
+    };
+    if (state.focus === "band") return {
+      reference: "backends/vasp/common.md + band.md + handoff.md",
+      asset: "assets/templates/vasp/band/",
+      script: "scripts/vasp/select_backend_knowledge.sh + validate_stage.sh + smoke_scf_band.sh",
+      excluded: "SCF KPOINTS 生成规则、其他 backend"
+    };
+    return { reference:"无", asset:"无", script:"无", excluded:"全部 backend 知识" };
+  }
+  return { initialState, transition, frontier, loading };
+})();
+
+const ACTIONS = [
+  ["load-scf","加载 SCF 知识"],["prepare-scf","准备 SCF"],["review-scf","评审 SCF"],["submit-scf","提交 SCF"],["finish-scf","同步并接受 SCF"],
+  ["load-band","切换到 Band 知识"],["prepare-band","准备 Band"],["review-band","评审 Band"],["submit-band","提交 Band"],["finish-band","同步并接受 Band"],
+  ["invalidate-scf","使 SCF 失效"],["reset","重置"]
+];
+const SCENARIOS = [
+  { name:"可靠主路径", description:"观察知识按阶段切换，review 后仍须提交与同步；band 只在 SCF current Run 与 CHGCAR 有效后进入 frontier。", steps:["load-scf","prepare-scf","review-scf","submit-scf","finish-scf","load-band","prepare-band","review-band","submit-band","finish-band"] },
+  { name:"错误顺序", description:"直接准备 band 应被 frontier 约束阻止；加载 band 知识不能替代上游产物。", steps:["load-band","prepare-band"] },
+  { name:"缺少阶段知识", description:"即使 SCF 位于 frontier，未加载对应 backend 知识也不能准备 snapshot。", steps:["prepare-scf","load-scf","prepare-scf"] },
+  { name:"上游失效传播", description:"完成两阶段后使 SCF 失效；既有 band 结果必须转为 needs-review，Spec 不再可关闭。", steps:["load-scf","prepare-scf","review-scf","submit-scf","finish-scf","load-band","prepare-band","review-band","submit-band","finish-band","invalidate-scf"] }
+];
+
+let state = BackendLoadingModel.initialState();
+let scenarioIndex = 0;
+let stepIndex = 0;
+const getById = id => document.getElementById(id);
+const row = (label,value) => `<dt>${label}</dt><dd>${value}</dd>`;
+const status = value => `<span class="pill ${["frontier","accepted","concludable"].includes(value)?"ready":["blocked","needs-review"].includes(value)?"blocked":""}">${value}</span>`;
+
+function dispatch(action, guided=false) {
+  state = BackendLoadingModel.transition(state, action);
+  if (guided) stepIndex += 1;
+  render();
+}
+function startScenario(index) { scenarioIndex=index; stepIndex=0; state=BackendLoadingModel.initialState(); render(); }
+function taskRows(task, outputName) {
+  return row("状态",status(task.status))+row("知识已加载",task.knowledge?"是":"否")+row("snapshot",task.prepared?"prepared":"none")+
+    row("pre-submit review",task.reviewed?"pass":"pending")+row("current Run",task.run)+row(outputName,task.chgcar||task.bandDat?"available":"missing");
+}
+function render() {
+  const frontier=BackendLoadingModel.frontier(state), loaded=BackendLoadingModel.loading(state);
+  getById("specState").innerHTML=row("生命周期",status(state.spec))+row("当前知识焦点",state.focus)+row("计算 frontier",frontier.length?frontier.join(", "):"empty")+row("依赖","SCF → Band");
+  getById("scfState").innerHTML=taskRows(state.scf,"CHGCAR");
+  getById("bandState").innerHTML=taskRows(state.band,"BAND.dat");
+  getById("lastEvent").className=`event ${state.last.kind==="error"?"error":""}`;
+  getById("lastEvent").innerHTML=`<strong>${state.last.kind==="error"?"已阻止":"状态变化"}</strong><br>${state.last.text}`;
+  getById("actions").innerHTML=ACTIONS.map(([id,label])=>`<button class="${id==="reset"?"danger":""}" data-action="${id}">${label}</button>`).join("");
+  getById("actions").querySelectorAll("button").forEach(button=>button.onclick=()=>dispatch(button.dataset.action));
+  const reasons={reference:"只读规则决定本阶段约束",asset:"复制为 task-local inputs 的声明输入",script:"可执行、可复用的确定性检查",excluded:"刻意不进入当前上下文"};
+  getById("loadingState").innerHTML=Object.entries(loaded).map(([key,value])=>`<tr><td>${key}</td><td><code>${value}</code></td><td>${reasons[key]}</td></tr>`).join("");
+  getById("tabs").innerHTML=SCENARIOS.map((item,index)=>`<button class="tab" aria-selected="${index===scenarioIndex}" data-index="${index}">${item.name}</button>`).join("");
+  getById("tabs").querySelectorAll("button").forEach(button=>button.onclick=()=>startScenario(Number(button.dataset.index)));
+  const scenario=SCENARIOS[scenarioIndex]; getById("scenarioDescription").textContent=scenario.description;
+  getById("steps").innerHTML=scenario.steps.map((action,index)=>{ const label=ACTIONS.find(item=>item[0]===action)[1]; return `<button class="step ${index<stepIndex?"done":index===stepIndex?"current":""}" ${index!==stepIndex?"disabled":""} data-action="${action}">${index+1}. ${label}</button>`; }).join("");
+  const current=getById("steps").querySelector("button:not([disabled])"); if(current) current.onclick=()=>dispatch(current.dataset.action,true);
+}
+render();
+</script>
+</body>
+</html>
