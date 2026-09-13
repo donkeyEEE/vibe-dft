@@ -38,16 +38,12 @@ _Avoid_: 计算线，状态文件
 **RQ Tracker**:
 一个 RQ 的配置化存储约定。`local-markdown` adapter 将其存储在
 `01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，其中包含 `RQ.md`、已明确发布的
-Specs 和 Decision Tickets。Tracker 不是独立状态文档，也不拥有执行进度。
+Specs。Tracker 不是独立状态文档，也不拥有执行进度。
 _Avoid_: Tracker 数据库，进度缓存，会话注册表
 
 **研究问题（Research Question, RQ）**:
 在一条研究主线内定义问题、边界、成功标准、已接受决策及已明确发布 Spec 的记录。
 _Avoid_: 研究计划目录，任务列表
-
-**Decision Ticket**:
-RQ 决策过程中为一个未解决问题建立的临时记录；答案被接受并写入 RQ 后即完成。
-_Avoid_: 计算任务，长期进度记录
 
 **计算规范（Spec）**:
 一个主判断的当前已批准科学设计，也是其任务目的、DAG、状态、Runs、current Run、
@@ -106,6 +102,6 @@ _Avoid_: 主数据，远程任务
 
 ## Scoped IDs and references
 
-ID 在父对象内编号且不复用：`RQ-NNN` 属于一条主线，`DT-NNN` 和 `SPEC-NNN`
-属于一个 RQ，`TASK-NNN` 属于一个 Spec，`RUN-NNN` 属于一个任务。同父引用使用 ID，
+ID 在父对象内编号且不复用：`RQ-NNN` 属于一条主线，`SPEC-NNN` 属于一个 RQ，
+`TASK-NNN` 属于一个 Spec，`RUN-NNN` 属于一个任务。同父引用使用 ID，
 跨层引用使用相对路径；目录名可在 ID 后附加 slug。

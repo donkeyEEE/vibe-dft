@@ -101,7 +101,7 @@ def test_runtime_inventory_is_sorted_and_independently_contains_dt005_assets(
     names = _runtime_names(builder, plugin_root)
 
     assert names == sorted(names)
-    assert len(names) == 81
+    assert len(names) == 80
     assert REQUIRED_DT005_ASSETS <= set(names)
 
 
@@ -410,7 +410,6 @@ def test_documentation_distinguishes_skill_calls_from_local_file_references(
 
     assert "invoke `$dev-engineering:grill-with-docs`" in rq
     assert "[the RQ template](references/rq-template.md)" in rq
-    assert "[the Decision Ticket\n   template](references/decision-ticket-template.md)" in rq
     assert "]($" not in rq
 
 

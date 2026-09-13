@@ -14,8 +14,8 @@ than guessing.
 | Request branch | Route |
 |---|---|
 | Missing or changed stable project, Tracker, data-boundary, or cluster-profile configuration | `$calc-setup` |
-| RQ lifecycle, Decision Ticket, accepted decision, or concluded-Spec RQ impact | `$calc-rq` |
-| Principal judgment, scientific commitment, task DAG, condition, acceptance, stopping rule, or Spec replacement | `$calc-to-spec` |
+| RQ lifecycle, accepted decision, unanswered RQ question, or concluded-Spec RQ impact | `$calc-rq` |
+| Complete Spec set for one RQ, principal judgment, scientific commitment, task DAG, condition, acceptance, stopping rule, or one Spec replacement | `$calc-to-spec` |
 | Advance a ready/active Spec; prepare, submit, track, synchronize, accept, correct, or close its Runs and tasks | `$calc-execute` |
 
 This is a routing-only interface. Give no scientific advice, method selection,

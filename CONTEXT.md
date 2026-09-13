@@ -21,12 +21,8 @@ Skill 是否允许 Codex 隐式选择的运行时策略；默认允许隐式调�
 
 `plugins/calc-project` 是可安装计算工作流插件。运行时计算模板和确定性辅助脚本属于唯一消费者 `calc-execute`，不属于插件共享资源。
 
-**Decision Ticket**:
-RQ 决策过程中，为一个尚未解决且需要显式回答的问题建立的临时决策记录。答案被接受并写入 RQ 后即完成，不参与后续 Spec 或计算执行协调。
-_Avoid_: 计算任务，开发工单，长期进度记录
-
 **RQ Tracker**:
-每个 RQ 用于存放其已发布 Spec 与 Decision Ticket 的配置化存储约定；RQ 属于一条计算研究主线，本地 Markdown adapter 下对应 `<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，不是独立状态文档。
+每个 RQ 用于存放 `RQ.md` 与已发布 Spec 的配置化存储约定；RQ 属于一条计算研究主线，本地 Markdown adapter 下对应 `<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，不是独立状态文档。
 _Avoid_: Tracker 数据库，进度缓存，session registry
 
 **计算工具脚本（Calculation Utility Script）**:
@@ -41,7 +37,7 @@ _Avoid_: watcher，完成判定器，Run 状态数据库
 Calc Project 的显式路由接口；原名 `ask-dnk`，自 2026-09-13 起使用现名。过去文档中的旧名称保留为历史记录。
 _Avoid_: ask-dnk（当前名称）
 
-关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Decision Ticket、Spec、计算任务、运行、Run-local inputs、计算模板、项目计算模板、插件计算模板。
+关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Spec、计算任务、运行、Run-local inputs、计算模板、项目计算模板、插件计算模板。
 
 ## Paper Project
 

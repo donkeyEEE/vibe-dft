@@ -31,7 +31,7 @@ containers. It does not populate calculation templates or the literature
 container. The Paper Project literature workflow owns the latter's contents.
 
 Create `software-profiles.md` only when cluster configuration is requested.
-Base setup creates no concrete RQ directory, Decision Ticket, Spec, task, Run,
+Base setup creates no concrete RQ directory, Spec, task, Run,
 calculation input, scheduler script, or project index. Existing RQs and Specs
 are reported and left unchanged.
 
