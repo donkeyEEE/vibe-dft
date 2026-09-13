@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/yz-skills-logo.png" alt="YZ Skills" width="460">
+</p>
+
 # YZ Skills
 
 面向科研计算、学术写作与个人项目日志的 Codex 插件集合。本仓库集中维护四个插件及其技能、脚本、模板和参考资料，每个 `plugins/<plugin-name>/` 目录都是独立的插件发布单元。
