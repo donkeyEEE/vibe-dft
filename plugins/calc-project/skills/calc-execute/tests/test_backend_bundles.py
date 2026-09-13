@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import re
-
-
 EXPECTED_BUNDLES = {
     "vasp-scf": ("vasp/common.md", "vasp/scf.md"),
     "vasp-band": ("vasp/common.md", "vasp/band.md", "vasp/handoff.md"),
@@ -22,19 +19,13 @@ EXPECTED_BUNDLES = {
 }
 
 
-def _declared_bundles(skill_text: str) -> dict[str, tuple[str, ...]]:
-    bundles: dict[str, tuple[str, ...]] = {}
-    for line in skill_text.splitlines():
-        match = re.fullmatch(r"\| `([^`]+)` \| (.+) \|", line)
-        if match:
-            bundles[match.group(1)] = tuple(re.findall(r"`([^`]+\.md)`", match.group(2)))
-    return bundles
-
-
-def test_execute_declares_the_exact_backend_bundles(plugin_root):
-    """Catch a branch loading an unrelated backend file or omitting an owner."""
+def test_execute_does_not_embed_a_backend_inventory(plugin_root):
+    """Keep backend discovery out of the main execution workflow."""
     text = (plugin_root / "skills/calc-execute/SKILL.md").read_text(encoding="utf-8")
-    assert _declared_bundles(text) == EXPECTED_BUNDLES
+    assert "Preferred backend bundles" not in text
+    assert "| Branch | Exact bundle |" not in text
+    for backend in EXPECTED_BUNDLES:
+        assert f"`{backend}`" not in text
 
 
 def test_every_declared_backend_file_exists(plugin_root):

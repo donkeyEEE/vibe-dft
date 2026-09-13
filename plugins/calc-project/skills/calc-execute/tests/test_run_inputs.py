@@ -16,23 +16,43 @@ PROBE = "skills/calc-execute/scripts/probe-run-environment.sh"
 MONITOR_REFERENCE = "skills/calc-execute/references/calculation-monitor.md"
 
 
-def test_execution_gate_requires_complete_authorities_before_mutation(plugin_root):
-    text = " ".join(
-        (plugin_root / "skills/calc-execute/SKILL.md")
-        .read_text(encoding="utf-8")
-        .split()
+def test_execute_skill_has_compact_three_part_contract(plugin_root):
+    skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(
+        encoding="utf-8"
     )
+    body = skill.split("---", 2)[2].strip()
+    sections = [line for line in body.splitlines() if line.startswith("#")]
 
-    assert "Before any mutation or advancement" in text
-    assert "read-only status diagnostic" in text
-    assert "specific missing or conflicting field" in text
-    for field in (
-        "`Question`, `Boundary`, `Success Criterion`, `Decisions`, and `Specs`",
-        "`ID`, `Status: ready | active`, `RQ`, `Judgment`, and `Tasks`",
-        "`Status`, `Path`, `Blocked by`, `Condition`, `Purpose`, `Acceptance`, and `Runs`",
-        "Run ID, `Status`, `Current`, `Path`, and `Result`",
+    assert sections == ["# Calc Execute", "## Workflow", "## Principles"]
+
+    overview, remainder = body.split("## Workflow", 1)
+    overview_text = " ".join(overview.removeprefix("# Calc Execute").split())
+    assert overview_text
+    assert len(overview_text) <= 500
+    assert "\n\n" not in overview.removeprefix("# Calc Execute").strip()
+
+    workflow, principles = remainder.split("## Principles", 1)
+    for reference in (
+        "references/task-advancement.md",
+        "references/run-preparation.md",
+        "references/pbs.md",
+        "references/simple-correction.md",
+        "references/calculation-monitor.md",
+        "references/remote-completion.md",
+        "references/sync.md",
     ):
-        assert field in text
+        assert reference in workflow
+    for sibling in (
+        "`$calc-setup`",
+        "`$dev-engineering:research`",
+        "`$calc-review`",
+        "`$calc-rq`",
+    ):
+        assert sibling in workflow
+
+    for status in ("`finished`", "`failed`", "`cancelled`"):
+        assert status in principles
+    assert "`$calc-to-spec`" in principles
 
 
 def test_calculation_monitor_is_conditional_and_post_submission(plugin_root):
