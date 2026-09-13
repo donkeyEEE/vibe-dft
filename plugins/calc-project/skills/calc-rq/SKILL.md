@@ -21,13 +21,16 @@ storage convention; `RQ.md` is the sole RQ authority.
    impact. Treat those files as authorities, not conversational summaries. Keep
    no separate question record, Tracker document, registry, cache, claim, or
    session state.
-3. For creating or deriving an RQ, or changing its Question, Boundary, or
-   Success Criterion, invoke `$dev-engineering:grill-with-docs`. If that
+3. For creating or deriving an RQ, or changing its Question, the `Boundary:`
+   field under Question, or Success Criterion, invoke `$dev-engineering:grill-with-docs`. If that
    dependency is unavailable, stop only this workflow and report it; inspection
    and already-decided RQ updates remain available when they do not require that
-   workflow. Resolve an unanswered question in the current conversation. After
-   the user answers it, propose the exact addition or replacement under
-   `RQ.md` `## Decisions`; do not persist the unanswered question separately.
+   workflow. Record RQ-scoped terminology and framing produced by the interview
+   under `RQ.md` `## Context`; reserve the repository's root `CONTEXT.md` for
+   stable project-wide domain terms. Resolve an unanswered question in the
+   current conversation. After the user answers it, propose the exact addition
+   or replacement under `RQ.md` `## Decisions`; do not persist the unanswered
+   question separately.
 4. Draft an RQ with [the RQ template](references/rq-template.md) when creating
    one. `RQ-NNN` IDs are stable and unused within their parent main-line.
 5. Present the exact proposed file paths and complete Markdown changes. Wait for

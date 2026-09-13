@@ -19,7 +19,7 @@ a separate fresh context.
 
 `S03-approved-creation`:
 
-> Create RQ-003 after inspecting interview.md and existing sibling RQs. The structured interview is complete and its accepted answers are recorded there. I approve exactly this proposal: create data/01line-a/01-rqs/RQ-003-strain-stability/RQ.md with complete content '# Strain stability\n\nID: RQ-003\nStatus: active\n\n## Question\nDoes synthetic phase A remain stable under strain?\n\n## Boundary\nSynthetic phase A at strains -1%, 0%, and +1%; fixed input model A.\n\n## Success Criterion\nAll three strain points record result PASS under the published Spec criterion.\n\n## Decisions\n- Use fixed input model A and strains -1%, 0%, +1%.\n\n## Specs\n'; also create its empty specs directory. No other RQ update is approved.
+> Create RQ-003 after inspecting interview.md and existing sibling RQs. The structured interview is complete and its accepted answers are recorded there. I approve exactly this proposal: create data/01line-a/01-rqs/RQ-003-strain-stability/RQ.md with complete content '# Strain stability\n\nID: RQ-003\nStatus: active\n\n## Question\nDoes synthetic phase A remain stable under strain?\n\nBoundary: Synthetic phase A at strains -1%, 0%, and +1%; fixed input model A.\n\n## Success Criterion\nAll three strain points record result PASS under the published Spec criterion.\n\n## Specs\n\n## Decisions\n- Use fixed input model A and strains -1%, 0%, +1%.\n\n## Context\n'; also create its empty specs directory. No other RQ update is approved.
 
 `S03-approved-decision-update`:
 

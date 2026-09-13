@@ -41,10 +41,12 @@ calculation or submission.
    source is unavailable, stop instead of discovering an alternative backend
    resource at runtime.
 3. Before drafting, invoke `$dev-engineering:grill-with-docs` in the current
-   conversation to form the scientific design. In new-Spec mode, determine the
-   complete set of independent principal judgments needed to answer the accepted
-   RQ before drafting any member. Return a genuinely unresolved RQ-level
-   question to
+   conversation to form the scientific design. Record Spec-scoped terminology
+   and framing produced by the interview in each affected Spec's final
+   `## Context`; reserve the repository's root `CONTEXT.md` for stable
+   project-wide domain terms. In new-Spec mode, determine the complete set of
+   independent principal judgments needed to answer the accepted RQ before
+   drafting any member. Return a genuinely unresolved RQ-level question to
    `$calc-rq`; after its accepted resolution, resume complete-set design from
    the authoritative RQ. If the interview dependency is unavailable, pause this
    workflow and report it.

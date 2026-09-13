@@ -11,12 +11,20 @@ def test_rq_template(plugin_root):
         "ID: RQ-001",
         "Status: active",
         "## Question",
-        "## Boundary",
+        "Boundary:",
         "## Success Criterion",
-        "## Decisions",
         "## Specs",
+        "## Decisions",
+        "## Context",
     ):
         assert field in text
+
+    assert text.index("## Specs") < text.index("## Decisions")
+    assert text.index("## Decisions") < text.index("## Context")
+    assert "## Boundary" not in text
+    assert text.index("## Question") < text.index("Boundary:")
+    assert text.index("Boundary:") < text.index("## Success Criterion")
+    assert "RQ-scoped terminology and framing" in text
 
 
 def test_rq_template_documents_allowed_statuses(plugin_root):

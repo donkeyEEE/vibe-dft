@@ -14,8 +14,12 @@ def test_spec_template(plugin_root):
         "Acceptance:",
         "#### Runs",
         "| Run | Status | Current | Path | Result |",
+        "## Context",
     ):
         assert field in text
+
+    assert "`Context` is the final section." in text
+    assert "Insert `Closure` immediately before `Context`" in text
 
 
 def test_design_flow_keeps_full_draft_internal_until_summary_approval(plugin_root):
