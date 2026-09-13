@@ -90,8 +90,9 @@ after the Spec records the Run as `submitted`, then launch its optional local
 service. Monitoring launch failure leaves the submitted Run unchanged; report
 the recorded job ID and the exact manual status command instead.
 
-For upload or result synchronization, read [reviewed
-synchronization](references/sync.md) and consume only its current reviewed plan.
+For upload or result synchronization, read [previewed
+synchronization](references/sync.md), review its dry-run report, then run the
+matching transfer.
 For tracking and receipt, read [remote
 completion](references/remote-completion.md); queue disappearance alone is not
 success. Correlate scheduler/accounting evidence, logs, expected products, and
