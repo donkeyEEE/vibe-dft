@@ -1,6 +1,6 @@
 # PDF evidence strategy
 
-Zo2Notes uses the least invasive source that can answer the reading question. Zotero remains the default text provider; the original local PDF is a targeted verification source, not the default full-document ingestion path.
+Get Zotero uses the least invasive source that can answer the reading question. Zotero remains the default text provider; the original local PDF is a targeted verification source, not the default full-document ingestion path.
 
 ## Routing order
 
@@ -23,8 +23,8 @@ Zo2Notes uses the least invasive source that can answer the reading question. Zo
 For a born-digital PDF with a usable text layer:
 
 ```bash
-lit parse <pdf> --format json --no-ocr --target-pages "<pages>" -o /tmp/zo2notes-pdf.json
-lit screenshot <pdf> --target-pages "<pages>" --dpi 150 -o /tmp/zo2notes-pages
+lit parse <pdf> --format json --no-ocr --target-pages "<pages>" -o /tmp/get-zotero-pdf.json
+lit screenshot <pdf> --target-pages "<pages>" --dpi 150 -o /tmp/get-zotero-pages
 ```
 
 Use structured JSON for bounding boxes and reading-order diagnosis. Use screenshots when the claim depends on a figure, dense table, equation layout, or other visual relation. Do not prefer layout-projected plain text over a complete, readable Zotero index for ordinary body-text reading.
@@ -32,7 +32,7 @@ Use structured JSON for bounding boxes and reading-order diagnosis. Use screensh
 For a scanned PDF or a missing, corrupt, or unusable text layer:
 
 ```bash
-lit parse <pdf> --ocr-language eng --target-pages "<pages>" -o /tmp/zo2notes-ocr.txt
+lit parse <pdf> --ocr-language eng --target-pages "<pages>" -o /tmp/get-zotero-ocr.txt
 ```
 
 OCR is a fallback. It should not be enabled merely to reprocess a healthy text layer because it is slower and can degrade formulas, subscripts, symbols, and scientific notation. Increase DPI or use another OCR language only when the source requires it.

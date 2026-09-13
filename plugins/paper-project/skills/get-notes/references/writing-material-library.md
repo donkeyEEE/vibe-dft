@@ -7,7 +7,7 @@
 - 已有计算研究线：`<project-root>/<research-line>/07-论文写作库/`
 - 只有论文文件：`<manuscript-parent>/论文写作库/`
 
-调用 `scripts/project_storage.py` 中的定位和初始化函数创建统一结构：
+调用 `scripts/writing_library_storage.py` 中的定位和初始化函数创建统一结构：
 
 ```text
 <writing-library>/

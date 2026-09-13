@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Sequence
 
-from attachment_paths import resolve_attachment_path
+from attachment_paths import AttachmentPathError, resolve_attachment_path
 from runtime_config import (
     ConfigError,
     Endpoint,
@@ -230,6 +230,160 @@ def summarize_item(item: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def artifact_metadata(item: dict[str, Any]) -> dict[str, Any]:
+    """Return stable bibliographic metadata for the content artifact contract."""
+    data = item.get("data", item)
+    return {
+        "title": data.get("title"),
+        "authors": creators_from_item(data),
+        "year": year_from_date(data.get("date")),
+        "publication": data.get("publicationTitle"),
+        "doi": data.get("DOI"),
+        "url": data.get("url"),
+        "abstract": data.get("abstractNote"),
+        "collections": list(data.get("collections") or []),
+    }
+
+
+def _pdf_attachment(children: list[dict[str, Any]]) -> dict[str, Any] | None:
+    for child in children:
+        data = child.get("data", child)
+        if (
+            data.get("itemType") == "attachment"
+            and data.get("contentType") == "application/pdf"
+        ):
+            return child
+    return None
+
+
+def _artifact_manifest(
+    item_key: str, metadata: dict[str, Any], content: dict[str, Any]
+) -> dict[str, Any]:
+    return {
+        "schema_version": 1,
+        "item_key": item_key,
+        "metadata": metadata,
+        "content": content,
+    }
+
+
+def build_content_artifact(
+    client: ZoteroClient, item_key: str, mode: str, out_dir: Path
+) -> dict[str, Any]:
+    """Fetch one parent item and expose its content as a file artifact."""
+    if mode not in {"auto", "indexed-text", "pdf"}:
+        raise ValueError(f"Unsupported content mode: {mode}")
+
+    quoted_item_key = urllib.parse.quote(item_key)
+    item = api_get(client, f"{LOCAL_USER}/items/{quoted_item_key}")
+    metadata = artifact_metadata(item)
+    children = api_get(client, f"{LOCAL_USER}/items/{quoted_item_key}/children")
+    attachment = _pdf_attachment(children if isinstance(children, list) else [])
+    if attachment is None:
+        if mode != "auto":
+            return _artifact_manifest(
+                item_key,
+                metadata,
+                {
+                    "kind": "error",
+                    "code": "pdf-attachment-not-found",
+                    "next_step": (
+                        "Attach a local PDF in Zotero or request auto mode for "
+                        "metadata-only evidence."
+                    ),
+                },
+            )
+        return _artifact_manifest(
+            item_key,
+            metadata,
+            {"kind": "metadata-only", "source": "metadata-abstract-only"},
+        )
+
+    attachment_data = attachment.get("data", attachment)
+    attachment_key = attachment.get("key") or attachment_data.get("key")
+    if not attachment_key:
+        return _artifact_manifest(
+            item_key,
+            metadata,
+            {
+                "kind": "error",
+                "code": "attachment-key-missing",
+                "next_step": "Select a PDF attachment with a valid Zotero key.",
+            },
+        )
+    quoted_attachment_key = urllib.parse.quote(str(attachment_key))
+
+    if mode in {"auto", "indexed-text"}:
+        response = client.request(
+            f"{LOCAL_USER}/items/{quoted_attachment_key}/fulltext"
+        )
+        if response.ok:
+            fulltext = parse_body(response)
+            content = fulltext.get("content", "") if isinstance(fulltext, dict) else ""
+            if content:
+                out_dir = out_dir.expanduser().resolve()
+                out_dir.mkdir(parents=True, exist_ok=True)
+                path = out_dir / f"{attachment_key}.txt"
+                path.write_text(content, encoding="utf-8")
+                return _artifact_manifest(
+                    item_key,
+                    metadata,
+                    {
+                        "kind": "text-file",
+                        "path": str(path),
+                        "source": "zotero-indexed-fulltext",
+                        "attachment_key": attachment_key,
+                        "indexed_pages": fulltext.get("indexedPages"),
+                        "total_pages": fulltext.get("totalPages"),
+                    },
+                )
+        if mode == "indexed-text":
+            return _artifact_manifest(
+                item_key,
+                metadata,
+                {
+                    "kind": "error",
+                    "code": "indexed-text-unavailable",
+                    "attachment_key": attachment_key,
+                    "next_step": "Request PDF mode or use metadata-only evidence.",
+                },
+            )
+
+    response = client.request(
+        f"{LOCAL_USER}/items/{quoted_attachment_key}/file/view/url"
+    )
+    if response.ok:
+        try:
+            raw = parse_body(response)
+            resolved = resolve_attachment_path(
+                str(raw), client.config.mode, client.config.path_mappings
+            )
+            return _artifact_manifest(
+                item_key,
+                metadata,
+                {
+                    "kind": "pdf-file",
+                    "path": str(resolved.path.resolve()),
+                    "source": "local-pdf",
+                    "attachment_key": attachment_key,
+                },
+            )
+        except AttachmentPathError as error:
+            detail = str(error)
+    else:
+        detail = response.error or f"HTTP {response.status}"
+    return _artifact_manifest(
+        item_key,
+        metadata,
+        {
+            "kind": "error",
+            "code": "pdf-unavailable",
+            "attachment_key": attachment_key,
+            "next_step": detail,
+        },
+    )
+
+
 def summarize_collection(collection: dict[str, Any]) -> dict[str, Any]:
     data = collection.get("data", collection)
     return {
@@ -330,35 +484,6 @@ def write_text_output(text: str, out: str | None) -> None:
             "bibtex_entries": count_bibtex_entries(text),
         }
     )
-
-
-def append_bib_entry(bib_path: Path, entry: str) -> tuple[str, bool]:
-    keys = extract_bibtex_keys(entry)
-    if not keys:
-        exit_with("Could not extract a BibTeX key from Zotero export")
-    key = keys[0]
-
-    existing = bib_path.read_text(encoding="utf-8", errors="replace") if bib_path.exists() else ""
-    already_present = re.search(r"@\w+\s*\{\s*" + re.escape(key) + r"\s*,", existing) is not None
-    if already_present:
-        return key, False
-
-    bib_path.parent.mkdir(parents=True, exist_ok=True)
-    prefix = existing.rstrip("\n") + "\n\n" if existing else ""
-    bib_path.write_text(prefix + entry.strip() + "\n", encoding="utf-8")
-    return key, True
-
-
-def insert_citation(target: Path, citation: str, marker: str | None) -> None:
-    text = target.read_text(encoding="utf-8", errors="replace") if target.exists() else ""
-    if marker:
-        if marker not in text:
-            exit_with(f"Marker not found in {target}: {marker!r}")
-        target.write_text(text.replace(marker, citation, 1), encoding="utf-8")
-        return
-
-    suffix = "" if not text or text.endswith("\n") else "\n"
-    target.write_text(text + suffix + citation + "\n", encoding="utf-8")
 
 
 def find_item(
@@ -548,14 +673,6 @@ def cmd_export_bibtex(args: argparse.Namespace, client: ZoteroClient) -> None:
     )
 
 
-def cmd_sync_bib(args: argparse.Namespace, client: ZoteroClient) -> None:
-    text = export_bibtex(client, include_children=args.include_children)
-    path = Path(args.out).expanduser().resolve()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
-    dump_json({"path": str(path), "entries": count_bibtex_entries(text)})
-
-
 def cmd_citations(args: argparse.Namespace, client: ZoteroClient) -> None:
     params = query({"include": "data,citation", "style": args.style})
     rows: list[dict[str, Any]] = []
@@ -606,37 +723,23 @@ def cmd_file_url(args: argparse.Namespace, client: ZoteroClient) -> None:
         print(raw)
 
 
-def cmd_cite(args: argparse.Namespace, client: ZoteroClient) -> None:
-    item = find_item(client, item_key=args.item_key, query_text=args.query)
-    item_key = item.get("key")
-    if not item_key:
-        exit_with("Matched Zotero item has no key")
-
-    citekey, added = append_bib_entry(
-        Path(args.bib).expanduser().resolve(), export_bibtex(client, item_key)
-    )
-    citation = f"\\cite{{{citekey}}}" if args.tex else f"[@{citekey}]"
-    target = Path(args.tex or args.markdown).expanduser().resolve()
-    insert_citation(target, citation, args.marker)
-    dump_json(
-        {
-            "item_key": item_key,
-            "title": summarize_item(item).get("title"),
-            "bibtex_key": citekey,
-            "bib_path": str(Path(args.bib).expanduser().resolve()),
-            "bib_entry_added": added,
-            "edited_file": str(target),
-            "inserted": citation,
-        }
-    )
-
-
 def cmd_selected_target(args: argparse.Namespace, client: ZoteroClient) -> None:
     response = require_ok(
         client.selected_target(), "Read selected Zotero library/collection"
     )
     payload = parse_body(response)
     print(json.dumps(payload, indent=2) if args.json else payload)
+
+
+def cmd_content(args: argparse.Namespace, client: ZoteroClient) -> None:
+    dump_json(
+        build_content_artifact(
+            client,
+            args.item_key,
+            args.content_mode,
+            Path(args.out_dir),
+        )
+    )
 
 
 def add_json_flag(parser: argparse.ArgumentParser) -> None:
@@ -704,14 +807,6 @@ def build_parser() -> argparse.ArgumentParser:
     export.add_argument("--out")
     export.set_defaults(func=cmd_export_bibtex)
 
-    sync_bib = subcommands.add_parser("sync-bib", help="Write a references.bib export")
-    sync_bib.add_argument("--out", default="references.bib")
-    sync_bib.add_argument("--include-children", action="store_true")
-    sync_bib.add_argument(
-        "--all", action="store_true", dest="include_children", help=argparse.SUPPRESS
-    )
-    sync_bib.set_defaults(func=cmd_sync_bib)
-
     citations = subcommands.add_parser("citations", help="Render formatted citations")
     citations.add_argument("--style", default="apa")
     add_json_flag(citations)
@@ -738,26 +833,24 @@ def build_parser() -> argparse.ArgumentParser:
     )
     file_url.set_defaults(func=cmd_file_url)
 
-    cite = subcommands.add_parser(
-        "cite", help="Insert a citation into a TeX or Markdown file and update a .bib file"
-    )
-    source = cite.add_mutually_exclusive_group(required=True)
-    source.add_argument("--item-key")
-    source.add_argument("--query")
-    target = cite.add_mutually_exclusive_group(required=True)
-    target.add_argument("--tex")
-    target.add_argument("--markdown")
-    cite.add_argument("--bib", default="references.bib")
-    cite.add_argument(
-        "--marker", help="Replace this marker with the citation; otherwise append the citation"
-    )
-    cite.set_defaults(func=cmd_cite)
-
     selected = subcommands.add_parser(
         "selected-target", help="Show the currently selected Zotero library/collection"
     )
     add_json_flag(selected)
     selected.set_defaults(func=cmd_selected_target)
+
+    content = subcommands.add_parser(
+        "content", help="Expose metadata, indexed text, or a PDF as a content artifact"
+    )
+    content.add_argument("item_key")
+    content.add_argument(
+        "--mode",
+        dest="content_mode",
+        choices=("auto", "indexed-text", "pdf"),
+        default="auto",
+    )
+    content.add_argument("--out-dir", required=True)
+    content.set_defaults(func=cmd_content)
 
     return parser
 

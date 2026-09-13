@@ -43,10 +43,10 @@ python3 <plugin-root>/skills/citation-validator/scripts/citation_validator.py ex
 **作者-年份引用**：直接使用生成的查询搜索 Zotero：
 
 ```bash
-python3 <plugin-root>/skills/zotero/scripts/zotero.py search "Author 2020" --json
+python3 <plugin-root>/skills/get-zotero/scripts/zotero.py search "Author 2020" --json
 ```
 
-使用 zotero 插件的 `zotero.py`（优先）或 Zo2Notes 的 `zotero.py`。如果 Zotero 未运行，提示用户启动 Zotero Desktop。
+只使用 `get-zotero` 的只读 CLI seam。如果 Zotero 未运行，提示用户启动 Zotero Desktop。
 
 搜索后，匹配最可能的结果。如果多个结果匹配，优先选择标题或领域与段落主题最相关的。如果找不到，标记为"未找到"。
 
@@ -57,24 +57,19 @@ python3 <plugin-root>/skills/zotero/scripts/zotero.py search "Author 2020" --jso
 对每条找到的文献，获取摘要：
 
 ```bash
-# 通过 zotero search 的 --json 输出中已包含 abstract
-# 或单独获取
-python3 <plugin-root>/skills/zotero/scripts/zotero.py search "exact title" --json
+python3 <plugin-root>/skills/get-zotero/scripts/zotero.py content \
+  <itemKey> --mode auto --out-dir <temporary-directory>
 ```
 
-摘要字段通常在 Zotero item 的 `abstractNote` 中。
+先按 `references/zotero-integration.md` 验证 manifest；摘要位于 metadata，正文由
+`content.kind` 指向的 artifact 提供。
 
 **何时获取全文**：
 - 摘要信息不足以判断支撑关系（例如摘要只描述了方法未提结论）
 - 摘要与声明看起来相关但需要确认具体数据或结论
 - 评估等级为 `partial_support` 或 `contradictory` 时需确认细节
 
-获取全文时，使用 zotero 插件的 `children` 找到 PDF 附件，再用 `fulltext` 获取索引全文：
-
-```bash
-python3 <plugin-root>/skills/zotero/scripts/zotero.py children <itemKey> --json
-python3 <plugin-root>/skills/zotero/scripts/zotero.py fulltext <attachmentKey> --out /tmp/fulltext.txt
-```
+获取全文时继续消费同一个 content artifact，不绕过 `get-zotero` 直接访问附件。
 
 仅读取与声明相关的部分（500-1000 字），不要将整篇论文加载到上下文。
 

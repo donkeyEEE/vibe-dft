@@ -5,7 +5,7 @@ import pytest
 
 
 SCRIPTS = (
-    Path(__file__).resolve().parents[2] / "skills" / "zo2notes" / "scripts"
+    Path(__file__).resolve().parents[2] / "skills" / "get-zotero" / "scripts"
 )
 sys.path.insert(0, str(SCRIPTS))
 

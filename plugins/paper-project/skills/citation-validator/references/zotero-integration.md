@@ -1,120 +1,54 @@
 # Zotero 集成参考
 
-## 访问 Zotero
+## 唯一获取接口
 
-### 方式一：zotero 插件（优先）
-
-使用全局安装的 zotero 插件脚本，该脚本默认使用 `http://127.0.0.1:23119`，原生 Windows/macOS/Linux 均可使用：
+通过 Paper Project 的 `get-zotero` 只读接口定位并取得文献内容：
 
 ```bash
-python3 <zotero-plugin>/skills/zotero/scripts/zotero.py search "query" --json
-python3 <zotero-plugin>/skills/zotero/scripts/zotero.py children <itemKey> --json
-python3 <zotero-plugin>/skills/zotero/scripts/zotero.py fulltext <attachmentKey> --out /tmp/fulltext.txt
+python3 <plugin-root>/skills/get-zotero/scripts/zotero.py search "query" --json
+python3 <plugin-root>/skills/get-zotero/scripts/zotero.py content \
+  <itemKey> --mode auto --out-dir <temporary-directory>
 ```
 
-`<zotero-plugin>` 路径：`/home/donk/.codex/plugins/cache/openai-curated-remote/zotero/0.1.2/`
+不直接调用 Zotero HTTP API，不导入 `get-zotero` 的 Python 模块，也不改用其他
+Zotero 脚本。连接模式、主机、端口和 Windows/WSL 附件映射全部由
+`get-zotero` 管理。
 
-### 方式二：Zo2Notes 脚本（回退）
+## 匹配策略
 
-使用 paper-project 自带的 Zo2Notes `zotero.py`。此脚本通过固定的 Windows-to-WSL bridge 访问 Zotero Desktop：
+- 作者—年份引用：优先匹配第一作者姓氏和年份，再以标题与段落主题消歧。
+- 数字编号引用：先从稿件参考文献表建立编号到文献信息的映射，再检索。
+- 已知 DOI：以 DOI 精确检索。
+- 多个结果仍无法消歧时，列出最匹配的三个候选供确认。
+- 找不到时标记为“未找到”，不得以相似论文代替。
+
+匹配置信度：作者与年份完全一致为精确匹配；作者一致且年份相差一年为高置信度；
+仅标题关键词和领域相符为中置信度；只有部分关键词为低置信度，必须确认。
+
+## Content artifact 验证与消费
+
+调用 `content` 后先验证：
+
+1. `schema_version == 1`；
+2. manifest 的 `item_key` 与目标条目一致；
+3. `content.kind` 是 `text-file`、`pdf-file`、`metadata-only` 或 `error`；
+4. `text-file` 或 `pdf-file` 的 `path` 指向实际存在的 artifact。
+
+按类型处理：
+
+- `text-file`：读取与待核验主张相关的索引正文片段。
+- `pdf-file`：仅在摘要和索引正文不足时定向读取必要页面，不下载或复制原 PDF。
+- `metadata-only`：只依据题录与原始摘要，明确记录 `evidence_basis: abstract`。
+- `error`：遵循 `code` 与 `next_step`；不得把获取失败解释为没有正文证据。
+
+全文可能很大，只读取与声明相关的部分，不把整篇论文载入上下文。
+
+## Zotero 不可用时
+
+提示用户启动 Zotero Desktop，然后运行：
 
 ```bash
-python3 <plugin-root>/skills/zo2notes/scripts/zotero.py search "query" --json
-python3 <plugin-root>/skills/zo2notes/scripts/zotero.py children <itemKey> --json
-python3 <plugin-root>/skills/zo2notes/scripts/zotero.py fulltext <attachmentKey> --out /tmp/fulltext.txt
+python3 <plugin-root>/skills/get-zotero/scripts/zotero.py doctor --json
 ```
 
-Zo2Notes 当前使用 `http://172.30.128.1:23119`，并发送 `Host: 127.0.0.1:23119` 与 `Zotero-API-Version: 3` 请求头。
-
-## 搜索策略
-
-### 作者-年份引用
-
-```bash
-python3 .../zotero.py search "Smith 2020" --json
-```
-
-Zotero 会返回匹配项。从结果中选择最匹配的：
-1. 优先 author 匹配 + year 匹配
-2. 其次 title 与段落主题相关
-3. 如果多个匹配，返回前 3 个供评估
-
-### 数字编号引用
-
-需要先建立编号到文献的映射（见 `references/citation-patterns.md`），然后用作者+年份搜索。
-
-### 通过 DOI 精确查找
-
-如果已知 DOI，可以直接查找：
-
-```bash
-python3 .../zotero.py search "10.1234/example" --json
-```
-
-## 获取摘要
-
-搜索结果的 JSON 中通常包含 `abstractNote` 字段：
-
-```json
-{
-  "key": "ABC123",
-  "title": "Paper title",
-  "abstractNote": "Abstract text...",
-  "creators": [...],
-  "year": "2020",
-  "doi": "10.1234/example"
-}
-```
-
-如果搜索结果不包含摘要，单独获取 item：
-
-```bash
-# 直接通过 API
-curl -sS -H 'Zotero-API-Version: 3' \
-  'http://127.0.0.1:23119/api/users/0/items/ABC123' | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('data',{}).get('abstractNote',''))"
-```
-
-WSL 下如需通过 Windows 主机访问，使用：
-
-```bash
-curl -sS -H 'Host: 127.0.0.1:23119' -H 'Zotero-API-Version: 3' \
-  'http://172.30.128.1:23119/api/users/0/items/ABC123' | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('data',{}).get('abstractNote',''))"
-```
-
-## 获取全文
-
-仅在摘要不足以判断时获取全文：
-
-```bash
-# 1. 找到 PDF 附件
-python3 .../zotero.py children ABC123 --json
-
-# 2. 从输出中找 attachment 类型，获取 key
-# 3. 获取全文
-python3 .../zotero.py fulltext <attachmentKey> --out /tmp/fulltext.txt
-```
-
-**注意**：
-- 全文可能很大（数万字），只读取与声明相关的部分
-- 如果 PDF 未索引（fulltext 为空），跳过，仅基于摘要评估
-- 不下载远端 PDF
-
-## 匹配置信度
-
-搜索结果的匹配度分级：
-
-| 匹配度 | 条件 | 处理 |
-|--------|------|------|
-| 精确匹配 | 第一作者姓氏 + 年份完全匹配 | 直接使用 |
-| 高置信度 | 第一作者匹配，年份 ±1 | 使用，标注 |
-| 中置信度 | 标题关键词匹配，领域匹配 | 使用，标注 |
-| 低置信度 | 仅有部分关键词匹配 | 列出选项，请用户确认 |
-| 无匹配 | 未找到任何结果 | 标记为"未找到" |
-
-## Zotero 不可用时的处理
-
-如果 Zotero Desktop 未运行或 API 不可用：
-
-1. 提示用户启动 Zotero Desktop
-2. 运行 `python3 .../zotero.py status --json`，诊断 Zotero Desktop、本地 API 与 Windows-to-WSL bridge
-3. 如果 Zotero 确实不可用，生成仅含引用标记提取的部分报告，供用户手动核查
+若仍不可用，生成仅含引用标记提取结果的部分报告，保留待核验状态。

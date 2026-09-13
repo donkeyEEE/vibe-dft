@@ -7,7 +7,7 @@ import pytest
 
 
 SCRIPTS = (
-    Path(__file__).resolve().parents[2] / "skills" / "zo2notes" / "scripts"
+    Path(__file__).resolve().parents[2] / "skills" / "get-zotero" / "scripts"
 )
 sys.path.insert(0, str(SCRIPTS))
 
@@ -26,9 +26,16 @@ def subcommand_names(parser: argparse.ArgumentParser) -> set[str]:
 
 def test_command_surface_is_read_only() -> None:
     commands = subcommand_names(zotero.build_parser())
-    assert {"enable", "disable", "restart", "import-bibtex", "import-ris"}.isdisjoint(
-        commands
-    )
+    modifying = {
+        "enable",
+        "disable",
+        "restart",
+        "import-bibtex",
+        "import-ris",
+        "sync-bib",
+        "cite",
+    }
+    assert modifying.isdisjoint(commands)
     assert "doctor" in commands
     assert "selected-target" in commands
 
@@ -184,41 +191,3 @@ def test_doctor_distinguishes_unreachable_api() -> None:
     assert payload["api"]["running"] is False
     assert payload["api"]["error_code"] == "explicit-host-unreachable"
     assert "configured host" in payload["api"]["next_step"]
-
-
-def test_cite_still_writes_project_files_after_client_refactor(
-    tmp_path: Path, capsys
-) -> None:
-    def opener(request, timeout):
-        if request.full_url.endswith("/api/"):
-            return FakeHTTPResponse()
-        if "/items/ABCD1234" in request.full_url:
-            return FakeHTTPResponse(
-                body=b'{"key":"ABCD1234","data":{"title":"Example"}}'
-            )
-        if "format=bibtex" in request.full_url:
-            return FakeHTTPResponse(
-                body=b"@article{Example2026,\n  title={Example}\n}\n"
-            )
-        raise AssertionError(request.full_url)
-
-    endpoint = Endpoint(
-        "http://127.0.0.1:24000", "127.0.0.1:24000", "automatic-loopback"
-    )
-    client = zotero.ZoteroClient(runtime(), (endpoint,), opener=opener)
-    manuscript = tmp_path / "paper.md"
-    bibliography = tmp_path / "references.bib"
-    args = argparse.Namespace(
-        item_key="ABCD1234",
-        query=None,
-        bib=str(bibliography),
-        tex=None,
-        markdown=str(manuscript),
-        marker=None,
-    )
-
-    zotero.cmd_cite(args, client)
-
-    assert manuscript.read_text(encoding="utf-8") == "[@Example2026]\n"
-    assert "@article{Example2026" in bibliography.read_text(encoding="utf-8")
-    assert json.loads(capsys.readouterr().out)["inserted"] == "[@Example2026]"

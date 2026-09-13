@@ -1,4 +1,0 @@
-interface:
-  display_name: "文献笔记与素材库"
-  short_description: "将指定文献集合转为项目本地中文研究笔记或论文写作素材库"
-  default_prompt: "使用 $zo2notes 从我明确选择的一个 Zotero 文献集合创建或维护论文写作素材库。"

@@ -16,14 +16,14 @@ DEFAULT_PORT = 23119
 DEFAULT_TIMEOUT_SECONDS = 5.0
 VALID_MODES = {"auto", "native", "wsl"}
 ENVIRONMENT_KEYS = {
-    "mode": "ZO2NOTES_ZOTERO_MODE",
-    "host": "ZO2NOTES_ZOTERO_HOST",
-    "port": "ZO2NOTES_ZOTERO_PORT",
+    "mode": "GET_ZOTERO_MODE",
+    "host": "GET_ZOTERO_HOST",
+    "port": "GET_ZOTERO_PORT",
 }
 
 
 class ConfigError(ValueError):
-    """Raised when Zo2Notes runtime settings are invalid or undiscoverable."""
+    """Raised when get-zotero runtime settings are invalid or undiscoverable."""
 
 
 @dataclass(frozen=True)
@@ -54,8 +54,8 @@ def config_path(system: str, environ: Mapping[str, str], home: Path) -> Path:
         appdata = environ.get("APPDATA", "").strip()
         if not appdata:
             raise ConfigError("APPDATA is required to locate the Windows configuration")
-        return Path(appdata) / "zo2notes" / "config.toml"
-    return home / ".config" / "zo2notes" / "config.toml"
+        return Path(appdata) / "get-zotero" / "config.toml"
+    return home / ".config" / "get-zotero" / "config.toml"
 
 
 def is_wsl(system: str, release: str, proc_version: str) -> bool:

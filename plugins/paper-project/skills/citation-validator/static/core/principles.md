@@ -40,15 +40,15 @@
 ## Zotero 访问原则
 
 - 只读访问 Zotero Desktop 本地 API
-- 通过 zotero 插件的 `zotero.py` 或 Zo2Notes 的 `zotero.py` 搜索和获取数据
-- 优先使用摘要（`/api/users/0/items/<key>` 中的 `abstractNote` 字段）
-- 摘要不足时，使用 `children` 找到 PDF 附件，再用 `fulltext` 获取索引全文
-- 不读取未索引的 PDF；不下载远端 PDF
+- 只通过 `get-zotero` 的只读 CLI seam 搜索和获取数据
+- 验证 content artifact contract 后，优先使用 metadata 中的原始摘要
+- 摘要不足时，按 `content.kind` 消费索引正文或本地 PDF artifact
+- PDF artifact 的使用遵循 `references/zotero-integration.md`；不下载远端 PDF
 - 如果 Zotero 中找不到某篇文献，标记为"未找到"并提示用户
 
 ## 源引用
 
 - 支撑评估框架来自 `nature-citation` skill 的支撑分级体系
-- Zotero 访问模式来自 `zo2notes` 和 `zotero` 技能
+- Zotero 访问模式来自 `get-zotero` skill
 - DOCX 解析通过 liteparse 完成
 - 引用模式识别来自 `references/citation-patterns.md`

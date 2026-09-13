@@ -1,0 +1,7 @@
+interface:
+  display_name: "Zotero 文献获取"
+  short_description: "只读获取 Zotero 题录、索引正文或原始 PDF"
+  default_prompt: "使用 $get-zotero 从 Zotero 只读获取这篇文献的题录与正文内容。"
+
+policy:
+  allow_implicit_invocation: true

@@ -6,7 +6,7 @@ import pytest
 
 
 SCRIPTS = (
-    Path(__file__).resolve().parents[2] / "skills" / "zo2notes" / "scripts"
+    Path(__file__).resolve().parents[2] / "skills" / "get-zotero" / "scripts"
 )
 sys.path.insert(0, str(SCRIPTS))
 
@@ -34,10 +34,10 @@ def test_config_path_uses_platform_conventions(tmp_path: Path) -> None:
         "Windows", {"APPDATA": r"C:\Users\Ada\AppData\Roaming"}, tmp_path
     )
     assert PureWindowsPath(str(windows)) == PureWindowsPath(
-        r"C:\Users\Ada\AppData\Roaming\zo2notes\config.toml"
+        r"C:\Users\Ada\AppData\Roaming\get-zotero\config.toml"
     )
     assert config_path("Linux", {}, tmp_path) == (
-        tmp_path / ".config" / "zo2notes" / "config.toml"
+        tmp_path / ".config" / "get-zotero" / "config.toml"
     )
 
 
@@ -47,7 +47,7 @@ def test_windows_config_path_requires_appdata(tmp_path: Path) -> None:
 
 
 def test_precedence_is_cli_then_env_then_toml_then_default(tmp_path: Path) -> None:
-    path = tmp_path / ".config" / "zo2notes" / "config.toml"
+    path = tmp_path / ".config" / "get-zotero" / "config.toml"
     path.parent.mkdir(parents=True)
     path.write_text(
         'version = 1\n[zotero]\nmode="native"\nhost="toml-host"\nport=24000\n',
@@ -56,7 +56,7 @@ def test_precedence_is_cli_then_env_then_toml_then_default(tmp_path: Path) -> No
 
     config = load_runtime_config(
         {"host": "cli-host", "port": None, "mode": None, "timeout_seconds": None},
-        {"ZO2NOTES_ZOTERO_HOST": "env-host", "ZO2NOTES_ZOTERO_PORT": "25000"},
+        {"GET_ZOTERO_HOST": "env-host", "GET_ZOTERO_PORT": "25000"},
         "Linux",
         "6.8",
         "Linux",
@@ -95,12 +95,29 @@ def test_invalid_configuration_fails_without_fallback(tmp_path: Path) -> None:
             "local_prefix",
         ),
     ]
-    path = tmp_path / ".config" / "zo2notes" / "config.toml"
+    path = tmp_path / ".config" / "get-zotero" / "config.toml"
     path.parent.mkdir(parents=True)
     for content, message in invalid_cases:
         path.write_text(content, encoding="utf-8")
         with pytest.raises(ConfigError, match=message):
             load_runtime_config({}, {}, "Linux", "6.8", "Linux", tmp_path)
+
+
+def test_retired_zo2notes_environment_names_have_no_effect(tmp_path: Path) -> None:
+    config = load_runtime_config(
+        {},
+        {
+            "ZO2NOTES_ZOTERO_MODE": "wsl",
+            "ZO2NOTES_ZOTERO_HOST": "old-host",
+            "ZO2NOTES_ZOTERO_PORT": "25000",
+        },
+        "Linux",
+        "6.8",
+        "Linux",
+        tmp_path,
+    )
+
+    assert (config.mode, config.host, config.port) == ("native", None, 23119)
 
 
 def runtime(*, mode: str, host: str | None, port: int = 23119) -> RuntimeConfig:

@@ -1,4 +1,4 @@
-# Zotero local API and connector routes for Zo2Notes
+# Zotero local API and connector routes for Get Zotero
 
 Base URL 由 `scripts/runtime_config.py` 解析。原生环境默认使用 `http://127.0.0.1:23119`；WSL 依次尝试 loopback 和动态发现的 Windows 主机地址。用户显式配置 host 时只使用该地址。
 
@@ -56,7 +56,7 @@ Safe read routes:
 
 ## 只读 Connector 路由
 
-Zotero Connector 与本地 API 共用端口。Zo2Notes 仅使用下列非修改性路由读取当前界面选择：
+Zotero Connector 与本地 API 共用端口。Get Zotero 仅使用下列非修改性路由读取当前界面选择：
 
 Useful routes:
 
@@ -64,4 +64,4 @@ Useful routes:
 POST /connector/getSelectedCollection
 ```
 
-其余 Connector 写入路由不属于 Zo2Notes 接口。
+其余 Connector 写入路由不属于 Get Zotero 接口。

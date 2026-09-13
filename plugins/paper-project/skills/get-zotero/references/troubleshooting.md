@@ -1,9 +1,9 @@
-# Zo2Notes 故障排查
+# Get Zotero 故障排查
 
 始终先运行：
 
 ```bash
-python3 <plugin-root>/skills/zo2notes/scripts/zotero.py doctor --json
+python3 <plugin-root>/skills/get-zotero/scripts/zotero.py doctor --json
 ```
 
 ## Zotero 不可达
@@ -14,11 +14,11 @@ python3 <plugin-root>/skills/zo2notes/scripts/zotero.py doctor --json
 
 ## 本地 API 未启用
 
-请用户在 Zotero 的设置界面启用“允许本机其他应用与 Zotero 通信”或对应版本中的 Local API 选项。Zo2Notes 不读取或修改 `prefs.js`，也不代替用户重启 Zotero。用户完成界面操作后重新运行 `doctor`。
+请用户在 Zotero 的设置界面启用“允许本机其他应用与 Zotero 通信”或对应版本中的 Local API 选项。Get Zotero 不读取或修改 `prefs.js`，也不代替用户重启 Zotero。用户完成界面操作后重新运行 `doctor`。
 
 ## 显式 host 不可达
 
-显式 host 不会自动回退。核对 host、port 和运行环境；修改配置前再次展示拟写 TOML 并取得确认。不要在 Zo2Notes 流程中自行创建防火墙规则、端口代理或远程转发。
+显式 host 不会自动回退。核对 host、port 和运行环境；修改配置前再次展示拟写 TOML 并取得确认。不要在 Get Zotero 流程中自行创建防火墙规则、端口代理或远程转发。
 
 ## PDF 附件不可访问
 

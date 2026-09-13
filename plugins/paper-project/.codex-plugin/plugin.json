@@ -1,6 +1,6 @@
 {
   "name": "paper-project",
-  "version": "0.1.0+codex.20260831061732",
+  "version": "0.1.0+codex.20260913073053",
   "description": "Research-paper workflows plus evidence-aware persona deliberation.",
   "author": {
     "name": "Local developer"
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Paper Project",
     "shortDescription": "Research-paper workflows for reading, writing, and figures.",
-    "longDescription": "Paper Project provides research-paper and dissertation planning, evidence-aware writing, citation validation, scientific figure creation, Zotero note workflows, and presentations. It also provides moderated, Nuwa-derived persona roundtables for comparing reasoning frameworks.",
+    "longDescription": "Paper Project provides research-paper and dissertation planning, evidence-aware writing, citation validation, scientific figure creation, separate Zotero retrieval and note-generation workflows, and presentations. It also provides moderated, Nuwa-derived persona roundtables for comparing reasoning frameworks.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [

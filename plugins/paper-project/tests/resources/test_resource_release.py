@@ -54,15 +54,19 @@ def test_release_contains_skill_owned_resources_without_retired_knowledge(
     assert not any(name.startswith(PREFIX + "skills/prl-polishing/") for name in release_files)
     assert PREFIX + "skills/cangjie-skill/SKILL.md" not in release_files
     for relative in (
-        "skills/zo2notes/scripts/runtime_config.py",
-        "skills/zo2notes/scripts/attachment_paths.py",
-        "skills/zo2notes/scripts/zotero.py",
-        "skills/zo2notes/references/configuration.md",
-        "skills/zo2notes/references/troubleshooting.md",
+        "skills/get-zotero/scripts/runtime_config.py",
+        "skills/get-zotero/scripts/attachment_paths.py",
+        "skills/get-zotero/scripts/zotero.py",
+        "skills/get-zotero/references/configuration.md",
+        "skills/get-zotero/references/troubleshooting.md",
+        "skills/get-notes/scripts/research_note_storage.py",
+        "skills/get-notes/scripts/writing_library_storage.py",
+        "skills/get-notes/scripts/_storage_support.py",
+        "skills/get-notes/references/writing-material-library.md",
     ):
         assert PREFIX + relative in release_files
     assert (
-        PREFIX + "skills/zo2notes/scripts/zotero_wsl_bridge.py" not in release_files
+        PREFIX + "skills/get-zotero/scripts/zotero_wsl_bridge.py" not in release_files
     )
     assert not any(name.startswith(PREFIX + "knowledge/") for name in release_files)
     for retired_skill in ("prl-shared", "paper2ppt", "ppt-master"):

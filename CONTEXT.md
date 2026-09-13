@@ -79,6 +79,9 @@ _Avoid_: 训练数据集、临时样本集
 
 Paper Project 不采用插件共享资源：即使另一插件中的 skill 使用相同内容，各插件也各自维护 skill-owned 副本，运行时不跨插件读取文件。Calc Project 当前也没有插件共享计算模板；所有运行时模板都与唯一消费者 `calc-execute` 共置。
 
+**Skill 可执行接口（Skill Executable Interface）**：由 owning skill 提供、其他 skill 通过命令行调用的版本化行为 seam。实现及辅助资源仍归 owning skill；消费者只依赖命令、输入、输出与错误契约，不导入 sibling skill 的实现模块。Paper Project 的 `get-zotero content` 是此类接口，`get-notes` 与 `citation-validator` 通过它消费只读 Zotero artifact，因此不构成插件共享资源。
+_Avoid_: sibling 共享脚本、插件共享资源、跨 skill Python 导入
+
 当前没有 formal、candidate 或 incubating 资源状态，也没有通用知识消费协议或项目初始化机制。历史材料只可留在历史文档或 Cangjie 明确标记为非执行的 `references/legacy/`。
 
 ## OSM Project
