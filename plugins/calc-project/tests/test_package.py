@@ -419,13 +419,13 @@ def test_business_skills_handoff_automatically_but_router_only_recommends(plugin
     rq = (skills / "calc-rq/SKILL.md").read_text(encoding="utf-8")
     spec = (skills / "calc-to-spec/SKILL.md").read_text(encoding="utf-8")
     execute = (skills / "calc-execute/SKILL.md").read_text(encoding="utf-8")
-    router_flat = " ".join(router.split())
+    execute_flat = " ".join(execute.split())
 
     assert "Recommend the resolved sibling rather than invoking it automatically" in router
-    assert "This router never invokes the recommended sibling" in router_flat
     assert "continue directly with `$calc-to-spec`" in rq
     assert "continue directly with `$calc-execute`" in spec
-    assert "Invoke the needed path automatically" in execute
+    assert "first load `$calc-setup`" in execute_flat
+    assert "invoke `$calc-rq`" in execute_flat
     assert "does not invoke the sibling automatically" not in spec
     assert "not authorization to\ninvoke a sibling automatically" not in rq
 
