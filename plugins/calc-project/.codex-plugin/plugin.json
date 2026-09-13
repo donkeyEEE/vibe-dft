@@ -1,6 +1,6 @@
 {
   "name": "calc-project",
-  "version": "0.1.0+codex.20260913065459",
+  "version": "0.1.0+codex.20260913140526",
   "description": "以六个显式接口管理计算项目配置、RQ、Spec、执行与瞬时只读评审。",
   "author": {
     "name": "donk"
