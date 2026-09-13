@@ -1,11 +1,14 @@
 # Magnetic VASP Read-only Checks
 
-From the exact prepared POSCAR and INCAR, list each magnetic atom's index,
-species, fractional z coordinate, z-sorted layer rank, and assigned `MAGMOM`.
-Compare the index-order assignments with the intended layer-moment sequence in
-the current approved Spec. Do not assign or infer a magnetic order.
+From the exact prepared POSCAR and INCAR, establish an unambiguous mapping when
+magnetic meaning depends on atom identity or ordering. Compare the index-order
+`MAGMOM` assignment with the intended site or layer moments in the approved
+Spec. A per-atom table is optional; use a compact grouping, deterministic check,
+table, or other reproducible evidence suited to the structure. For a uniform,
+single-sublattice assignment with unchanged ordering, verifying array length,
+grouping, and values is sufficient. Do not assign or infer a magnetic order.
 
-A mismatch, missing approved sequence, or changed atom order is `block` owned
-by `$calc-to-spec`; a rendering mismatch against an approved sequence is
-`block` owned by `$calc-execute`. A near-zero total moment, completed VASP job,
-or downstream convergence does not establish the intended layer sequence.
+Distinguish inability to establish the mapping because the intended order is
+scientifically underdetermined from a rendering or ordering defect with an
+already approved meaning. A near-zero total moment, completed VASP job, or
+downstream convergence does not establish the intended order.

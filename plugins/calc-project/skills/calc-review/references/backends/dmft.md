@@ -7,9 +7,9 @@ and decisive convergence/acceptance criteria. Project source instructions may
 supply invocation and rendering mechanics only; they cannot add or override a
 scientific value.
 
-For postprocessing, require the selected approved impurity-spectral MaxEnt,
-self-energy MaxEnt, or self-energy Pade route and its declared lightweight
+For postprocessing, establish that the prepared route is the approved
+impurity-spectral MaxEnt, self-energy MaxEnt, self-energy Pade, or another route
+explicitly fixed by the Spec, and that it produces the declared lightweight
 outputs. HDF5 sources and operations stay server-side, while synchronization
-excludes HDF5. A missing commitment or ambiguous scientific criterion is
-`block` owned by `$calc-to-spec`; a prepared input, path, environment, or
-packaging mismatch is `block` owned by `$calc-execute`.
+excludes HDF5. Identify any missing commitment, ambiguous scientific criterion,
+or prepared input, path, environment, and packaging defect precisely.

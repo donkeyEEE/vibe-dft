@@ -13,6 +13,6 @@ effective `ISPIN`, `NKPTS`, `NBANDS`, SOC flags, indices, and occupations;
 read-only protection. For `NSW=5`, expected names are `1` through `5`, not
 four-digit VASP-style names. Require the task's exact coupling/product and
 failure-marker checks. A small interface smoke test is not evidence that a
-production trajectory is valid. Scientific mismatch belongs to
-`$calc-to-spec`; staging, protection, field, or environment mismatch belongs
-to `$calc-execute`, and either is `block`.
+production trajectory is valid. Distinguish a scientifically underdetermined
+mismatch from a staging, protection, field, or environment defect in the
+reported evidence.

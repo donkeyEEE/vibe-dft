@@ -6,7 +6,8 @@ the current Spec. Require the named current SCF OUTCAR as the Fermi-level
 source and the exact accepted spin-resolved Wannier Hamiltonian and centres
 files. A Wannier `mp_grid` does not authorize the TB2J mesh.
 
-Require the rendered environment, command, expected `exchange.out`, and named
-`TB2J_results/Vampire/vampire.*` products. A missing scientific selection is
-`block` owned by `$calc-to-spec`; a stale source, copied input, environment, or
-product-contract mismatch is `block` owned by `$calc-execute`.
+Establish that the rendered environment and command produce the declared
+`exchange.out` and named VAMPIRE handoff products; do not require a fixed report
+form when equivalent evidence is available. Identify a missing scientific
+selection separately from a stale source, copied input, environment, or product
+contract defect.

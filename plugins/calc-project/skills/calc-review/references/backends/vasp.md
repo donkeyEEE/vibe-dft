@@ -8,11 +8,11 @@ DFT+U and magnetic arrays; `ENCUT`, k-point definition, smearing,
 For SOC, also check `LSORBIT`, `SAXIS`, symmetry, spinor `NBANDS`, and the
 approved non-collinear executable.
 
-Require preparation-time POTCAR/KPOINTS mechanics, stage-specific VASPKIT
-working directory and menu route, named upstream current-Run handoffs, and all
-expected products to agree with the task. For band and Wannier pre-run stages,
+Establish that POTCAR/KPOINTS generation preserves the approved species and
+k-point meaning; require a particular tool route only when it is scientifically
+or operationally non-equivalent to alternatives. Check named upstream
+current-Run handoffs and expected products. For band and Wannier pre-run stages,
 inspect the exact server-side `CHGCAR`/`WAVECAR` source and immutable prepared
-handoff. For directional MAE, require a comparable approved pair, the same
-named SCF charge source, and the Spec's energy convention. A missing choice or
-change in physical commitment is `block` owned by `$calc-to-spec`; a prepared
-file or handoff defect is `block` owned by `$calc-execute`.
+handoff. For directional MAE, establish a comparable approved pair, the same
+named SCF charge source, and the Spec's energy convention. Distinguish a missing
+scientific choice from prepared-file and handoff defects.
