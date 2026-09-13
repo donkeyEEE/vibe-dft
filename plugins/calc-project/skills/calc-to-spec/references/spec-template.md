@@ -40,9 +40,17 @@ recorded upstream results. A task stays pending until its dependencies and
 condition permit it; a false condition makes it skipped, while ambiguity
 returns to Spec design.
 
-Each Spec has one principal Judgment. Purpose, Acceptance, and any stopping
-rule state the approved scientific decision without selecting values from a
-generic template. A concluded Spec adds this section to the same file:
+Each Spec has one principal Judgment. Record parameters that determine the
+scientific question, interpretation, or comparability. Parameters omitted from
+the Spec may be execution-owned only when `$calc-execute` has a deterministic
+backend, software-profile, or upstream-evidence basis and the choice does not
+change scientific meaning; an explicit Spec value is binding.
+
+`Acceptance` states the minimum sufficient evidence that `Purpose` was answered.
+It may require successful production of a named artifact or diagnostic without
+requiring a favorable scientific outcome. Add convergence, quality, comparison,
+or handoff thresholds only when the Task purpose or principal Judgment depends
+on them. A concluded Spec adds this section to the same file:
 
 ```markdown
 ## Closure

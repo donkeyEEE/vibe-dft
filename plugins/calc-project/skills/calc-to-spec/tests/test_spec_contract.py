@@ -18,7 +18,7 @@ def test_spec_template(plugin_root):
         assert field in text
 
 
-def test_publication_gate_requires_complete_approved_documents(plugin_root):
+def test_design_flow_grills_then_uses_summary_approval(plugin_root):
     text = " ".join(
         (plugin_root / "skills/calc-to-spec/SKILL.md")
         .read_text(encoding="utf-8")
@@ -26,15 +26,25 @@ def test_publication_gate_requires_complete_approved_documents(plugin_root):
     )
 
     lower = text.casefold()
-    assert "complete proposed spec" in lower
-    assert "current rq" in lower
-    assert "before any write" in lower
-    assert "approval of malformed content" in lower
-    assert "does not authorize filling or changing" in text
-    for field in (
-        "`Question`, `Boundary`, `Success Criterion`, `Decisions`, and `Specs`",
-        "`ID`, `Status`, `RQ`, `Judgment`, and `Tasks`",
-        "`Status`, `Path`, `Blocked by`, `Condition`, `Purpose`, `Acceptance`, and `Runs`",
-        "Run ID, `Status`, `Current`, `Path`, and `Result`",
-    ):
-        assert field in text
+    assert "$dev-engineering:grill-with-docs" in text
+    assert text.index("$dev-engineering:grill-with-docs") < text.index(
+        "Draft the Spec"
+    )
+    assert "target path, design summary" in lower
+    assert "full markdown draft" not in lower
+    assert "complete overwritten spec" not in lower
+    assert "each recorded run row has" not in lower
+
+
+def test_spec_separates_scientific_commitments_from_execution_discretion(plugin_root):
+    spec = (plugin_root / "skills/calc-to-spec/SKILL.md").read_text(encoding="utf-8")
+    template = (
+        plugin_root / "skills/calc-to-spec/references/spec-template.md"
+    ).read_text(encoding="utf-8")
+
+    spec_flat = " ".join(spec.split())
+    template_flat = " ".join(template.split())
+    assert "execution-owned" in spec_flat
+    assert "minimum sufficient evidence" in spec_flat
+    assert "execution-owned" in template_flat
+    assert "favorable scientific outcome" in template_flat

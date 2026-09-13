@@ -38,63 +38,55 @@ Run and performs no calculation or submission.
    scientific value. If a required reference, project capability, or evidence
    source is unavailable, stop instead of discovering an alternative backend
    resource at runtime.
-3. Form one principal judgment for the Spec. Propose separate Specs for
-   independent principal judgments. Settle every decision that would change the
-   scientific commitment, task DAG, dependency or condition, acceptance
-   criterion, or stopping rule. Return RQ-level scientific uncertainty to
-   `$calc-rq`; return a stable project capability or configuration gap to
-   `$calc-setup`.
-4. Draft the complete Spec with [the Spec template](references/spec-template.md).
-   Allocate `SPEC-NNN` only within the resolved RQ, `TASK-NNN` only within that
-   Spec, and `RUN-NNN` only within its task. Record task paths relative to the
-   configured data root and Run paths relative to their task. Dependencies name
-   only tasks in the same Spec and form an acyclic graph. Conditions use only
-   recorded upstream results. State decisive acceptance and stopping criteria;
-   ambiguity is an unresolved design decision, not an execution default.
-5. For replacement, first read the current Spec, every recorded task and Run,
+3. Before drafting, invoke `$dev-engineering:grill-with-docs` in the current
+   conversation to form the scientific design. If that dependency is
+   unavailable, pause this workflow and report it.
+4. Draft the Spec with [the Spec template](references/spec-template.md). Form
+   one principal judgment and propose separate Specs for independent principal
+   judgments. Include the tasks, dependencies, conditions, acceptance criteria,
+   and stopping rule needed to answer that judgment. Allocate `SPEC-NNN` only
+   within the resolved RQ, `TASK-NNN` only within that Spec, and `RUN-NNN` only
+   within its task. Dependencies name only tasks in the same Spec and form an
+   acyclic graph. Conditions use only recorded upstream results. State
+   acceptance as the minimum sufficient evidence that the task's Purpose was
+   answered. Leave execution-owned choices to `$calc-execute`: environment and
+   executable paths, launch and parallel mechanics, logging and restart
+   controls, and auxiliary parameters with a deterministic backend,
+   software-profile, or upstream-evidence default that does not change
+   scientific meaning. An explicit Spec value is binding. Return RQ-level
+   scientific uncertainty to `$calc-rq`; return a stable project capability or
+   configuration gap to `$calc-setup`.
+5. For replacement, read the current Spec, every recorded task and Run,
    the referenced physical Run directories, and current scheduler state. A
    concluded Spec is immutable. Active execution that could be invalidated or
    made inconsistent blocks replacement. The proposal preserves all physical
    Run directories and overwrites only the current Spec design; it creates no
    obsolete-design history or revision counter.
-6. Present one concrete publication proposal: the full Markdown draft, its
-   exact `specs/SPEC-NNN-<slug>.md` target, and the exact single ID/title/link
-   entry for `RQ.md` `## Specs`. For replacement, show the complete overwritten
-   Spec and any index correction. Obtain explicit approval for this exact
-   proposal. Silence, historical preference, and general delegation do not
-   satisfy an approval gate. A changed proposal invalidates that approval.
-7. Immediately before writing, re-read `RQ.md`, the exact target Spec path, and
-   every authority used for replacement. Before any write, require the complete
-   proposed Spec, the current RQ, and, for replacement, the current Spec to have
-   the needed document shape. The RQ has `ID`, `Status: active | concluded`, and
-   `Question`, `Boundary`, `Success Criterion`, `Decisions`, and `Specs`. The
-   proposed and current Spec have `ID`, `Status`, `RQ`, `Judgment`, and `Tasks`;
-   each task has `Status`, `Path`, `Blocked by`, `Condition`, `Purpose`,
-   `Acceptance`, and `Runs`; each recorded Run row has Run ID, `Status`,
-   `Current`, `Path`, and `Result`. Apply the permitted values, same-Spec
-   dependency and acyclic-DAG rule, relative-path rules, and at-most-one-current
-   Run convention stated by the Spec template. Also require unique references,
-   unchanged approved content, and matching RQ ownership. This is a direct check
-   of the documents being used, not a general schema validator.
-
-   Approval of malformed content does not waive this contract and does not
-   authorize filling or changing the approved proposal. Stop all writes, name
-   the specific missing or conflicting field and its document, and identify its
-   owner: RQ shape returns to `$calc-rq`; a proposed Spec is corrected here and
-   presented again in full for new approval; current Spec design or task
-   declarations belong here, while current execution status and Run records
-   belong to `$calc-execute`. Identity, path, ownership, or newly unsafe active
-   execution conflicts stop in the same way. Publishing an identical complete
-   ID/path/content/link is idempotent. Otherwise write the approved Spec and
-   exactly one RQ index link, then re-read both authorities to confirm them.
-8. Report the published or replaced Spec and recommend `$calc-execute` for a
-   ready or safely replaced active Spec. The recommendation carries resolved
-   paths and unfinished intent; it does not invoke the sibling automatically.
+6. Present the target path, design summary, exact `RQ.md` index change, and, for
+   replacement, confirmation that physical Run directories are preserved.
+   Obtain explicit approval for that proposal. Silence, historical preference,
+   and general delegation do not satisfy the approval gate. A change to the
+   target, scientific design, index entry, or stated replacement effects
+   invalidates the approval.
+7. Immediately before writing, re-read `RQ.md`, the target Spec, and every
+   authority used for replacement. Require matching RQ ownership and confirm
+   that the approved design remains complete and the replacement remains safe.
+   Stop on a conflict instead of repairing another owner's authority. Otherwise
+   write the Spec and exactly one RQ index link, then re-read both to confirm
+   them. Publishing the same target, design, and index entry is idempotent.
+8. Report the published or replaced Spec. When the user's unfinished request
+   includes execution, continue directly with `$calc-execute` for a ready or
+   safely replaced active Spec, carrying the resolved identities, paths,
+   approved content, and remaining intent. The handoff adds no submission or
+   other external-action authorization; `$calc-execute` applies its own gates.
 
 ## Authority
 
 This skill owns the current principal judgment, scientific commitments, task
 DAG, task declarations, conditions, acceptance rules, and stopping rules in one
-Spec. The Spec is the sole authority for its task and Run records. This skill
-does not materialize those declarations, alter physical Run data, persist a
-parallel workflow record, or formally update RQ conclusions.
+Spec. `$calc-execute` owns execution-owned choices omitted by the Spec and
+records their realized values in the Run inputs and evidence; it cannot
+override an explicit Spec value. The Spec is the sole authority for its task
+and Run records. This skill does not materialize those declarations, alter
+physical Run data, persist a parallel workflow record, or formally update RQ
+conclusions.

@@ -7,10 +7,13 @@ layout or mandatory pipeline.
 ## Evidence and approval inputs
 
 Read the accepted RQ decisions, approved structure provenance, relevant prior
-Runs, and method capability records. For layered magnets, identify each magnetic
-atom's structure index, species, fractional z coordinate, z-sorted layer rank,
-and proposed index-order `MAGMOM`; obtain the user's intended layer-moment
-sequence and approval of the comparison. Also obtain approval for the tasks
+Runs, and method capability records. For magnets whose intended order depends
+on atom identity or ordering, establish an unambiguous mapping between structure
+atoms, index-order `MAGMOM`, and the intended site or layer moments. Choose any
+unambiguous evidence form; a compact grouping, deterministic check, or per-atom
+table may be used according to risk. Obtain the user's scientific judgment only
+when existing approved evidence does not determine that mapping. Also obtain
+approval for the tasks
 actually needed, their dependencies and conditions, all material settings,
 Wannier subspaces, TB2J model choices, and the VAMPIRE observable and stopping
 criterion.
@@ -40,14 +43,10 @@ per-spin windows.
 
 ## Magnetic-order boundary
 
-Record this comparison in the design evidence:
-
-| atom index | species | fractional z | z-sorted layer rank | assigned `MAGMOM` | intended layer moment |
-|---|---|---:|---:|---:|---|
-| `<index>` | `<species>` | `<z>` | `<rank>` | `<value>` | `<user-confirmed moment>` |
-
-No fixed sign pattern transfers between structures because atom numbering need
+Record enough reproducible evidence to recover the approved correspondence; do
+not impose a fixed table when a simpler representation is unambiguous. No fixed
+sign pattern transfers between structures because atom numbering need
 not follow geometric layer order. A near-zero total moment, completed VASP Run,
 or converged downstream TB2J result does not validate the intended layer
-sequence. Missing physical approval blocks the design; no stage template or
-historical case supplies a default.
+sequence. When the physical meaning is not already determined, no stage template
+or historical case supplies a default.

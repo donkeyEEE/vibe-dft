@@ -17,15 +17,19 @@ valid for this Spec.
 
 - Identify relaxation, SCF, non-self-consistent bands, SOC, DFT+U, or VASP
   Wannier pre-run scope, including the role of each task in the DAG.
-- Record the approved `ENCUT`, k-point density, `ISPIN`/`MAGMOM`, smearing,
-  `LORBIT`, and output controls `LWAVE` and `LCHARG` that the task requires.
+- Record the approved `ENCUT`, k-point density, `ISPIN`/`MAGMOM`, smearing, and
+  any `LORBIT`, `LWAVE`, or `LCHARG` value whose presence changes the intended
+  observable or a declared downstream handoff. Otherwise these output controls
+  are execution-owned and `$calc-execute` derives them from the task's named
+  products and downstream needs.
 - For SOC, record the approved non-collinear executable and `LSORBIT`, `SAXIS`,
   and symmetry commitments.
 - For DFT+U, bind every species-indexed array to the approved POSCAR/POTCAR
   species order.
-- State acceptance and stopping criteria in terms of the intended scientific
-  result and necessary handoff evidence. Record every intentional deviation
-  from the approved material-specific source.
+- State acceptance as the minimum result and necessary handoff evidence that
+  answer the task Purpose. Add convergence or quality thresholds only when the
+  principal judgment depends on them. Record every intentional deviation from
+  the approved material-specific source.
 
 Missing or conflicting physical settings remain an open design decision. Do
 not infer them from a generic baseline or broaden a completed RQ into a new
