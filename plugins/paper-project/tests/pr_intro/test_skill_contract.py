@@ -102,7 +102,7 @@ def test_openai_interface_allows_implicit_invocation():
 
 
 def test_repository_navigation_lists_pr_intro():
-    description = "Draft or restructure evidence-grounded Physical Review Introductions."
+    description = "撰写或重构以证据为基础的 Physical Review 论文引言。"
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
     plugin_readme = (ROOT / "plugins/paper-project/README.md").read_text(
         encoding="utf-8"

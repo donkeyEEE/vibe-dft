@@ -2,7 +2,7 @@ import yaml
 
 
 EXPECTED = {
-    "ask-dnk",
+    "ask-lyz",
     "calc-setup",
     "calc-rq",
     "calc-to-spec",

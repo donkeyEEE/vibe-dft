@@ -58,7 +58,7 @@ Tracker is a storage convention; `RQ.md` remains the accepted RQ authority.
    resolved RQ, paths, accepted decisions, and remaining intent. Stop for
    missing approval or an unavailable configured Tracker. Invoke the owning
    business sibling directly for a stable-configuration or Spec-design issue;
-   use `$ask-dnk` only when workflow selection itself remains open-ended.
+   use `$ask-lyz` only when workflow selection itself remains open-ended.
 
 Do not create or change a Spec, task, Run, calculation input, or execution
 state within this interface. A sibling handoff needs no separate authorization,

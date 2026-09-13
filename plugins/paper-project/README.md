@@ -6,7 +6,7 @@ Codex 插件。插件中的技能通过 `paper-project:<skill-name>` 命名空�
 ## 主要技能
 
 - `big-paper-helper`：规划、起草、修改和审计材料计算类中文博士论文。
-- [pr-intro](skills/pr-intro/SKILL.md)：Draft or restructure evidence-grounded Physical Review Introductions.
+- [pr-intro](skills/pr-intro/SKILL.md)：撰写或重构以证据为基础的 Physical Review 论文引言。
 - `prl-figure`：创建、修改和审查投稿级科学图件。
 - `citation-validator`：检查 DOCX 稿件中的引用是否真正支持相邻主张。
 - `zo2notes`：把 Zotero 文献转成项目内中文阅读笔记。

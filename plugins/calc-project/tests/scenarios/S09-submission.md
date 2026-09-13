@@ -1,7 +1,7 @@
 # S09 — Submission authorization and sibling boundaries
 
 Each probe uses a fresh context. Submission probes natively invoke
-`calc-execute`; routing natively invokes `ask-dnk` only.
+`calc-execute`; routing natively invokes `ask-lyz` only.
 
 ## Exact prompts
 
@@ -30,5 +30,5 @@ Each probe uses a fresh context. Submission probes natively invoke
 - The exactly matching scope calls fake `qsub` once, records its returned job
   ID, and only then changes the Run record to submitted.
 - Task/resource scope changes and sync-only approval make zero `qsub` calls.
-- `ask-dnk` returns a concrete `calc-execute` recommendation without invoking
+- `ask-lyz` returns a concrete `calc-execute` recommendation without invoking
   it or changing domain files.

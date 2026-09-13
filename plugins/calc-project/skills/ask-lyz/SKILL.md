@@ -1,9 +1,9 @@
 ---
-name: ask-dnk
+name: ask-lyz
 description: Route an explicit Calc Project request to one of the setup, RQ, Spec-design, or execution interfaces.
 ---
 
-# Ask DNK
+# Ask LYZ
 
 Read only enough stable project context and authoritative pointers to identify
 one target and one sibling. Return the sibling's exact invocation, resolved

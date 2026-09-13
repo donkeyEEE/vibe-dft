@@ -231,7 +231,7 @@
   {
     "source": "skills/calc-workflows/SKILL.md",
     "targets": [
-      "skills/ask-dnk/SKILL.md",
+      "skills/ask-lyz/SKILL.md",
       "skills/calc-to-spec/SKILL.md",
       "skills/calc-execute/SKILL.md"
     ],
@@ -410,7 +410,7 @@
   {
     "source": "skills/namd-workflow/agents/openai.yaml",
     "targets": [
-      "skills/ask-dnk/agents/openai.yaml",
+      "skills/ask-lyz/agents/openai.yaml",
       "skills/calc-setup/agents/openai.yaml",
       "skills/calc-rq/agents/openai.yaml",
       "skills/calc-to-spec/agents/openai.yaml",

@@ -164,7 +164,7 @@ def test_malformed_metadata_is_rejected(plugin_root, tmp_path, metadata):
 def test_seventh_skill_is_rejected(plugin_root, tmp_path):
     builder = _load_builder()
     copy = _copy_plugin(plugin_root, tmp_path)
-    shutil.copytree(copy / "skills/ask-dnk", copy / "skills/seventh")
+    shutil.copytree(copy / "skills/ask-lyz", copy / "skills/seventh")
 
     with pytest.raises(ValueError, match="exactly"):
         builder.runtime_files(copy)
@@ -385,7 +385,7 @@ def test_manifest_and_skill_metadata_describe_exact_explicit_roster(plugin_root)
         (plugin_root / ".codex-plugin/plugin.json").read_text(encoding="utf-8")
     )
     expected = (
-        "ask-dnk",
+        "ask-lyz",
         "calc-setup",
         "calc-rq",
         "calc-to-spec",
@@ -416,7 +416,7 @@ def test_documentation_distinguishes_skill_calls_from_local_file_references(
 
 def test_business_skills_handoff_automatically_but_router_only_recommends(plugin_root):
     skills = plugin_root / "skills"
-    router = (skills / "ask-dnk/SKILL.md").read_text(encoding="utf-8")
+    router = (skills / "ask-lyz/SKILL.md").read_text(encoding="utf-8")
     rq = (skills / "calc-rq/SKILL.md").read_text(encoding="utf-8")
     spec = (skills / "calc-to-spec/SKILL.md").read_text(encoding="utf-8")
     execute = (skills / "calc-execute/SKILL.md").read_text(encoding="utf-8")

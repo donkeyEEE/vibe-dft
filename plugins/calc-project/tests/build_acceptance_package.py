@@ -15,7 +15,7 @@ import yaml
 
 
 SKILL_NAMES = (
-    "ask-dnk",
+    "ask-lyz",
     "calc-setup",
     "calc-rq",
     "calc-to-spec",

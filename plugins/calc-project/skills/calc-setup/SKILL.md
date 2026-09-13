@@ -33,4 +33,4 @@ profiles. It creates no RQ, Decision Ticket, Spec, task, or Run. It performs no
 data synchronization, job submission, or mutable Run-environment validation.
 
 A configured project may proceed to `$calc-rq`. Route project configuration
-problems back here; route open-ended workflow selection to `$ask-dnk`.
+problems back here; route open-ended workflow selection to `$ask-lyz`.
