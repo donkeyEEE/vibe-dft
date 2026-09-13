@@ -44,10 +44,15 @@ as separate arguments:
 --job-id QSUB_JOB_ID
 --thread-id CODEX_THREAD_ID
 --spec ABSOLUTE_SPEC_PATH
---run ABSOLUTE_CURRENT_RUN_PATH
+--run LOCAL_AUTHORITATIVE_RUN_PATH
 --message CALLER_SELECTED_MESSAGE
 --interval 30
 ```
+
+`LOCAL_AUTHORITATIVE_RUN_PATH` must exist on the machine running the local
+systemd monitor. Resolve it from the project's Data root and the authoritative
+Spec/Run records. A remote cluster execution path is used only through SSH or
+synchronization and must never be passed to `--run`.
 
 After launch, report the job ID, resources, immediate scheduler state, and
 whether systemd accepted the unit. When systemd or `CODEX_THREAD_ID` is
