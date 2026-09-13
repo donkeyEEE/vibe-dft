@@ -28,7 +28,8 @@ Each probe natively invokes `calc-project:calc-to-spec` in a fresh fixture.
 
 - The design interview runs before every draft. Publication writes only the
   Spec represented by the approved target, design summary, and exact RQ link;
-  it does not adopt unapproved drafts.
+  the approval proposal displays those concise fields rather than the complete
+  Markdown draft, and publication does not adopt unapproved drafts.
 - Repeating identical publication leaves one link.
 - A different owner at the target stops all writes.
 - An incomplete scientific design leaves both the Spec target and RQ index

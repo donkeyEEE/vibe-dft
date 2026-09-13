@@ -18,7 +18,7 @@ def test_spec_template(plugin_root):
         assert field in text
 
 
-def test_design_flow_grills_then_uses_summary_approval(plugin_root):
+def test_design_flow_keeps_full_draft_internal_until_summary_approval(plugin_root):
     text = " ".join(
         (plugin_root / "skills/calc-to-spec/SKILL.md")
         .read_text(encoding="utf-8")
@@ -30,7 +30,10 @@ def test_design_flow_grills_then_uses_summary_approval(plugin_root):
     assert text.index("$dev-engineering:grill-with-docs") < text.index(
         "Draft the Spec"
     )
-    assert "target path, design summary" in lower
+    assert "keep the complete spec draft internal" in lower
+    assert "present only the target path, design summary" in lower
+    assert "approval does not require displaying the complete markdown" in lower
+    assert "output is one reviewable draft" not in lower
     assert "full markdown draft" not in lower
     assert "complete overwritten spec" not in lower
     assert "each recorded run row has" not in lower

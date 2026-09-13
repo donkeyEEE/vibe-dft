@@ -7,9 +7,9 @@ description: Design or replace one calculation Spec from an accepted RQ and a pr
 
 Own one Spec's current scientific design. Input is exactly one RQ plus one
 intended principal judgment, or exactly one existing Spec to replace. Output is
-one reviewable draft and, only after explicit approval, one published Spec and
-one link in its RQ. This skill declares tasks; it creates no task directory or
-Run and performs no calculation or submission.
+one concise publication proposal before approval and, only after explicit
+approval, one published Spec and one link in its RQ. This skill declares tasks;
+it creates no task directory or Run and performs no calculation or submission.
 
 ## Flow
 
@@ -41,33 +41,35 @@ Run and performs no calculation or submission.
 3. Before drafting, invoke `$dev-engineering:grill-with-docs` in the current
    conversation to form the scientific design. If that dependency is
    unavailable, pause this workflow and report it.
-4. Draft the Spec with [the Spec template](references/spec-template.md). Form
-   one principal judgment and propose separate Specs for independent principal
-   judgments. Include the tasks, dependencies, conditions, acceptance criteria,
-   and stopping rule needed to answer that judgment. Allocate `SPEC-NNN` only
-   within the resolved RQ, `TASK-NNN` only within that Spec, and `RUN-NNN` only
-   within its task. Dependencies name only tasks in the same Spec and form an
-   acyclic graph. Conditions use only recorded upstream results. State
-   acceptance as the minimum sufficient evidence that the task's Purpose was
-   answered. Leave execution-owned choices to `$calc-execute`: environment and
-   executable paths, launch and parallel mechanics, logging and restart
-   controls, and auxiliary parameters with a deterministic backend,
-   software-profile, or upstream-evidence default that does not change
-   scientific meaning. An explicit Spec value is binding. Return RQ-level
-   scientific uncertainty to `$calc-rq`; return a stable project capability or
-   configuration gap to `$calc-setup`.
+4. Draft the Spec with [the Spec template](references/spec-template.md), and
+   keep the complete Spec draft internal until publication. Form one principal
+   judgment and propose separate Specs for independent principal judgments.
+   Include the tasks, dependencies, conditions, acceptance criteria, and
+   stopping rule needed to answer that judgment. Allocate `SPEC-NNN` only within
+   the resolved RQ, `TASK-NNN` only within that Spec, and `RUN-NNN` only within
+   its task. Dependencies name only tasks in the same Spec and form an acyclic
+   graph. Conditions use only recorded upstream results. State acceptance as the
+   minimum sufficient evidence that the task's Purpose was answered. Leave
+   execution-owned choices to `$calc-execute`: environment and executable paths,
+   launch and parallel mechanics, logging and restart controls, and auxiliary
+   parameters with a deterministic backend, software-profile, or
+   upstream-evidence default that does not change scientific meaning. An
+   explicit Spec value is binding. Return RQ-level scientific uncertainty to
+   `$calc-rq`; return a stable project capability or configuration gap to
+   `$calc-setup`.
 5. For replacement, read the current Spec, every recorded task and Run,
    the referenced physical Run directories, and current scheduler state. A
    concluded Spec is immutable. Active execution that could be invalidated or
    made inconsistent blocks replacement. The proposal preserves all physical
    Run directories and overwrites only the current Spec design; it creates no
    obsolete-design history or revision counter.
-6. Present the target path, design summary, exact `RQ.md` index change, and, for
-   replacement, confirmation that physical Run directories are preserved.
-   Obtain explicit approval for that proposal. Silence, historical preference,
-   and general delegation do not satisfy the approval gate. A change to the
-   target, scientific design, index entry, or stated replacement effects
-   invalidates the approval.
+6. Present only the target path, design summary, exact `RQ.md` index change,
+   and, for replacement, confirmation that physical Run directories are
+   preserved. Obtain explicit approval for that concise proposal; approval does
+   not require displaying the complete Markdown. Silence, historical
+   preference, and general delegation do not satisfy the approval gate. A
+   change to the target, scientific design, index entry, or stated replacement
+   effects invalidates the approval.
 7. Immediately before writing, re-read `RQ.md`, the target Spec, and every
    authority used for replacement. Require matching RQ ownership and confirm
    that the approved design remains complete and the replacement remains safe.
