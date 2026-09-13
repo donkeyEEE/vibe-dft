@@ -52,11 +52,15 @@ Tracker is a storage convention; `RQ.md` remains the accepted RQ authority.
    introduce a transaction or session registry.
 7. Re-read `RQ.md` and the same-RQ Tickets after each write. Advance at most the
    currently decidable Ticket frontier and resolve one Ticket at a time.
-   Unrelated open Tickets do not block Spec design. Stop when the decisions
-   relevant to the intended Spec are sufficient and recommend `$calc-to-spec`,
-   or stop for missing approval, an unavailable configured Tracker, or a change
-   that belongs to Spec design. Recommend `$ask-dnk` for routing-only needs.
+   Unrelated open Tickets do not block Spec design. When the decisions relevant
+   to the intended Spec are sufficient and the user's unfinished request
+   includes designing it, continue directly with `$calc-to-spec`, carrying the
+   resolved RQ, paths, accepted decisions, and remaining intent. Stop for
+   missing approval or an unavailable configured Tracker. Invoke the owning
+   business sibling directly for a stable-configuration or Spec-design issue;
+   use `$ask-dnk` only when workflow selection itself remains open-ended.
 
 Do not create or change a Spec, task, Run, calculation input, or execution
-state. A sufficiently decided RQ is a transition point, not authorization to
-invoke a sibling automatically.
+state within this interface. A sibling handoff needs no separate authorization,
+but the receiving skill retains every approval and external-action gate it
+owns.

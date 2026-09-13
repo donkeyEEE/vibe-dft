@@ -24,6 +24,7 @@ parameter value, review verdict, authorization, or domain mutation.
 Do not route ordinary requests directly to `$calc-review`; its normal caller is
 `$calc-execute`, while a user may explicitly invoke it for immediate diagnosis.
 
-Recommend the resolved sibling rather than invoking it automatically unless
-the user authorized that concrete chain. A request that already names the
-correct sibling uses it directly; this router is not a mandatory front door.
+Recommend the resolved sibling rather than invoking it automatically. This
+router never invokes the recommended sibling. A request that already names the
+correct sibling uses it directly without entering this router; this router is
+not a mandatory front door.

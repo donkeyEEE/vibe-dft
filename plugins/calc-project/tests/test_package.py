@@ -412,3 +412,29 @@ def test_documentation_distinguishes_skill_calls_from_local_file_references(
     assert "[the RQ template](references/rq-template.md)" in rq
     assert "[the Decision Ticket\n   template](references/decision-ticket-template.md)" in rq
     assert "]($" not in rq
+
+
+def test_business_skills_handoff_automatically_but_router_only_recommends(plugin_root):
+    skills = plugin_root / "skills"
+    router = (skills / "ask-dnk/SKILL.md").read_text(encoding="utf-8")
+    rq = (skills / "calc-rq/SKILL.md").read_text(encoding="utf-8")
+    spec = (skills / "calc-to-spec/SKILL.md").read_text(encoding="utf-8")
+    execute = (skills / "calc-execute/SKILL.md").read_text(encoding="utf-8")
+    router_flat = " ".join(router.split())
+
+    assert "Recommend the resolved sibling rather than invoking it automatically" in router
+    assert "This router never invokes the recommended sibling" in router_flat
+    assert "continue directly with `$calc-to-spec`" in rq
+    assert "continue directly with `$calc-execute`" in spec
+    assert "Invoke the needed path automatically" in execute
+    assert "does not invoke the sibling automatically" not in spec
+    assert "not authorization to\ninvoke a sibling automatically" not in rq
+
+
+def test_readme_describes_requalifiable_run_inputs(plugin_root):
+    readme = (plugin_root.parents[1] / "README.md").read_text(encoding="utf-8")
+    readme_flat = " ".join(readme.split())
+
+    assert "Run 目录保存不可变 `inputs/`" not in readme_flat
+    assert "每次验证与评审固定当时的输入快照" in readme_flat
+    assert "符合条件的当前 Run 可原地纠正" in readme_flat
