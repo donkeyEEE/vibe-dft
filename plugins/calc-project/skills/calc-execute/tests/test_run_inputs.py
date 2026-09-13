@@ -32,6 +32,17 @@ def test_execute_skill_has_compact_three_part_contract(plugin_root):
     assert "\n\n" not in overview.removeprefix("# Calc Execute").strip()
 
     workflow, principles = remainder.split("## Principles", 1)
+    workflow_steps = [
+        line for line in workflow.splitlines() if line[:1].isdigit() and ". " in line
+    ]
+    assert [line.split(".", 1)[0] for line in workflow_steps] == [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+    ]
     for reference in (
         "references/task-advancement.md",
         "references/run-preparation.md",
