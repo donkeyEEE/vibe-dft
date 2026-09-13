@@ -13,7 +13,7 @@ import pytest
 SCRIPT = "skills/calc-execute/scripts/fingerprint_run.py"
 TEMPLATE = "skills/calc-execute/assets/templates/common/run.sh.template"
 PROBE = "skills/calc-execute/scripts/probe-run-environment.sh"
-MONITOR_REFERENCE = "skills/calc-execute/references/calculation-monitor.md"
+REMOTE_COMPLETION_REFERENCE = "skills/calc-execute/references/remote-completion.md"
 
 
 def test_execute_skill_has_compact_three_part_contract(plugin_root):
@@ -48,7 +48,6 @@ def test_execute_skill_has_compact_three_part_contract(plugin_root):
         "references/run-preparation.md",
         "references/pbs.md",
         "references/simple-correction.md",
-        "references/calculation-monitor.md",
         "references/remote-completion.md",
         "references/sync.md",
     ):
@@ -69,13 +68,16 @@ def test_execute_skill_has_compact_three_part_contract(plugin_root):
 def test_calculation_monitor_is_conditional_and_post_submission(plugin_root):
     skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(encoding="utf-8")
     skill_flat = " ".join(skill.split())
-    reference_path = plugin_root / MONITOR_REFERENCE
+    reference_path = plugin_root / REMOTE_COMPLETION_REFERENCE
 
     assert reference_path.is_file()
-    assert "references/calculation-monitor.md" in skill
+    assert not (
+        plugin_root / "skills/calc-execute/references/calculation-monitor.md"
+    ).exists()
+    assert "references/remote-completion.md" in skill
     assert "explicitly requested" in skill
     assert skill_flat.index("update the Spec Run row to `submitted`") < skill_flat.index(
-        "references/calculation-monitor.md"
+        "references/remote-completion.md"
     )
 
     reference = reference_path.read_text(encoding="utf-8")

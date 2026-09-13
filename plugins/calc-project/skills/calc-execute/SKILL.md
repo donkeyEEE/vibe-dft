@@ -17,28 +17,26 @@ and Spec closure.
 2. For each selected task, create a new Run or use [simple
    correction](references/simple-correction.md) to select an eligible current
    Run for repair.
-3. Prepare the selected Run with [Run preparation](references/run-preparation.md),
-   [PBS execution](references/pbs.md), and any applicable backend references.
-   If stable project configuration must change, first load `$calc-setup` and
-   make the change through that workflow. If software usage is uncertain, ask
-   the user whether to start an execution-research workflow with
+3. Read [Run preparation](references/run-preparation.md) and prepare the selected
+   Run with [PBS execution](references/pbs.md) and any applicable backend
+   references. If stable project configuration must change, first load
+   `$calc-setup` and make the change through that workflow. If software usage is
+   uncertain, ask the user whether to start an execution-research workflow with
    `$dev-engineering:research`.
-4. Validate the prepared Run, then invoke `$calc-review` on the prepared
+4. Validate the prepared Run, invoke `$calc-review` on the prepared
    snapshot. Resolve execution findings and review again as needed. Submit only
    when the review passes and the submission is within the user's current
    authorization.
 5. After submission, record the scheduler response and update the Spec Run row
-   to `submitted`. When post-submission monitoring or continuation was
-   explicitly requested, read [Calculation
-   Monitor](references/calculation-monitor.md). Use [remote
-   completion](references/remote-completion.md) to track the Run and [previewed
+   to `submitted`. Read [remote completion](references/remote-completion.md),
+   then start its Calculation Monitor when post-submission monitoring or
+   continuation was explicitly requested. Use [previewed
    synchronization](references/sync.md) when transferring files. Choose the Run
    status from the actual situation using the definitions below.
-6. Apply the task's approved Acceptance with [task
-   advancement](references/task-advancement.md), then continue with the next
-   available task. When the Spec is complete, propose its closure and conclude
-   it after the user accepts. If the RQ must then change, invoke `$calc-rq` and
-   present its proposal to the user.
+6. Apply the task's approved Acceptance from the Spec, then continue with the
+   next available task. When the Spec is complete, propose its closure and
+   conclude it after the user accepts. If the RQ must then change, invoke
+   `$calc-rq` and present its proposal to the user.
 
 ## Principles
 
