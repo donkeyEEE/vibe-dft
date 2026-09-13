@@ -60,13 +60,20 @@ Spec 中为支持主判断声明的可执行工作。身份、目的、依赖、
 _Avoid_: 独立任务元数据，目录 README 权威
 
 **运行（Run）**:
-一个任务的一次独立执行尝试。每个 Run 在自己的 `inputs/` 中保存精确输入快照，并有
-`outputs/` 和 `logs/`；失败、取消和重算均创建并保留独立 Run。
+一个任务的一次执行尝试。每个 Run 在自己的 `inputs/` 中记录实际采用的科学承诺和
+执行参数，并有 `outputs/` 和 `logs/`。尚未形成需保留科学证据的当前 Run 可按明确授权
+原地纠正；已接受、需比较或来源不确定的执行使用独立 Run。
 _Avoid_: 计算任务，覆盖目录
 
 **Run 输入（Run Inputs）**:
-位于 `TASK-…/RUN-…/inputs/` 的精确输入快照，包含 `run.sh`、`run.pbs` 和科学输入。
+位于 `TASK-…/RUN-…/inputs/` 的实际执行输入，包含 `run.sh`、`run.pbs`、科学输入和
+由执行阶段确定的参数；每次验证和评审针对当时完整内容的精确快照。
 _Avoid_: 任务级 inputs，计算模板
+
+**执行参数（Execution-owned Parameter）**:
+Spec 未明确固定、且不改变科学问题、结果含义或可比性的实现选择。`calc-execute` 只能
+依据已加载 backend 规则、软件 profile 或上游事实确定，并在 Run 输入和证据中记录。
+_Avoid_: 科学承诺，Spec 覆盖
 
 **最小同步配置（Minimal Sync Configuration）**:
 任务目录中的 `calc-sync.yaml`，只配置 `local`、`server` 和 `exclude`；它是工具配置，

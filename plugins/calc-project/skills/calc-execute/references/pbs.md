@@ -48,10 +48,12 @@ Submit with the digest printed by this chain's successful validation:
 bash /exact/task/RUN-NNN/inputs/run.sh submit "$reviewed_digest"
 ```
 
-`submit` recomputes the complete `inputs/` fingerprint and refuses a missing or
-mismatched digest before `qsub`. It performs no preparation, validation, copy,
-or edit. It changes to the Run directory and submits exactly `inputs/run.pbs`,
-routing PBS stdout and stderr to `logs/pbs.stdout` and `logs/pbs.stderr`.
+`submit` loads the reviewed Run-local environment, then recomputes the complete
+`inputs/` fingerprint and refuses a missing or mismatched digest before `qsub`.
+This ordering detects any input side effect from environment loading. It
+performs no preparation, validation, copy, or edit of its own. It changes to the
+Run directory and submits exactly `inputs/run.pbs`, routing PBS stdout and
+stderr to `logs/pbs.stdout` and `logs/pbs.stderr`.
 
 Keep qsub's returned job ID visible and record that actual execution evidence
 in the Spec's Run row. A checksum is only a byte-identity guard. Submission

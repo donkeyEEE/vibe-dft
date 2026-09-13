@@ -1,29 +1,56 @@
 # Simple Correction
 
-Use this branch only when all of these facts are established:
+Use this branch for a reproducible execution failure with one direct root cause
+established by logs, deterministic checks, or the loaded backend rules. The
+repair must leave the Spec's scientific commitments, task commitment, DAG,
+acceptance, and stopping rule unchanged.
 
-- the failure is reproducible;
-- logs, deterministic checks, or the loaded backend rules establish one direct
-  root cause rather than competing diagnoses;
-- the repair leaves the task's scientific commitment, DAG, acceptance, and
-  stopping rule unchanged;
-- the exact repair is authorized; and
-- verification will occur through a new Run while every old Run is preserved.
+## Choose the Run
 
-Present the evidence, root cause, exact changed inputs or mechanics, new Run
-path, and effects. A changed proposal needs new authorization. Every action the
-user describes as overwrite, reuse, or recomputation remains individually
-gated, but its physical implementation is still a new `RUN-NNN`; never delete,
-empty, or modify an old Run to simulate overwrite.
+Reuse the current Run by default when it is `prepared` or `failed`, no job for it
+is active or may still write, and it contains no accepted result or scientific
+result that must remain available for evidence or comparison. Execution-only
+repairs include command spelling, environment-loading order, paths, scheduler
+directives, resource-launch mechanics, generated script mechanics, and file
+placement. It may also revise an execution-owned parameter selected by
+`$calc-execute` when the new value remains within the same deterministic basis
+and scientific meaning. An explicit Spec value and upstream identity stay
+unchanged.
 
-Prepare the new Run from the current Spec and current upstream Runs. Execute
-the full `prepare → validate → transient review → unchanged submit` chain under
-the current concrete submission scope, then accept it only through the task's
-approved criteria. A correction review does not inherit the failed Run's or a
-previous snapshot's verdict.
+Create a new Run when any of these applies:
 
-Competing diagnoses, exploratory debugging, a proposed diagnostic task, or a
-possible change to scientific commitment is not simple correction. Preserve
-the evidence and stop. Route a design change to `$calc-to-spec`; when no
-approved capability owns a complex technical diagnosis, report that boundary
-instead of expanding this interface.
+- the current Run is accepted or supplies recorded scientific evidence;
+- a scientific input, method, structure, parameter, upstream identity, task
+  commitment, acceptance, or stopping rule changes;
+- old and corrected results must remain comparable;
+- the provenance of existing products is uncertain; or
+- a submitted job is active, cancellation is unconfirmed, or another process
+  may write the Run.
+
+A required Spec change is not made here. Preserve the current Run and route the
+proposal to `$calc-to-spec`; after approval, execute it in a new Run.
+
+## Apply and requalify
+
+Establish the evidence, root cause, exact changes, selected Run path, artifacts
+that will be replaced, and effects before writing. Continue automatically when
+the repair is inside the user's current execution scope and changes only this
+eligible Run.
+New external authorization is still required for submission, cancellation,
+extra cost or resources, or mutation outside that scope. Before reusing a
+failed Run, record its scheduler identity and concise failure evidence in the
+Spec Run row. Then replace only the affected Run-local inputs and derived
+outputs or logs needed for a clean retry. Do not touch another Run, an accepted
+artifact, an approved upstream source, or the task-level sources.
+
+Any in-place change invalidates the Run's previous digest, validation, and
+review. Prepare and validate the corrected snapshot, invoke a fresh transient
+review, and submit only that unchanged reviewed snapshot under a concrete
+submission authorization. Update the same Run record from new scheduler and
+result evidence, and accept it only through the unchanged approved criteria.
+
+When the root cause is not yet established, perform safe read-only or reversible
+diagnosis and return here once evidence supports a correction. A possible
+change to scientific commitment is not simple correction and stops only when
+approved authorities cannot determine the needed scientific judgment. Preserve
+evidence across the diagnostic path.

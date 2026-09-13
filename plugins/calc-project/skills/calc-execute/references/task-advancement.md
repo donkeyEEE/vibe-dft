@@ -34,8 +34,11 @@ follow the sequence in `SKILL.md`.
 
 Apply the task's current approved `Acceptance` statement to the declared Run
 evidence. Decisive satisfaction completes the task without another approval.
-Ambiguous criteria, conflicting evidence, or a newly required scientific
-judgment stops acceptance and returns the exact evidence to `$calc-to-spec`.
+Acceptance asks whether the Purpose received its minimum sufficient evidence,
+not whether the scientific result was favorable. Do not add unrecorded quality,
+convergence, or best-practice gates. Ambiguous criteria, conflicting evidence,
+or a newly required scientific judgment stops acceptance and returns the exact
+evidence to `$calc-to-spec`.
 
 The first accepted Run that satisfies the current task definition may become
 `Current: yes`. Replacing an existing current Run requires an explicit reason

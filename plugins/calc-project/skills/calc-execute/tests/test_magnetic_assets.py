@@ -313,11 +313,13 @@ def test_pack_helper_excludes_models_and_large_files(plugin_root, tmp_path):
     assert {p.name for p in destination.iterdir()} == {"exchange.out", "M_vs_T.png", "manifest.included", "manifest.skipped"}
 
 
-def test_scientific_changes_have_an_explicit_stop_owner(plugin_root):
+def test_scientific_changes_stop_while_rendering_defects_repair(plugin_root):
     backend = plugin_root / "skills/calc-execute/references/backends"
     magnetic = (backend / "vasp/common.md").read_text()
     mae = (backend / "vasp/mae.md").read_text()
     windows = (backend / "wannier90/common.md").read_text()
-    assert "MAGMOM" in magnetic and "blocks" in magnetic and "$calc-to-spec" in magnetic
+    assert "MAGMOM" in magnetic
+    assert "Repair rendering defects automatically" in magnetic
+    assert "stop when the intended physical order is not determined" in magnetic
     assert "unapproved direction blocks" in mae and "$calc-to-spec" in mae
     assert "Changed, shared, missing, or reordered values block" in windows and "$calc-to-spec" in windows

@@ -132,6 +132,7 @@ def _render_run(plugin_root: Path, tmp_path: Path, stage: str) -> tuple[Path, Pa
     (run / "outputs").mkdir()
     (run / "logs").mkdir()
     (inputs / "run.pbs").write_text("#!/bin/bash\n", encoding="utf-8")
+    (inputs / "cluster-env.sh").write_text(":\n", encoding="utf-8")
 
     source = tmp_path / f"{stage}-source"
     source.write_bytes(f"{stage} handoff\n".encode())
@@ -265,6 +266,53 @@ def test_validate_reports_the_complete_run_fingerprint(plugin_root, tmp_path, fa
         capture_output=True,
         text=True,
     ).stdout.strip()
+
+
+def test_validate_and_submit_load_the_run_local_scheduler_environment(
+    plugin_root, tmp_path, fake_commands
+):
+    run, _ = _render_run(plugin_root, tmp_path, "scf")
+    assert _run_action(run, "prepare").returncode == 0
+
+    scheduler_commands = tmp_path / "scheduler-commands"
+    scheduler_commands.mkdir()
+    (tmp_path / "commands" / "qsub").rename(scheduler_commands / "qsub")
+    (run / "inputs" / "cluster-env.sh").write_text(
+        f"export PATH={shlex.quote(str(scheduler_commands))}:\"$PATH\"\n",
+        encoding="utf-8",
+    )
+
+    validation = _run_action(run, "validate")
+
+    assert validation.returncode == 0, validation.stderr
+    digest = validation.stdout.strip()
+    submission = _run_action(run, "submit", digest)
+    assert submission.returncode == 0, submission.stderr
+    assert submission.stdout == "731.server\n"
+
+
+def test_submit_rejects_inputs_changed_while_loading_environment(
+    plugin_root, tmp_path, fake_commands
+):
+    run, _ = _render_run(plugin_root, tmp_path, "scf")
+    assert _run_action(run, "prepare").returncode == 0
+    source_count = tmp_path / "cluster-env-source.count"
+    (run / "inputs" / "cluster-env.sh").write_text(
+        f'count_file={shlex.quote(str(source_count))}\n'
+        'count="$(cat "$count_file" 2>/dev/null || printf 0)"\n'
+        'if test "$count" -gt 0; then\n'
+        '    printf "# changed after review\\n" >> "$INPUTS_DIR/run.pbs"\n'
+        'fi\n'
+        'printf "%s\\n" "$((count + 1))" > "$count_file"\n',
+        encoding="utf-8",
+    )
+    digest = _run_action(run, "validate").stdout.strip()
+
+    submission = _run_action(run, "submit", digest)
+
+    assert submission.returncode != 0
+    assert "input snapshot changed" in submission.stderr
+    assert not fake_commands["qsub"].exists()
 
 
 def test_submit_requires_current_digest_and_never_prepares(plugin_root, tmp_path, fake_commands):

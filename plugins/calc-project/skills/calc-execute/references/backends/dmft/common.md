@@ -43,8 +43,10 @@ and method-specific ordering while adopting the Run contract from
 `inputs/`, `outputs/`, and `logs/`, source the exact rendered environment,
 refuse nonempty outputs, stage only named inputs, run in `outputs/`, route the
 program log to `logs/`, and require the Spec-named products before success.
-Do not invent a common solid_dmft command line, environment initializer,
-scheduler resource, input filename, or output list.
+Do not invent a common solid_dmft command line, scientific solver value, input
+filename, or output list. Environment initialization and scheduler resources
+may be filled from the maintained software profile or another deterministic
+execution source and must be recorded in the Run inputs.
 
 Before review, run `inputs/run.sh prepare` and `inputs/run.sh validate` on the
 server and run the exact DMFT environment probe from [PBS

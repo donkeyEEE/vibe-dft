@@ -85,7 +85,7 @@ Calc Project 采用六个显式接口和一条单向权威链。`ask-dnk` 只负
 | 任务状态、Run 记录、输入快照、输出与执行证据 | Spec 与对应 Run 目录 | `calc-execute` |
 | 提交前判断 | 当前 prepared Run 的瞬时审查结果 | `calc-review` |
 
-每个 RQ 的本地 Markdown Tracker 目录包含 `RQ.md`、`decision-tickets/` 和 `specs/`；不存在独立 Tracker 数据库、进度缓存或 session registry。Spec 是任务、DAG、Run、执行状态与闭环的协调权威，Run 目录保存不可变 `inputs/`、私有 `outputs/` 和 `logs/`。正常提交链为：
+每个 RQ 的本地 Markdown Tracker 目录包含 `RQ.md`、`decision-tickets/` 和 `specs/`；不存在独立 Tracker 数据库、进度缓存或 session registry。Spec 是任务、DAG、Run、执行状态与闭环的协调权威；Run 目录保存实际 `inputs/`、私有 `outputs/` 和 `logs/`。每次验证与评审固定当时的输入快照，符合条件的当前 Run 可原地纠正，任何修改都会使旧验证与评审失效。正常提交链为：
 
 ```text
 prepare → validate → calc-review → submit unchanged inputs

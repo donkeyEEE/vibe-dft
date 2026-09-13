@@ -4,13 +4,15 @@ Read this reference when materializing or preparing one Run. Backend references
 provide the stage-specific input list and checks; this reference owns only the
 common Run seam.
 
-## Materialize one new Run
+## Select and materialize the Run
 
 Resolve the Spec, task, Run ID, task path, and declared upstream current Run
 before writing. A Run contains `inputs/`, `outputs/`, and `logs/`; `run.sh` and
-`run.pbs` live in that Run's `inputs/`. Preserve every older Run. If the target
-Run path already belongs to another snapshot, stop and select a new stable Run
-ID rather than clearing, overwriting, or adopting it.
+`run.pbs` live in that Run's `inputs/`. Normally allocate a new stable Run ID.
+When [simple correction](simple-correction.md) selects the current Run for an
+in-place repair, reuse that exact path and replace only the authorized artifacts
+before preparation. Otherwise, if the target path already belongs to another
+snapshot, stop rather than clearing, overwriting, or adopting it.
 
 Render
 `../assets/templates/common/run.sh.template` from its exact path. Replace these
@@ -28,7 +30,10 @@ integration points once each:
 body. It requires a declared regular source and an existing destination
 directory below this Run's `inputs/`. It uses server-side `rsync`, preserves the
 source, accepts an already identical regular destination, and rejects links or
-a differing destination. Name every copied file; do not use a directory glob.
+a differing destination. An authorized in-place correction removes or replaces
+the named affected destination before invoking `prepare`; the helper never
+decides correction eligibility. Name every copied file; do not use a directory
+glob.
 
 Render backend assets from their exact owning paths. Templates supply structure,
 not scientific choices: values and upstream identities come from the approved
@@ -45,10 +50,11 @@ bash /exact/task/RUN-NNN/inputs/run.sh validate
 ```
 
 `prepare` may add only the declared files to its own Run's `inputs/` and must
-finish before review. `validate` checks the common layout, scheduler command,
-backend prerequisites, and stage-specific consistency, then prints the digest
-of every file below `inputs/`. Scripts and copied helpers are part of that
-snapshot; nothing is excluded.
+finish before review. `validate` loads the reviewed Run-local
+`inputs/cluster-env.sh`, then checks the common layout, scheduler command,
+backend prerequisites, and stage-specific consistency before printing the
+digest of every file below `inputs/`. Scripts and copied helpers are part of
+that snapshot; nothing is excluded.
 
 Pass the prepared Run, task, current Spec, printed digest, and intended
 submission environment to `calc-review`. Its transient result is not a file.
@@ -66,5 +72,9 @@ review even when the local input digest is unchanged.
 
 Only after those rechecks, a passing review in this same execution chain, and a
 submission inside the current authorization scope may `calc-execute` pass the
-in-memory reviewed digest to `run.sh submit`. A digest proves byte identity; it
-does not prove review or approval.
+in-memory reviewed digest to `run.sh submit`. Submission reloads the same
+reviewed Run-local `inputs/cluster-env.sh`, then verifies the complete input
+digest before invoking `qsub`; an environment-loading side effect therefore
+invalidates the snapshot. Environment changes still require validation and a
+fresh review. A digest proves byte identity; it does not prove review or
+approval.

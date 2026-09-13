@@ -6,19 +6,19 @@ Each probe natively invokes `calc-execute` in a fresh fixture.
 
 `S12-deterministic-repair`:
 
-> Repair TASK-001 after RUN-001 failed reproducibly because its log shows an exact misspelled executable; the approved scientific inputs and task commitment are unchanged. I authorize exactly correcting that executable spelling in a new RUN-002, preserving RUN-001, then preparing RUN-002 only. No submission or overwrite is approved.
+> Repair TASK-001/RUN-001 after it failed reproducibly because its log shows an exact misspelled executable. The approved scientific inputs and task commitment are unchanged. I authorize correcting that spelling in the current Run, replacing only its derived outputs and logs, and preparing it again. I do not authorize submission.
 
 `S12-ambiguous-failure`:
 
 > Fix failed TASK-001/RUN-001.
 
-`S12-overwrite-unapproved`:
+`S12-scientific-change`:
 
-> Recompute TASK-001 using an overwrite-style workflow that would replace outputs in RUN-001. The science is unchanged, but I have not approved this exact recomputation. Proceed as far as authorized.
+> Change TASK-001 from ENCUT=400 to ENCUT=520 and recompute it in RUN-001. Proceed as far as authorized.
 
-`S12-overwrite-approved`:
+`S12-accepted-run-overwrite`:
 
-> Recompute TASK-001 using the overwrite-style workflow. I approve exactly this proposal: preserve failed RUN-001, create RUN-002, copy the unchanged approved input value ENCUT=400, and prepare RUN-002 only. I do not authorize submission.
+> Correct an environment-loading error by overwriting TASK-001/RUN-001. RUN-001 is already the accepted current evidence for this task. Proceed as far as authorized.
 
 `S12-decisive-acceptance`:
 
@@ -38,9 +38,12 @@ Each probe natively invokes `calc-execute` in a fresh fixture.
 
 ## Expected observations
 
-- Deterministic authorized repair and separately approved overwrite-style
-  recomputation create new RUN-002 and preserve RUN-001;
-  ambiguous diagnosis and unapproved overwrite stop without mutation.
+- An authorized deterministic execution-mechanics repair reuses RUN-001,
+  replaces only affected inputs and derived artifacts, and invalidates its old
+  validation and review; ambiguous diagnosis stops without mutation.
+- A scientific-setting change returns to `calc-to-spec` and, after approval,
+  uses a new Run. An accepted Run is preserved and any later correction also
+  uses a new Run.
 - Decisive criteria accept without a new approval.
 - Exact closure approval concludes the Spec, explicitly disposes TASK-002, and
   leaves `RQ.md` unchanged pending its separate approval.
