@@ -32,6 +32,7 @@ REQUIRED_DT005_ASSETS = {
     "skills/calc-execute/scripts/fingerprint_run.py",
     "skills/calc-execute/scripts/calculation-monitor.py",
     "skills/calc-execute/references/remote-completion.md",
+    "skills/calc-execute/references/calculation-troubleshooting.md",
     "skills/calc-execute/scripts/probe-run-environment.sh",
     "skills/calc-execute/scripts/sync/sync_calc_data.py",
     "skills/calc-execute/scripts/vasp/compare_incar_parameters.sh",
@@ -101,7 +102,7 @@ def test_runtime_inventory_is_sorted_and_independently_contains_dt005_assets(
     names = _runtime_names(builder, plugin_root)
 
     assert names == sorted(names)
-    assert len(names) == 79
+    assert len(names) == 80
     assert REQUIRED_DT005_ASSETS <= set(names)
 
 

@@ -14,15 +14,17 @@ and Spec closure.
 1. Read the existing Spec and the project state relevant to it. Use [task
    advancement](references/task-advancement.md) to identify every task that can
    advance now.
-2. For each selected task, create a new Run or use [simple
-   correction](references/simple-correction.md) to select an eligible current
-   Run for repair.
+2. Select a Run for each task. When a selected task is abnormal, use
+   [calculation troubleshooting](references/calculation-troubleshooting.md) to
+   locate the problem; it routes a directly established execution error to
+   [simple correction](references/simple-correction.md) and determines whether
+   an eligible current Run can be repaired in place. Otherwise create a new Run.
 3. Read [Run preparation](references/run-preparation.md) and prepare the selected
    Run with [PBS execution](references/pbs.md) and any applicable backend
    references. If stable project configuration must change, first load
-   `$calc-setup` and make the change through that workflow. If software usage is
-   uncertain, ask the user whether to start an execution-research workflow with
-   `$dev-engineering:research`.
+   `$calc-setup` and make the change through that workflow. Treat unresolved
+   software usage as an abnormal task and return to calculation troubleshooting;
+   that branch owns any `$dev-engineering:research` invocation.
 4. Validate the prepared Run, invoke `$calc-review` on the prepared
    snapshot. Resolve execution findings and review again as needed. Submit only
    when the review passes and the submission is within the user's current

@@ -41,6 +41,7 @@ REQUIRED_DT005_ASSETS = (
     "skills/calc-execute/scripts/fingerprint_run.py",
     "skills/calc-execute/scripts/calculation-monitor.py",
     "skills/calc-execute/references/remote-completion.md",
+    "skills/calc-execute/references/calculation-troubleshooting.md",
     "skills/calc-execute/scripts/probe-run-environment.sh",
     "skills/calc-execute/scripts/sync/sync_calc_data.py",
     "skills/calc-execute/scripts/vasp/compare_incar_parameters.sh",

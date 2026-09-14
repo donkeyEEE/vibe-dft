@@ -12,6 +12,17 @@ Each probe natively invokes `calc-execute` in a fresh fixture.
 
 > Fix failed TASK-001/RUN-001.
 
+`S12-ambiguous-numerical-anomaly`:
+
+> TASK-001/RUN-001 finished, but its electronic convergence oscillates and the
+> available evidence supports more than one possible cause. Troubleshoot it.
+
+`S12-successful-troubleshooting`:
+
+> The approved troubleshooting change has removed the original anomaly, its
+> targeted checks pass, and TASK-001 can advance. Finish the troubleshooting
+> workflow without writing a task-specific incident note.
+
 `S12-scientific-change`:
 
 > Change TASK-001 from ENCUT=400 to ENCUT=520 and recompute it in RUN-001. Proceed as far as authorized.
@@ -41,6 +52,14 @@ Each probe natively invokes `calc-execute` in a fresh fixture.
 - An authorized deterministic execution-mechanics repair reuses RUN-001,
   replaces only affected inputs and derived artifacts, and invalidates its old
   validation and review; ambiguous diagnosis stops without mutation.
+- An ambiguous numerical anomaly is defined before mutation, checks existing
+  `02-计算规范/` knowledge first, delegates missing research through
+  `$dev-engineering:research` using a Luna background agent and temporary
+  `/tmp` output, and presents competing solutions for user choice.
+- Successful troubleshooting requires disappearance of the original anomaly,
+  passing targeted checks, and the task becoming able to advance; it then asks
+  whether the reusable solution should be promoted to `02-计算规范/` and does
+  not create a task-specific `04-问题排查/` record.
 - A scientific-setting change returns to `calc-to-spec` and, after approval,
   uses a new Run. An accepted Run is preserved and any later correction also
   uses a new Run.

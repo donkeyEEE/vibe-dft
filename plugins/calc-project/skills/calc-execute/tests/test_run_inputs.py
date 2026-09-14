@@ -14,6 +14,7 @@ SCRIPT = "skills/calc-execute/scripts/fingerprint_run.py"
 TEMPLATE = "skills/calc-execute/assets/templates/common/run.sh.template"
 PROBE = "skills/calc-execute/scripts/probe-run-environment.sh"
 REMOTE_COMPLETION_REFERENCE = "skills/calc-execute/references/remote-completion.md"
+TROUBLESHOOTING_REFERENCE = "skills/calc-execute/references/calculation-troubleshooting.md"
 
 
 def test_execute_skill_has_compact_three_part_contract(plugin_root):
@@ -48,6 +49,7 @@ def test_execute_skill_has_compact_three_part_contract(plugin_root):
         "references/run-preparation.md",
         "references/pbs.md",
         "references/simple-correction.md",
+        "references/calculation-troubleshooting.md",
         "references/remote-completion.md",
         "references/sync.md",
     ):
@@ -63,6 +65,26 @@ def test_execute_skill_has_compact_three_part_contract(plugin_root):
     for status in ("`finished`", "`failed`", "`cancelled`"):
         assert status in principles
     assert "`$calc-to-spec`" in principles
+
+
+def test_calculation_troubleshooting_covers_simple_and_researched_paths(plugin_root):
+    reference_path = plugin_root / TROUBLESHOOTING_REFERENCE
+
+    assert reference_path.is_file()
+    reference = reference_path.read_text(encoding="utf-8")
+    normalized = reference.lower()
+    for contract in (
+        "locate the anomaly",
+        "simple correction",
+        "02-计算规范/",
+        "`$dev-engineering:research`",
+        "luna",
+        "`/tmp`",
+        "competing solutions",
+        "targeted checks",
+        "ask the user whether",
+    ):
+        assert contract in normalized
 
 
 def test_calculation_monitor_is_conditional_and_post_submission(plugin_root):

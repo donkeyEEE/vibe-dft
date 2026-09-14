@@ -49,8 +49,9 @@ review, and submit only that unchanged reviewed snapshot under a concrete
 submission authorization. Update the same Run record from new scheduler and
 result evidence, and accept it only through the unchanged approved criteria.
 
-When the root cause is not yet established, perform safe read-only or reversible
-diagnosis and return here once evidence supports a correction. A possible
+When the root cause is not yet established, return to [calculation
+troubleshooting](calculation-troubleshooting.md) and come back once evidence
+supports a correction. A possible
 change to scientific commitment is not simple correction and stops only when
 approved authorities cannot determine the needed scientific judgment. Preserve
 evidence across the diagnostic path.
