@@ -158,12 +158,9 @@ def _validate_metadata(plugin_root: Path) -> None:
     for name in SKILL_NAMES:
         metadata_path = plugin_root / "skills" / name / "agents" / "openai.yaml"
         metadata = _load_yaml_metadata(metadata_path)
-        policy = metadata.get("policy")
         skill_interface = metadata.get("interface")
         if (
-            not isinstance(policy, dict)
-            or policy.get("allow_implicit_invocation") is not False
-            or not isinstance(skill_interface, dict)
+            not isinstance(skill_interface, dict)
             or any(
                 not isinstance(skill_interface.get(field), str)
                 or not skill_interface[field].strip()

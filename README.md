@@ -89,8 +89,8 @@ codex plugin add calc-project@yz-skills
 | [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 推进整份已就绪或活动中的 Spec，管理任务、Run、提交、同步、接收与闭合。 |
 | [calc-review](plugins/calc-project/skills/calc-review/SKILL.md) | 对指定的已准备 Run 快照做瞬时只读预提交评审。 |
 
-所有接口都需要显式调用。已知目标时直接调用对应技能；只有不知道应该进入哪个
-接口时才使用 `ask-lyz`。
+六个接口均可由 Codex 根据任务自动选择，也可以显式调用。已知目标时可直接调用
+对应技能；不确定应进入哪个接口时可使用 `ask-lyz`。
 
 #### 主要工作流
 

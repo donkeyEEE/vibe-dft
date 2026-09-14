@@ -1,15 +1,15 @@
 {
   "name": "calc-project",
   "version": "0.1.0+codex.20260913155909",
-  "description": "以六个显式接口管理计算项目配置、RQ、Spec、执行与瞬时只读评审。",
+  "description": "以六个可自动选择的接口管理计算项目配置、RQ、Spec、执行与瞬时只读评审。",
   "author": {
     "name": "donk"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Calc Project",
-    "shortDescription": "显式配置、RQ、Spec、执行、评审与路由接口",
-    "longDescription": "calc-project 提供六个显式调用接口：ask-lyz 只负责路由；calc-setup 管理稳定项目结构与配置；calc-rq 管理研究问题及其已接受决策；calc-to-spec 为一个 RQ 设计并发布完整科学 Spec 集或替换一份 Spec；calc-execute 推进整份 ready 或 active Spec 的任务与 Run；calc-review 对一个准确的 prepared Run 快照执行瞬时只读评审。Spec 是任务 DAG、Run 记录、current Run、执行状态与闭合的唯一权威。",
+    "shortDescription": "配置、RQ、Spec、执行、评审与路由接口",
+    "longDescription": "calc-project 提供六个可自动选择的接口：ask-lyz 只负责路由；calc-setup 管理稳定项目结构与配置；calc-rq 管理研究问题及其已接受决策；calc-to-spec 为一个 RQ 设计并发布完整科学 Spec 集或替换一份 Spec；calc-execute 推进整份 ready 或 active Spec 的任务与 Run；calc-review 对一个准确的 prepared Run 快照执行瞬时只读评审。Spec 是任务 DAG、Run 记录、current Run、执行状态与闭合的唯一权威。",
     "developerName": "donk",
     "category": "Productivity",
     "capabilities": [

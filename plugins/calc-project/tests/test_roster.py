@@ -20,12 +20,12 @@ def test_exact_roster(plugin_root):
     } == EXPECTED
 
 
-def test_explicit_only_metadata(plugin_root):
+def test_model_invoked_metadata(plugin_root):
     for name in sorted(EXPECTED):
         metadata = plugin_root / "skills" / name / "agents" / "openai.yaml"
         data = yaml.safe_load(metadata.read_text(encoding="utf-8"))
 
-        assert data["policy"]["allow_implicit_invocation"] is False
+        assert "policy" not in data
         assert f"${name}" in data["interface"]["default_prompt"]
         assert data["interface"]["display_name"]
         assert data["interface"]["short_description"]
