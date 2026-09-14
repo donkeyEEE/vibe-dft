@@ -14,11 +14,12 @@ and Spec closure.
 1. Read the existing Spec and the project state relevant to it. Use [task
    advancement](references/task-advancement.md) to identify every task that can
    advance now.
-2. Select a Run for each task. When a selected task is abnormal, use
+2. For an abnormal selected task, use
    [calculation troubleshooting](references/calculation-troubleshooting.md) to
    locate the problem; it routes a directly established execution error to
-   [simple correction](references/simple-correction.md) and determines whether
-   an eligible current Run can be repaired in place. Otherwise create a new Run.
+   [simple correction](references/simple-correction.md), then selects an
+   eligible current Run for repair or creates a new Run only after the solution
+   is selected. For a task without an anomaly, create a new Run.
 3. Read [Run preparation](references/run-preparation.md) and prepare the selected
    Run with [PBS execution](references/pbs.md) and any applicable backend
    references. If stable project configuration must change, first load

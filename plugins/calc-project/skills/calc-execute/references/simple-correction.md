@@ -7,9 +7,10 @@ acceptance, and stopping rule unchanged.
 
 ## Choose the Run
 
-Reuse the current Run by default when it is `prepared` or `failed`, no job for it
-is active or may still write, and it contains no accepted result or scientific
-result that must remain available for evidence or comparison. Execution-only
+Reuse the current Run by default when it is `prepared`, `failed`, or `finished`,
+no job for it is active or may still write, and its products have not been
+adopted by task acceptance and need not remain available for provenance,
+evidence, or comparison. Execution-only
 repairs include command spelling, environment-loading order, paths, scheduler
 directives, resource-launch mechanics, generated script mechanics, and file
 placement. It may also revise an execution-owned parameter selected by

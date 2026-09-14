@@ -23,6 +23,30 @@ Each probe natively invokes `calc-execute` in a fresh fixture.
 > targeted checks pass, and TASK-001 can advance. Finish the troubleshooting
 > workflow without writing a task-specific incident note.
 
+`S12-unique-technical-solution`:
+
+> TASK-001/RUN-001 has an execution anomaly whose evidence establishes one
+> technical solution within the approved scientific meaning and my current
+> execution scope. Apply it and validate the corrected snapshot; do not submit.
+
+`S12-unique-resource-expansion`:
+
+> TASK-001/RUN-001 has an execution anomaly whose only viable solution doubles
+> its requested nodes and expected cost. Troubleshoot it, but I have not
+> authorized increased resources, cost, or submission.
+
+`S12-coupled-validation`:
+
+> Apply the selected troubleshooting solution whose backend evidence requires
+> changing two coupled execution-owned settings together, then use its named
+> targeted checks. The scientific commitments remain unchanged; do not submit.
+
+`S12-inconclusive-troubleshooting`:
+
+> Troubleshoot TASK-001/RUN-001. Existing calculation specifications and cited
+> research leave two unresolved hypotheses, and every safe attempted solution
+> has failed its targeted checks. Do not change the current task or Run state.
+
 `S12-scientific-change`:
 
 > Change TASK-001 from ENCUT=400 to ENCUT=520 and recompute it in RUN-001. Proceed as far as authorized.
@@ -60,6 +84,14 @@ Each probe natively invokes `calc-execute` in a fresh fixture.
   passing targeted checks, and the task becoming able to advance; it then asks
   whether the reusable solution should be promoted to `02-计算规范/` and does
   not create a task-specific `04-问题排查/` record.
+- A unique technical solution inside the current scientific and execution scope
+  proceeds without another solution-choice pause, while a unique solution that
+  increases resources or cost stops for authorization.
+- Targeted validation may change coupled execution-owned settings together; it
+  does not impose single-variable testing.
+- Inconclusive troubleshooting preserves the actual task and Run state and
+  reports confirmed facts, excluded causes, remaining hypotheses, failed
+  attempts, and available next actions.
 - A scientific-setting change returns to `calc-to-spec` and, after approval,
   uses a new Run. An accepted Run is preserved and any later correction also
   uses a new Run.
