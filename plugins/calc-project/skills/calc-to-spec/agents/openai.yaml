@@ -1,6 +1,4 @@
 interface:
   display_name: "Calc to Spec"
-  short_description: "设计并发布一个批准的计算 Spec"
-  default_prompt: "$calc-to-spec 为指定 RQ 设计或替换一个 Spec。"
-policy:
-  allow_implicit_invocation: false
+  short_description: "设计完整 Spec 集或替换一份 Spec"
+  default_prompt: "$calc-to-spec 为指定 RQ 设计并发布完整 Spec 集，或替换一份现有 Spec。"

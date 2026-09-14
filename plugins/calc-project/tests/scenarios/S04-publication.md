@@ -8,6 +8,10 @@ Each probe natively invokes `calc-project:calc-to-spec` in a fresh fixture.
 
 > Run the required scientific-design interview, then publish the resulting Spec to data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-001-stability.md. I approve this design summary: judge synthetic stability with one unconditional SCF task; accept when outputs/result.txt records the completed stability result; stop when that task is accepted. I also approve exactly one RQ.md ## Specs entry '- [SPEC-001: Stability](specs/SPEC-001-stability.md)'.
 
+`S04-complete-set-before-execution`:
+
+> Design every Spec needed to answer RQ-001, then continue with execution. The accepted RQ requires two independent principal judgments: synthetic structural stability and synthetic magnetic ordering. I approve one complete-set proposal with data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-001-stability.md for the stability judgment and data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-002-magnetism.md for the magnetic judgment, together with exactly these two RQ.md ## Specs entries: '- [SPEC-001: Stability](specs/SPEC-001-stability.md)' and '- [SPEC-002: Magnetism](specs/SPEC-002-magnetism.md)'. Publish both before handing the remaining request to calc-execute.
+
 `S04-incomplete-design`:
 
 > Run the required scientific-design interview for SPEC-002, but publish it even if the intended judgment still has no acceptance criterion or stopping rule.
@@ -27,9 +31,15 @@ Each probe natively invokes `calc-project:calc-to-spec` in a fresh fixture.
 ## Expected observations
 
 - The design interview runs before every draft. Publication writes only the
-  Spec represented by the approved target, design summary, and exact RQ link;
-  the approval proposal displays those concise fields rather than the complete
-  Markdown draft, and publication does not adopt unapproved drafts.
+  Spec or complete Spec set represented by the approved targets, design
+  summaries, and exact aggregate RQ index change; the approval proposal
+  displays those concise fields rather than the complete Markdown drafts, and
+  publication does not adopt unapproved drafts.
+- New-Spec mode identifies every independent principal judgment before
+  drafting, publishes one Spec for each judgment in the approved complete set,
+  confirms every member and the aggregate RQ index change, and only then hands
+  remaining execution intent to `calc-execute`. It never hands off after only
+  the first member.
 - Repeating identical publication leaves one link.
 - A different owner at the target stops all writes.
 - An incomplete scientific design leaves both the Spec target and RQ index

@@ -6,7 +6,7 @@ All probes natively invoke `calc-project:calc-setup` in fresh isolated fixtures.
 
 `S02-empty-approved`:
 
-> Initialize the empty project directory project. I approve exactly this proposal: create project/structures, project/calculation_templates, data, project/AGENTS.md, project/CONTEXT.md, and project/ARCHITECTURE.md; configure Data root ../data, Tracker adapter local-markdown, RQ location 01-rqs, and no software profile. Do not create any RQ, Decision Ticket, Spec, task, or Run.
+> Initialize the empty project directory project. I approve exactly this proposal: create project/structures, project/calculation_templates, data, project/AGENTS.md, project/CONTEXT.md, and project/ARCHITECTURE.md; configure Data root ../data, Tracker adapter local-markdown, RQ location 01-rqs, and no software profile. Do not create any RQ, Spec, task, or Run.
 
 `S02-custom-context`:
 

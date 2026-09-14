@@ -25,7 +25,13 @@ Acceptance: <acceptance condition>
 | Run | Status | Current | Path | Result |
 |---|---|---|---|---|
 | RUN-001 | prepared | no | <task-relative-run-path> | — |
+
+## Context
 ```
+
+`Context` is the final section. It records Spec-scoped terminology and framing
+needed to interpret the Judgment, Tasks, conditions, acceptance rules, Runs,
+and Closure when present.
 
 Spec status is `ready | active | concluded`. Task status is `pending | current
 | completed | skipped | cancelled | needs-review`; independent tasks may be
@@ -60,4 +66,5 @@ Evidence: <accepted tasks and Runs>
 RQ impact: <proposed RQ update>
 ```
 
-`RQ impact` remains a proposal until `calc-rq` updates the RQ.
+Insert `Closure` immediately before `Context`, so `Context` remains the final
+section. `RQ impact` remains a proposal until `calc-rq` updates the RQ.

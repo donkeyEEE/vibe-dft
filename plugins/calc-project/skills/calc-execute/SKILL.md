@@ -5,149 +5,55 @@ description: Execute one selected ready or active Calc Project Spec by preparing
 
 # Calc Execute
 
-Advance one whole ready or active Spec. Resolve one exact Spec through its RQ
-and configured Tracker location, or use the exact path supplied by the caller.
-Do not resolve a bare, parentless Spec ID by repository scanning. Read the
-current Spec, its referenced task and Run paths, stable project configuration,
-software profile, current scheduler/accounting state, and relevant remote
-files before deciding what can advance. A missing or conflicting authority
-stops the affected action; do not repair it through a parallel state file.
+Advance one selected ready or active Calc Project Spec through its complete
+execution lifecycle, from task advancement and Run execution to task acceptance
+and Spec closure.
 
-Before any mutation or advancement, read the concrete RQ, Spec, task, and Run
-records used by that action and require their needed document shape. The RQ has
-`ID`, `Status: active | concluded`, and `Question`, `Boundary`, `Success
-Criterion`, `Decisions`, and `Specs`. The Spec has `ID`, `Status: ready | active`,
-`RQ`, `Judgment`, and `Tasks`. Each task has `Status`, `Path`, `Blocked by`,
-`Condition`, `Purpose`, `Acceptance`, and `Runs`; task status is `pending |
-current | completed | skipped | cancelled | needs-review`, dependencies name
-same-Spec tasks and are acyclic, conditions use recorded upstream results, and
-paths follow the configured relative-path convention. Each recorded Run row has
-Run ID, `Status`, `Current`, `Path`, and `Result`; Run status is `prepared |
-submitted | finished | failed | cancelled`, `Current` is `yes | no`, and a task
-has at most one current Run. A closure action additionally requires the current
-task dispositions and the proposed `Closure` fields defined below. This is a
-direct pre-action check of the named authorities, not a general schema validator.
+## Workflow
 
-If that check fails, make no affected mutation and report the specific missing
-or conflicting field, document, and task or Run. Identify the owner: RQ shape
-belongs to `$calc-rq`; Judgment, DAG, task declarations, conditions, and
-acceptance belong to `$calc-to-spec`; execution status, Run records, and current
-Run designation belong here; stable project configuration belongs to
-`$calc-setup`. Do not silently supply a missing value or translate an invalid
-status. An ordinary read-only status diagnostic may still report the facts that
-are present and the malformed authority, but it writes nothing and does not
-advance the Spec.
+1. Read the existing Spec and the project state relevant to it. Use [task
+   advancement](references/task-advancement.md) to identify every task that can
+   advance now.
+2. For an abnormal selected task, use
+   [calculation troubleshooting](references/calculation-troubleshooting.md) to
+   locate the problem; it routes a directly established execution error to
+   [simple correction](references/simple-correction.md), then selects an
+   eligible current Run for repair or creates a new Run only after the solution
+   is selected. For a task without an anomaly, create a new Run.
+3. Read [Run preparation](references/run-preparation.md) and prepare the selected
+   Run with [PBS execution](references/pbs.md) and any applicable backend
+   references. If stable project configuration must change, first load
+   `$calc-setup` and make the change through that workflow. Treat unresolved
+   software usage as an abnormal task and return to calculation troubleshooting;
+   that branch owns any `$dev-engineering:research` invocation.
+4. Validate the prepared Run, invoke `$calc-review` on the prepared
+   snapshot. Resolve execution findings and review again as needed. Submit only
+   when the review passes and the submission is within the user's current
+   authorization.
+5. After submission, record the scheduler response and update the Spec Run row
+   to `submitted`. Read [remote completion](references/remote-completion.md),
+   then start its Calculation Monitor when post-submission monitoring or
+   continuation was explicitly requested. Use [previewed
+   synchronization](references/sync.md) when transferring files. Choose the Run
+   status from the actual situation using the definitions below.
+6. Apply the task's approved Acceptance from the Spec, then continue with the
+   next available task. When the Spec is complete, propose its closure and
+   conclude it after the user accepts. If the RQ must then change, invoke
+   `$calc-rq` and present its proposal to the user. Before returning control,
+   invoke `$show-cot` with the resolved project root and the Task and Run
+   handled by this execution step. Present its full project overview so the
+   response names the Task at which execution ended.
 
-The Spec is the sole authority for its task graph, statuses, Run records,
-current Runs, acceptance, execution record, and closure. Derive the ready
-frontier from it on demand with [task advancement](references/task-advancement.md);
-persist no frontier, review result, task metadata, Run metadata, workflow
-record, or session cache. Independent ready tasks may advance in parallel when
-the user's current bounds and submission authorization permit it. A false
-condition makes a task `skipped`; an ambiguous condition or scientific
-criterion returns to `$calc-to-spec` without guessing.
+## Principles
 
-## Run sequence
-
-For each frontier task without a current Run eligible for correction, allocate
-a new stable Run ID and path under that task. Materialize only the approved task
-path and that Run's `inputs/`, `outputs/`, and `logs/`. Read [Run
-preparation](references/run-preparation.md) while preparing it and [PBS
-execution](references/pbs.md) while rendering or validating its PBS script.
-Select the exact backend bundle below and render scientific commitments from
-the current approved Spec plus the explicitly named project sources. Fill an
-omitted execution-owned parameter only from a deterministic loaded backend
-rule, software profile, or upstream fact when it cannot change the scientific
-question, interpretation, or comparability. Record the realized choice in the
-Run inputs and concise Run evidence. An explicit Spec value always wins;
-uncertain ownership or scientific effect returns to `$calc-to-spec`.
-
-Run `inputs/run.sh prepare`, then `inputs/run.sh validate`, recheck the intended
-submission environment and every named upstream current Run, and invoke
-`$calc-review` on that exact prepared snapshot. Review is transient: continue
-to submission only for `pass` or `pass_with_warnings` returned in this same
-execution chain, with byte-identical inputs, unchanged resources and target
-environment, and a concrete submission authorization that covers this Run.
-Report warnings. Continue automatically through repairable review findings:
-diagnose them, apply [simple correction](references/simple-correction.md) when
-eligible, or use the configuration path when stable configuration is defective,
-then prepare, validate, and review the resulting snapshot again. A changed
-snapshot or environment requires validation and a fresh review. A direct
-diagnostic review or a review from another session is never submission
-authorization.
-
-A submission scope may bound cluster, queue, resources or cost, eligible
-tasks, concurrency, and validity. Display and obtain approval for the concrete
-submission when no existing scope covers it; approval for synchronization or
-a different proposal does not apply. After `submit`, capture the actual
-scheduler response and job identity in the Run logs and update the Spec Run row
-to `submitted` only from that evidence. A digest proves byte identity, not
-review or authorization.
-
-When post-submission monitoring or continuation was explicitly requested in
-this execution chain, read [Calculation Monitor](references/calculation-monitor.md)
-after the Spec records the Run as `submitted`, then launch its optional local
-service. Monitoring launch failure leaves the submitted Run unchanged; report
-the recorded job ID and the exact manual status command instead.
-
-For upload or result synchronization, read [reviewed
-synchronization](references/sync.md) and consume only its current reviewed plan.
-For tracking and receipt, read [remote
-completion](references/remote-completion.md); queue disappearance alone is not
-success. Correlate scheduler/accounting evidence, logs, expected products, and
-timestamps, then synchronize only reviewed lightweight outputs. Keep HDF5,
-`CHGCAR`, and `WAVECAR` server-side. Record concise actual Run evidence in the
-Spec and set the Run to `finished`, `failed`, or `cancelled` only when current
-evidence supports it; never claim a remote cancellation that did not occur.
-
-Apply the approved task acceptance rule through [task
-advancement](references/task-advancement.md). Use [simple
-correction](references/simple-correction.md) only at its evidence,
-authorization, and Run-selection seam. An eligible current Run may be repaired
-in place; scientific or provenance-bearing changes use a new Run. If the frontier becomes empty, propose closure only when
-the current Spec justifies it. Present the principal judgment, accepted task
-and Run evidence, disposition of every remaining task, closure reason, and
-proposed RQ impact. Only explicit approval of that exact proposal permits the
-single immutable `concluded`/`## Closure` write. Later formal RQ impact is a
-separate `$calc-rq` proposal and approval.
-
-Stop for an explicit pause or only when progress requires a new scientific
-judgment, new external authorization, resolution of an unavoidable concurrent
-writer, or user resolution of authoritative objects that safe inspection cannot
-reconcile. Diagnose other uncertainty and choose the lowest-risk reversible
-technical repair automatically. An active Calculation Monitor is the wait
-mechanism, not permission for periodic agent polling: ordinary goal
-continuation does not resume scheduler work. Only a complete
-`PBS_JOB_LEFT_QSTAT` message for the recorded Run or an explicit user status
-request opens the remote-completion path. Follow the monitor reference when a
-persistent goal continues while that external wait remains. A later eligible
-invocation resumes from the same current authorities and external state.
-
-## Exact backend bundles
-
-For a backend branch, load exactly its row below. Stop if any listed file is missing; do not scan the backend directory or substitute a related file.
-
-| Branch | Exact bundle |
-|---|---|
-| `vasp-scf` | `vasp/common.md`, `vasp/scf.md` |
-| `vasp-band` | `vasp/common.md`, `vasp/band.md`, `vasp/handoff.md` |
-| `vasp-wannier-prerun` | `vasp/common.md`, `vasp/wannier-prerun.md`, `vasp/handoff.md` |
-| `vasp-mae` | `vasp/common.md`, `vasp/mae.md`, `vasp/handoff.md` |
-| `dmft` | `dmft/common.md` |
-| `dmft-postprocessing` | `dmft/common.md`, `dmft/postprocessing.md` |
-| `namd` | `namd/common.md` |
-| `namdwithsoc` | `namd/common.md`, `namd/namdwithsoc.md` |
-| `wannier90` | `wannier90/common.md` |
-| `tb2j` | `tb2j/common.md` |
-| `vampire` | `vampire/common.md`, `vampire/handoff.md` |
-
-The backend reference names each exact template, helper, handoff source, required product, and stage-specific body inserted into the common `run.sh.template`. Every inserted command propagates failure with `|| return 1`. Ordinary preparation writes only its selected Run; PBS reads the reviewed `inputs/`, works in `outputs/`, and writes command logs in `logs/`. A simple correction may replace artifacts only under its reference. PBS itself refuses nonempty outputs so cleanup remains an explicit pre-prepare correction action.
-
-## Sibling boundaries
-
-Continue an execution repair here and review the repaired snapshot again. Use
-`$calc-to-spec` when a scientific design change is required, `$calc-setup` for
-stable configuration repair, and `$calc-rq` for separately approved closure
-impact. Invoke the needed path automatically when existing authorities uniquely
-determine a safe action. Ask the user only at the stop conditions above, and
-carry no unapproved scientific inference across a skill seam.
+- Submission, synchronization, cancellation, increased resources or cost,
+  deletion, and overwriting outside the current work scope require user
+  authorization.
+- A Run is `finished` when it ends normally and produces results available for
+  task acceptance. It is `failed` when it ends unsuccessfully without complete
+  results for task acceptance. It is `cancelled` when its execution has
+  actually been cancelled and will not continue to run or write results.
+- A change to scientific definition or provenance uses a new Run. When it also
+  requires a Spec change, invoke `$calc-to-spec` to produce a modification
+  proposal, ask the user whether to accept it, and continue only after
+  acceptance.

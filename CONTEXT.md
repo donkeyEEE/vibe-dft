@@ -21,12 +21,8 @@ Skill 是否允许 Codex 隐式选择的运行时策略；默认允许隐式调�
 
 `plugins/calc-project` 是可安装计算工作流插件。运行时计算模板和确定性辅助脚本属于唯一消费者 `calc-execute`，不属于插件共享资源。
 
-**Decision Ticket**:
-RQ 决策过程中，为一个尚未解决且需要显式回答的问题建立的临时决策记录。答案被接受并写入 RQ 后即完成，不参与后续 Spec 或计算执行协调。
-_Avoid_: 计算任务，开发工单，长期进度记录
-
 **RQ Tracker**:
-每个 RQ 用于存放其已发布 Spec 与 Decision Ticket 的配置化存储约定；RQ 属于一条计算研究主线，本地 Markdown adapter 下对应 `<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，不是独立状态文档。
+每个 RQ 用于存放 `RQ.md` 与已发布 Spec 的配置化存储约定；RQ 属于一条计算研究主线，本地 Markdown adapter 下对应 `<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，不是独立状态文档。
 _Avoid_: Tracker 数据库，进度缓存，session registry
 
 **计算工具脚本（Calculation Utility Script）**:
@@ -37,11 +33,19 @@ _Avoid_: 计算模板，任务专用脚本
 由一次已记录的调度器提交启动、在本地独立等待该 Run 的作业离开活动队列并请求恢复原 Codex 线程的临时协调进程。它不判断 Run 成功，也不保存 Spec、Run 或科学验收状态。
 _Avoid_: watcher，完成判定器，Run 状态数据库
 
+**执行研究（Execution Research）**:
+`calc-execute` 在任务执行中遇到不确定性时，为补充软件用法、输入格式、命令、环境要求、产物与机械校验规则而开展的临时研究。其结果先作为临时证据，只有经用户接受后才沉淀为计算规范；它不是任务级执行方案，也不取代 Spec 的科学权威。
+_Avoid_: 通用 Run，任务级后端方案，搜索授权
+
+**计算排障（Calculation Troubleshooting）**:
+`calc-execute` 对异常计算任务定位问题、补充证据、提出方案并验证处置结果的执行流程；根因明确且满足原地纠正条件的异常进入简单纠错分支。
+_Avoid_: 简单纠错，结果解释，Spec 修改
+
 **Ask LYZ (`ask-lyz`)**:
 Calc Project 的显式路由接口；原名 `ask-dnk`，自 2026-09-13 起使用现名。过去文档中的旧名称保留为历史记录。
 _Avoid_: ask-dnk（当前名称）
 
-关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Decision Ticket、Spec、计算任务、运行、Run-local inputs、计算模板、项目计算模板、插件计算模板。
+关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Spec、计算任务、运行、计算归属树（COT）、Run-local inputs、计算模板、项目计算模板、插件计算模板。
 
 ## Paper Project
 

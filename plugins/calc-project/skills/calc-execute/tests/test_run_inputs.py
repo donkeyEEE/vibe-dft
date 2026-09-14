@@ -13,38 +13,93 @@ import pytest
 SCRIPT = "skills/calc-execute/scripts/fingerprint_run.py"
 TEMPLATE = "skills/calc-execute/assets/templates/common/run.sh.template"
 PROBE = "skills/calc-execute/scripts/probe-run-environment.sh"
-MONITOR_REFERENCE = "skills/calc-execute/references/calculation-monitor.md"
+REMOTE_COMPLETION_REFERENCE = "skills/calc-execute/references/remote-completion.md"
+TROUBLESHOOTING_REFERENCE = "skills/calc-execute/references/calculation-troubleshooting.md"
 
 
-def test_execution_gate_requires_complete_authorities_before_mutation(plugin_root):
-    text = " ".join(
-        (plugin_root / "skills/calc-execute/SKILL.md")
-        .read_text(encoding="utf-8")
-        .split()
+def test_execute_skill_has_compact_three_part_contract(plugin_root):
+    skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(
+        encoding="utf-8"
     )
+    body = skill.split("---", 2)[2].strip()
+    sections = [line for line in body.splitlines() if line.startswith("#")]
 
-    assert "Before any mutation or advancement" in text
-    assert "read-only status diagnostic" in text
-    assert "specific missing or conflicting field" in text
-    for field in (
-        "`Question`, `Boundary`, `Success Criterion`, `Decisions`, and `Specs`",
-        "`ID`, `Status: ready | active`, `RQ`, `Judgment`, and `Tasks`",
-        "`Status`, `Path`, `Blocked by`, `Condition`, `Purpose`, `Acceptance`, and `Runs`",
-        "Run ID, `Status`, `Current`, `Path`, and `Result`",
+    assert sections == ["# Calc Execute", "## Workflow", "## Principles"]
+
+    overview, remainder = body.split("## Workflow", 1)
+    overview_text = " ".join(overview.removeprefix("# Calc Execute").split())
+    assert overview_text
+    assert len(overview_text) <= 500
+    assert "\n\n" not in overview.removeprefix("# Calc Execute").strip()
+
+    workflow, principles = remainder.split("## Principles", 1)
+    workflow_steps = [
+        line for line in workflow.splitlines() if line[:1].isdigit() and ". " in line
+    ]
+    assert [line.split(".", 1)[0] for line in workflow_steps] == [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+    ]
+    for reference in (
+        "references/task-advancement.md",
+        "references/run-preparation.md",
+        "references/pbs.md",
+        "references/simple-correction.md",
+        "references/calculation-troubleshooting.md",
+        "references/remote-completion.md",
+        "references/sync.md",
     ):
-        assert field in text
+        assert reference in workflow
+    for sibling in (
+        "`$calc-setup`",
+        "`$dev-engineering:research`",
+        "`$calc-review`",
+        "`$calc-rq`",
+    ):
+        assert sibling in workflow
+
+    for status in ("`finished`", "`failed`", "`cancelled`"):
+        assert status in principles
+    assert "`$calc-to-spec`" in principles
+
+
+def test_calculation_troubleshooting_covers_simple_and_researched_paths(plugin_root):
+    reference_path = plugin_root / TROUBLESHOOTING_REFERENCE
+
+    assert reference_path.is_file()
+    reference = reference_path.read_text(encoding="utf-8")
+    normalized = reference.lower()
+    for contract in (
+        "locate the anomaly",
+        "simple correction",
+        "02-计算规范/",
+        "`$dev-engineering:research`",
+        "luna",
+        "`/tmp`",
+        "competing solutions",
+        "targeted checks",
+        "ask the user whether",
+    ):
+        assert contract in normalized
 
 
 def test_calculation_monitor_is_conditional_and_post_submission(plugin_root):
     skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(encoding="utf-8")
     skill_flat = " ".join(skill.split())
-    reference_path = plugin_root / MONITOR_REFERENCE
+    reference_path = plugin_root / REMOTE_COMPLETION_REFERENCE
 
     assert reference_path.is_file()
-    assert "references/calculation-monitor.md" in skill
+    assert not (
+        plugin_root / "skills/calc-execute/references/calculation-monitor.md"
+    ).exists()
+    assert "references/remote-completion.md" in skill
     assert "explicitly requested" in skill
     assert skill_flat.index("update the Spec Run row to `submitted`") < skill_flat.index(
-        "references/calculation-monitor.md"
+        "references/remote-completion.md"
     )
 
     reference = reference_path.read_text(encoding="utf-8")

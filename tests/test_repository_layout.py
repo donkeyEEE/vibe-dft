@@ -20,6 +20,7 @@ EXPECTED_CALC_SKILLS = (
     "calc-to-spec",
     "calc-execute",
     "calc-review",
+    "show-cot",
 )
 FORBIDDEN_DIRS = {".pytest_cache", "__pycache__", ".worktrees", ".scratch", "dist"}
 def check_required_repository_layout_exists() -> None:
@@ -75,7 +76,7 @@ def check_each_plugin_has_a_valid_manifest() -> None:
         assert data["name"] == plugin
 
         if plugin == "calc-project":
-            assert data["version"] == "0.1.0+codex.20260913065459"
+            assert data["version"] == "0.1.0+codex.20260913155909"
             prompts = data["interface"]["defaultPrompt"]
             assert len(prompts) == len(EXPECTED_CALC_SKILLS)
             for name, prompt in zip(EXPECTED_CALC_SKILLS, prompts, strict=True):

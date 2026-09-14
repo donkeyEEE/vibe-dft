@@ -7,9 +7,10 @@ acceptance, and stopping rule unchanged.
 
 ## Choose the Run
 
-Reuse the current Run by default when it is `prepared` or `failed`, no job for it
-is active or may still write, and it contains no accepted result or scientific
-result that must remain available for evidence or comparison. Execution-only
+Reuse the current Run by default when it is `prepared`, `failed`, or `finished`,
+no job for it is active or may still write, and its products have not been
+adopted by task acceptance and need not remain available for provenance,
+evidence, or comparison. Execution-only
 repairs include command spelling, environment-loading order, paths, scheduler
 directives, resource-launch mechanics, generated script mechanics, and file
 placement. It may also revise an execution-owned parameter selected by
@@ -49,8 +50,9 @@ review, and submit only that unchanged reviewed snapshot under a concrete
 submission authorization. Update the same Run record from new scheduler and
 result evidence, and accept it only through the unchanged approved criteria.
 
-When the root cause is not yet established, perform safe read-only or reversible
-diagnosis and return here once evidence supports a correction. A possible
+When the root cause is not yet established, return to [calculation
+troubleshooting](calculation-troubleshooting.md) and come back once evidence
+supports a correction. A possible
 change to scientific commitment is not simple correction and stops only when
 approved authorities cannot determine the needed scientific judgment. Preserve
 evidence across the diagnostic path.

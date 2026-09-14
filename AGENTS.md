@@ -4,7 +4,7 @@
 
 ## 插件导航
 
-- [calc-project](plugins/calc-project/)：通过六个显式接口路由并管理科研计算项目配置、RQ、Spec、整份 Spec 执行与 prepared Run 瞬时评审。稳定术语见 [calc-setup 领域词汇](plugins/calc-project/skills/calc-setup/references/project-context.md)，Run 输入、执行模板和同步工具由 `calc-execute` 所有。
+- [calc-project](plugins/calc-project/)：通过六个显式接口路由并管理科研计算项目配置、RQ、Spec、整份 Spec 执行与 prepared Run 瞬时评审；`show-cot` 提供从既有权威记录派生的显式只读执行总览。稳定术语见 [calc-setup 领域词汇](plugins/calc-project/skills/calc-setup/references/project-context.md)，Run 输入、执行模板和同步工具由 `calc-execute` 所有。
 - [paper-project](plugins/paper-project/)：文献整理、论文与学位论文写作、引用核验和科学图件。研究证据与学术表达任务进入此插件。
 - [osm-project](plugins/osm-project/)：将当前对话中的项目进展整理为草稿，经确认后写入 Obsidian Daily Note。用户要求记录项目日志时进入此插件。
 - [skill-incubator](plugins/skill-incubator/)：维护尚未形成独立插件边界的可安装 skill，包括通用物理论文润色与演示文稿工作流。
@@ -21,6 +21,7 @@
 
 ## 仓库规则
 
+- 设计插件或 skill 时，相信智能体的判断与执行能力：明确目标、接口和完成标准，并为实现保留自主空间；只为安全、权限、不可逆操作或已验证的稳定性要求增加行为限制。
 - 插件发布单元位于 `plugins/<plugin-name>/`；单一 skill 使用的资源与该 skill 共置。
 - 只有至少两个活动 skill 实际消费的资源才进入所属插件的 `resources/`；消费者直接声明精确相对路径。
 - 修改资源消费 seam 时，联动验证 consuming skills、相对路径和插件发布包。

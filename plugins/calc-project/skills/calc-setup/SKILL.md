@@ -29,7 +29,7 @@ description: Initialize, reorganize, or maintain one calculation project's stabl
 
 This skill owns stable project structure, data boundaries, Tracker storage
 configuration, the generated Agent pointer, and maintained cluster/software
-profiles. It creates no RQ, Decision Ticket, Spec, task, or Run. It performs no
+profiles. It creates no RQ, Spec, task, or Run. It performs no
 data synchronization, job submission, or mutable Run-environment validation.
 
 A configured project may proceed to `$calc-rq`. Route project configuration

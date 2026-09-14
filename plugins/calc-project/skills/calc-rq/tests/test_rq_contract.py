@@ -11,12 +11,20 @@ def test_rq_template(plugin_root):
         "ID: RQ-001",
         "Status: active",
         "## Question",
-        "## Boundary",
+        "Boundary:",
         "## Success Criterion",
-        "## Decisions",
         "## Specs",
+        "## Decisions",
+        "## Context",
     ):
         assert field in text
+
+    assert text.index("## Specs") < text.index("## Decisions")
+    assert text.index("## Decisions") < text.index("## Context")
+    assert "## Boundary" not in text
+    assert text.index("## Question") < text.index("Boundary:")
+    assert text.index("Boundary:") < text.index("## Success Criterion")
+    assert "RQ-scoped terminology and framing" in text
 
 
 def test_rq_template_documents_allowed_statuses(plugin_root):
@@ -26,27 +34,7 @@ def test_rq_template_documents_allowed_statuses(plugin_root):
     assert "RQ status is `active | concluded`." in text
 
 
-def test_decision_ticket_template_has_open_and_resolution_shapes(plugin_root):
-    text = (
-        plugin_root / "skills/calc-rq/references/decision-ticket-template.md"
-    ).read_text()
+def test_rq_skill_has_only_its_rq_template(plugin_root):
+    references = plugin_root / "skills/calc-rq/references"
 
-    for field in (
-        "ID: DT-001",
-        "Status: open",
-        "Blocked by:",
-        "## Question",
-        "Status: resolved",
-        "## Answer",
-    ):
-        assert field in text
-    assert "Ticket status is `open | resolved`." in text
-
-
-def test_decision_ticket_dependencies_are_same_parent_ids(plugin_root):
-    text = (
-        plugin_root / "skills/calc-rq/references/decision-ticket-template.md"
-    ).read_text()
-
-    assert "Blocked by: DT-001, DT-002" in text
-    assert "same RQ" in text
+    assert {path.name for path in references.iterdir()} == {"rq-template.md"}

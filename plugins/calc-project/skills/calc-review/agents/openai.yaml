@@ -2,5 +2,3 @@ interface:
   display_name: "Calc Review"
   short_description: "只读评审一个准确的 prepared Run 快照"
   default_prompt: "$calc-review 只读评审指定 prepared Run 的准确快照。"
-policy:
-  allow_implicit_invocation: false

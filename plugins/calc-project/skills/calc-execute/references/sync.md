@@ -1,4 +1,4 @@
-# Reviewed synchronization
+# Previewed synchronization
 
 Read this reference only for remote inspection, transfer planning, or transfer of one selected task. Run every command from the calculation project root and resolve the bundled script from this skill's installed directory.
 
@@ -24,8 +24,6 @@ python <calc-execute-skill-root>/scripts/sync/sync_calc_data.py push <task-root>
 python <calc-execute-skill-root>/scripts/sync/sync_calc_data.py pull <task-root>/calc-sync.yaml --yes
 ```
 
-`inspect` is an explicit remote listing for diagnosis. `plan` defaults to pull and writes `.calc-sync/reviewed-plan.json` below the task root. Present the rendered plan for review. Use `--yes` only for the direction and exact list the user approved.
+`inspect` is an optional remote listing for diagnosis. `plan` defaults to pull and runs one `rsync --dry-run`; it prints the report and saves no synchronization state. Present that report for review. After the user or agent accepts it, run the matching `push` or `pull` with `--yes`. Execution reads the current configuration and filesystem directly; it does not bind itself to the earlier report or account for changes since review.
 
-The reviewed plan expires after 30 minutes and binds the flat configuration, direction, and complete file list by fingerprint. Push and pull consume that saved list directly: a missing, expired, edited, wrong-direction, or configuration-mismatched plan requires a new plan and review. Transfer-time checks may read only the exact listed paths to confirm safety and immutable Run inputs; they do not list, rebuild, or enlarge the plan.
-
-HDF5 files in every extension case, `CHGCAR`, and `WAVECAR` remain server-side. Push also excludes `calc-sync.yaml`, `.calc-sync/`, and local caches. Transfers preserve the exact relative names, use no deletion mode, and reject traversal or symlink paths. If an approved path targets an existing file under `RUN-…/inputs/`, transfer proceeds only when the existing destination is a regular file with identical bytes. A differing input follows [simple correction](simple-correction.md): an eligible current Run may be changed only through its authorized correction flow; otherwise use a new Run. Either choice requires a newly reviewed synchronization plan.
+HDF5 files in every extension case, `CHGCAR`, and `WAVECAR` remain server-side. Both directions exclude `calc-sync.yaml`, `.calc-sync/`, local caches, configured patterns, and symbolic links. Transfers use no deletion mode. The helper validates the configuration and task-root location, but performs no per-file remote probes, saved-plan checks, fingerprints, expiry checks, or immutable-input comparisons.

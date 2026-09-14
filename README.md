@@ -82,15 +82,17 @@ codex plugin add calc-project@yz-skills
 
 | 技能 | 功能与适用场景 |
 | --- | --- |
-| [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 可选的显式路由入口；请求不明确时推荐正确的同级接口，但不代替用户调用。 |
+| [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 可选的显式路由入口；请求不明确时推荐正确的工作接口，询问进展时展示只读 COT。 |
 | [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、Tracker 配置、数据边界和集群配置。 |
-| [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），管理临时决策记录及已接受决策。 |
-| [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 把一个 RQ 设计为可执行的科学 Spec，经批准后发布。 |
+| [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），将获批答案直接记录为已接受决策。 |
+| [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 为一个 RQ 设计并发布完整科学 Spec 集，或替换一份现有 Spec。 |
 | [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 推进整份已就绪或活动中的 Spec，管理任务、Run、提交、同步、接收与闭合。 |
 | [calc-review](plugins/calc-project/skills/calc-review/SKILL.md) | 对指定的已准备 Run 快照做瞬时只读预提交评审。 |
+| [show-cot](plugins/calc-project/skills/show-cot/SKILL.md) | 显式只读展示计算项目完整的 RQ、Spec、Task 与 Run 归属树和执行历史。 |
 
-所有接口都需要显式调用。已知目标时直接调用对应技能；只有不知道应该进入哪个
-接口时才使用 `ask-lyz`。
+六个工作接口均可由 Codex 根据任务自动选择，也可以显式调用。`show-cot` 是可显式
+调用的只读总览；已知目标时可直接调用对应技能，不确定应进入哪个接口时可使用
+`ask-lyz`。
 
 #### 主要工作流
 
@@ -115,10 +117,10 @@ Calc Project 以 `RQ → Spec → Task → Run` 组织计算工作：
 
 通常先用 `calc-setup` 建立项目根目录、数据根、RQ Tracker 和集群配置，再沿主线推进：
 
-1. 用 `calc-rq` 建立或推进 RQ；需要用户明确回答的未决问题通过临时决策记录解决，
-   接受后的答案写回 RQ。
-2. 用 `calc-to-spec` 把 RQ 中的一个主要判断设计为 Spec，明确 Task、依赖、条件、
-   验收与停止规则，并在用户批准后发布。
+1. 用 `calc-rq` 建立或推进 RQ；需要用户明确回答的问题在当前访谈中解决，获批答案
+   直接写入 RQ 的 `## Decisions`。
+2. 用 `calc-to-spec` 先识别回答 RQ 所需的全部主要判断，为每个判断设计一份 Spec，
+   明确 Task、依赖、条件、验收与停止规则，并在用户批准后发布完整 Spec 集。
 3. 用 `calc-execute` 推进整份已发布 Spec。它选择当前可执行的 Task，为 Task 创建或
    继续 Run，准备并验证输入、获得具体提交授权、提交作业、接收结果并按验收规则
    推进后续 Task。
@@ -135,7 +137,7 @@ Calc Project 以 `RQ → Spec → Task → Run` 组织计算工作：
 ```text
 $calc-project:calc-setup 为当前目录建立计算项目配置。
 $calc-project:calc-rq 为这条研究主线建立 RQ-001。
-$calc-project:calc-to-spec 为 RQ-001 设计一个新的 Spec。
+$calc-project:calc-to-spec 为 RQ-001 设计并发布回答该 RQ 所需的完整 Spec 集。
 $calc-project:calc-execute 推进 SPEC-001 中当前可执行的 Task 和 Run。
 ```
 

@@ -31,7 +31,8 @@ REQUIRED_DT005_ASSETS = {
     "skills/calc-execute/assets/templates/vampire/run.pbs.template",
     "skills/calc-execute/scripts/fingerprint_run.py",
     "skills/calc-execute/scripts/calculation-monitor.py",
-    "skills/calc-execute/references/calculation-monitor.md",
+    "skills/calc-execute/references/remote-completion.md",
+    "skills/calc-execute/references/calculation-troubleshooting.md",
     "skills/calc-execute/scripts/probe-run-environment.sh",
     "skills/calc-execute/scripts/sync/sync_calc_data.py",
     "skills/calc-execute/scripts/vasp/compare_incar_parameters.sh",
@@ -101,7 +102,7 @@ def test_runtime_inventory_is_sorted_and_independently_contains_dt005_assets(
     names = _runtime_names(builder, plugin_root)
 
     assert names == sorted(names)
-    assert len(names) == 81
+    assert len(names) == 82
     assert REQUIRED_DT005_ASSETS <= set(names)
 
 
@@ -161,10 +162,10 @@ def test_malformed_metadata_is_rejected(plugin_root, tmp_path, metadata):
         builder.runtime_files(copy)
 
 
-def test_seventh_skill_is_rejected(plugin_root, tmp_path):
+def test_eighth_skill_is_rejected(plugin_root, tmp_path):
     builder = _load_builder()
     copy = _copy_plugin(plugin_root, tmp_path)
-    shutil.copytree(copy / "skills/ask-lyz", copy / "skills/seventh")
+    shutil.copytree(copy / "skills/ask-lyz", copy / "skills/eighth")
 
     with pytest.raises(ValueError, match="exactly"):
         builder.runtime_files(copy)
@@ -391,6 +392,7 @@ def test_manifest_and_skill_metadata_describe_exact_explicit_roster(plugin_root)
         "calc-to-spec",
         "calc-execute",
         "calc-review",
+        "show-cot",
     )
 
     assert manifest["skills"] == "./skills/"
@@ -410,7 +412,6 @@ def test_documentation_distinguishes_skill_calls_from_local_file_references(
 
     assert "invoke `$dev-engineering:grill-with-docs`" in rq
     assert "[the RQ template](references/rq-template.md)" in rq
-    assert "[the Decision Ticket\n   template](references/decision-ticket-template.md)" in rq
     assert "]($" not in rq
 
 
@@ -420,13 +421,14 @@ def test_business_skills_handoff_automatically_but_router_only_recommends(plugin
     rq = (skills / "calc-rq/SKILL.md").read_text(encoding="utf-8")
     spec = (skills / "calc-to-spec/SKILL.md").read_text(encoding="utf-8")
     execute = (skills / "calc-execute/SKILL.md").read_text(encoding="utf-8")
-    router_flat = " ".join(router.split())
+    execute_flat = " ".join(execute.split())
 
-    assert "Recommend the resolved sibling rather than invoking it automatically" in router
-    assert "This router never invokes the recommended sibling" in router_flat
+    assert "Recommend the resolved workflow sibling rather than invoking it automatically" in router
+    assert "the progress branch invokes only its read-only COT view" in router
     assert "continue directly with `$calc-to-spec`" in rq
     assert "continue directly with `$calc-execute`" in spec
-    assert "Invoke the needed path automatically" in execute
+    assert "first load `$calc-setup`" in execute_flat
+    assert "invoke `$calc-rq`" in execute_flat
     assert "does not invoke the sibling automatically" not in spec
     assert "not authorization to\ninvoke a sibling automatically" not in rq
 
