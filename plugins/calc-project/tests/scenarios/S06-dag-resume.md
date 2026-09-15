@@ -23,7 +23,7 @@ Each probe natively invokes `calc-project:calc-execute` in a fresh fixture.
 ## Expected observations
 
 - TASK-001 and TASK-002 form a parallel frontier; the false child becomes
-  skipped only if the authoritative Spec update is safe.
+  failed only if the authoritative Spec update is safe.
 - The vague threshold returns to design with no guessed value.
 - The vanished job is not successful; fresh context uses only Spec, Run, and
   fake scheduler/accounting facts and creates no cache.

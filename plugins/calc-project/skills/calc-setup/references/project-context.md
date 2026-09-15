@@ -52,7 +52,7 @@ _Avoid_: Tracker 状态，工作流状态文件
 
 **计算任务（Calculation Task）**:
 Spec 中为支持主判断声明的可执行工作。身份、目的、依赖、条件、验收和状态由父 Spec
-拥有；数据目录仅保存计算文件和最小同步配置。
+拥有；状态为 `pending`、`completed`、`failed` 或 `needs-review`。数据目录仅保存计算文件和最小同步配置。
 _Avoid_: 独立任务元数据，目录 README 权威
 
 **运行（Run）**:

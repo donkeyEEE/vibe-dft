@@ -61,7 +61,7 @@ Each probe natively invokes `calc-execute` in a fresh fixture.
 
 `S12-approved-early-closure`:
 
-> I approve exactly this early closure proposal for data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-001-correction.md: principal judgment 'Synthetic criterion met'; evidence TASK-001/RUN-001 result PASS; dispose TASK-002 as skipped because the stopping rule fired; reason 'decisive early stopping rule'; proposed RQ impact 'narrow future work to phase A'. Write Status concluded and one immutable ## Closure with those facts. I do not approve any RQ.md update.
+> I approve exactly this early closure proposal for data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-001-correction.md: principal judgment 'Synthetic criterion met'; evidence TASK-001/RUN-001 result PASS; dispose TASK-002 as failed because the stopping rule fired; reason 'decisive early stopping rule'; proposed RQ impact 'narrow future work to phase A'. Write Status concluded and one immutable ## Closure with those facts. I do not approve any RQ.md update.
 
 `S12-closed-immutable`:
 

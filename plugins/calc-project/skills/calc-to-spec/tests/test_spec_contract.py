@@ -22,6 +22,15 @@ def test_spec_template(plugin_root):
     assert "Insert `Closure` immediately before `Context`" in text
 
 
+def test_spec_template_uses_reduced_task_statuses(plugin_root):
+    text = (
+        plugin_root / "skills/calc-to-spec/references/spec-template.md"
+    ).read_text()
+
+    assert "Task status is `pending | completed\n| failed | needs-review`" in text
+    assert "A decisively false condition or a cancelled task is\n`failed`" in text
+
+
 def test_design_flow_keeps_full_draft_internal_until_summary_approval(plugin_root):
     text = " ".join(
         (plugin_root / "skills/calc-to-spec/SKILL.md")

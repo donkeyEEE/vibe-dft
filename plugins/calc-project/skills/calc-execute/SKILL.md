@@ -11,10 +11,31 @@ and Spec closure.
 
 ## Workflow
 
-1. Read the existing Spec and the project state relevant to it. Use [task
-   advancement](references/task-advancement.md) to identify every task that can
-   advance now.
-2. For an abnormal selected task, use
+1. Resolve the execution frontier. Read the selected Spec, every declared Task
+   and recorded Run, and the scheduler, remote, log, and output evidence
+   relevant to this invocation. Require `Status: ready | active`, unique
+   same-Spec Task references, an acyclic dependency graph, permitted Task and
+   Run statuses, resolvable paths, and at most one current Run per Task. Stop
+   and report authority that is malformed, conflicting, or inadequate to
+   reconcile rather than repairing or guessing it.
+   Reconcile the Spec only from actual evidence; `submitted` covers queued and
+   running work, and scheduler disappearance without correlated completion
+   evidence is not `finished`. Derive every runnable Task from its dependencies
+   and `Condition`: a pending Task is runnable when every blocker is completed
+   and its condition is `always` or decisively true; mark a decisively false
+   condition `failed`; return an ambiguous condition to `$calc-to-spec`; retain
+   `needs-review` Tasks in the frontier according to their current evidence.
+   Classify every Task with a recorded Run by that Run's actual status: a
+   `submitted` Run is observed or monitored, a `prepared` Run proceeds through
+   validation and review, a `finished` Run proceeds to acceptance, and a
+   `failed` Run enters troubleshooting, rather than allocating another Run.
+   Persist each deterministic state change, but neither create a Run nor submit
+   work in this step.
+2. Select an independent runnable Task within the user's stated work,
+   concurrency, and submission scope. Set a ready Spec to `active` when its
+   first Task begins. Continue a selected Task's recorded Run according to its
+   classified state; create a new Run only when no recorded Run requires
+   advancement. For an abnormal selected task, use
    [calculation troubleshooting](references/calculation-troubleshooting.md) to
    locate the problem; it routes a directly established execution error to
    [simple correction](references/simple-correction.md), then selects an
@@ -36,7 +57,9 @@ and Spec closure.
    continuation was explicitly requested. Use [previewed
    synchronization](references/sync.md) when transferring files. Choose the Run
    status from the actual situation using the definitions below.
-6. Apply the task's approved Acceptance from the Spec, then continue with the
+6. When accepting a Task, changing its current Run, propagating invalidation,
+   or closing the Spec, read [task advancement](references/task-advancement.md).
+   Apply the task's approved Acceptance from the Spec, then continue with the
    next available task. When the Spec is complete, propose its closure and
    conclude it after the user accepts. If the RQ must then change, invoke
    `$calc-rq` and present its proposal to the user. Before returning control,

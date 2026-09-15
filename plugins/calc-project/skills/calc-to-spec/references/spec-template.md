@@ -33,9 +33,8 @@ Acceptance: <acceptance condition>
 needed to interpret the Judgment, Tasks, conditions, acceptance rules, Runs,
 and Closure when present.
 
-Spec status is `ready | active | concluded`. Task status is `pending | current
-| completed | skipped | cancelled | needs-review`; independent tasks may be
-current together. Run status is `prepared | submitted | finished | failed |
+Spec status is `ready | active | concluded`. Task status is `pending | completed
+| failed | needs-review`. Run status is `prepared | submitted | finished | failed |
 cancelled`; `submitted` covers queueing and execution. `Current` is `yes | no`,
 and a task has at most one current Run.
 
@@ -43,8 +42,8 @@ Task paths are relative to the configured data root. Run paths are relative to
 their task. `Blocked by` lists only `TASK-NNN` IDs in this Spec and the graph is
 acyclic. `Condition` is `always` or one natural-language sentence based on
 recorded upstream results. A task stays pending until its dependencies and
-condition permit it; a false condition makes it skipped, while ambiguity
-returns to Spec design.
+condition permit it. A decisively false condition or a cancelled task is
+`failed`; ambiguity returns to Spec design.
 
 Each Spec has one principal Judgment. Record parameters that determine the
 scientific question, interpretation, or comparability. Parameters omitted from

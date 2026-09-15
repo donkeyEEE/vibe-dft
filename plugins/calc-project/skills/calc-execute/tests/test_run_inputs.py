@@ -67,6 +67,34 @@ def test_execute_skill_has_compact_three_part_contract(plugin_root):
     assert "`$calc-to-spec`" in principles
 
 
+def test_execution_frontier_is_resolved_in_the_main_workflow(plugin_root):
+    skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(encoding="utf-8")
+    advancement = (
+        plugin_root / "skills/calc-execute/references/task-advancement.md"
+    ).read_text(encoding="utf-8")
+
+    workflow = skill.split("## Workflow", 1)[1].split("## Principles", 1)[0]
+    first_step = " ".join(workflow.split("2.", 1)[0].split())
+
+    for contract in (
+        "selected Spec",
+        "recorded Run",
+        "authority that is malformed, conflicting",
+        "inadequate to reconcile",
+        "runnable Task",
+        "`submitted` Run",
+        "rather than allocating another",
+        "decisively false",
+        "`failed`",
+        "`$calc-to-spec`",
+        "Persist each deterministic state change",
+    ):
+        assert contract in first_step
+    assert "## Derive the frontier" not in advancement
+    assert "## Accept results and select the current Run" in advancement
+    assert "## Close once" in advancement
+
+
 def test_calculation_troubleshooting_covers_simple_and_researched_paths(plugin_root):
     reference_path = plugin_root / TROUBLESHOOTING_REFERENCE
 

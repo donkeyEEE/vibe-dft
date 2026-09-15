@@ -1,35 +1,5 @@
 # Task Advancement
 
-Read this reference when deriving the frontier, accepting a task, changing a
-current Run, propagating invalidation, or closing the Spec. The current Spec is
-the only task/DAG/Run authority; task directories and external systems supply
-evidence, not competing state.
-
-## Derive the frontier
-
-1. Re-read the Spec and require `Status: ready | active`, unique same-Spec task
-   references, an acyclic dependency graph, permitted task and Run statuses,
-   resolvable paths, and at most one current Run per task. Stop rather than
-   repair a malformed or conflicting authority.
-2. Re-read each referenced Run directory and the current scheduler/accounting,
-   remote, log, and output state relevant to the invocation. Reconcile the
-   Spec only from actual evidence. `submitted` covers queued and running work;
-   scheduler disappearance without correlated completion evidence is not
-   `finished`.
-3. A `pending` task is ready only when every `Blocked by` task is completed and
-   its `Condition` is `always` or decisively true from recorded upstream
-   results. Mark a decisively false condition `skipped`. Return an ambiguous
-   condition to `$calc-to-spec`. Existing `current` and `needs-review` tasks
-   remain part of the frontier according to their current evidence.
-4. Advance every independent ready task permitted by the user's stated work
-   bound and concurrency/submission scope. Persist no computed frontier.
-
-Set a ready Spec to `active` when its first task begins. A newly materialized
-task becomes `current`; allocate its next unused `RUN-NNN`, add the concrete
-relative path to the task's Runs table, and keep all earlier Run directories
-and rows. Preparation, validation, review, submission, receipt, and correction
-follow the sequence in `SKILL.md`.
-
 ## Accept results and select the current Run
 
 Apply the task's current approved `Acceptance` statement to the declared Run
