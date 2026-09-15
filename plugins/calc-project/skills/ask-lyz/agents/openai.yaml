@@ -1,4 +1,7 @@
 interface:
   display_name: "Ask LYZ"
-  short_description: "路由 Calc Project 工作请求或展示只读进展总览"
-  default_prompt: "$ask-lyz 判断这项计算项目工作应进入哪个显式接口。"
+  short_description: "推荐 Calc Project 接口、解释术语或查询进度"
+  default_prompt: "$ask-lyz 进度查看和查询工作接口。"
+
+policy:
+  allow_implicit_invocation: false

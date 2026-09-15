@@ -82,7 +82,7 @@ codex plugin add calc-project@yz-skills
 
 | 技能 | 功能与适用场景 |
 | --- | --- |
-| [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 可选的显式路由入口；请求不明确时推荐正确的工作接口，询问进展时展示只读 COT。 |
+| [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 显式辅助入口；推荐工作接口、解释项目术语或查询进度。 |
 | [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、Tracker 配置、数据边界和集群配置。 |
 | [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），将获批答案直接记录为已接受决策。 |
 | [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 为一个 RQ 设计并发布完整科学 Spec 集，或替换一份现有 Spec。 |
@@ -92,7 +92,7 @@ codex plugin add calc-project@yz-skills
 
 六个工作接口均可由 Codex 根据任务自动选择，也可以显式调用。`show-cot` 是可显式
 调用的只读总览；已知目标时可直接调用对应技能，不确定应进入哪个接口时可使用
-`ask-lyz`。
+`ask-lyz`；需要解释 Calc Project 术语时也可使用该入口。
 
 #### 主要工作流
 
@@ -127,7 +127,8 @@ Calc Project 以 `RQ → Spec → Task → Run` 组织计算工作：
 4. 当全部 Task 得到明确处置后，`calc-execute` 提出 Spec 闭合；研究结论是否影响
    RQ，由后续 `calc-rq` 流程处理。
 
-`ask-lyz` 只在无法判断应使用哪个接口时提供路由建议。`calc-review` 则是 Run 提交前
+`ask-lyz` 在无法判断应使用哪个接口时提供路由建议，也可解释项目术语或查询进度。
+`calc-review` 则是 Run 提交前
 的瞬时只读关口：正常情况下由 `calc-execute` 对准确的已准备输入快照调用；输入、
 资源或执行环境发生变化后必须重新验证和评审。它不管理 Task、Run 或 Spec 状态，
 直接调用也不会产生后续提交授权。

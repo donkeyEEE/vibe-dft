@@ -421,10 +421,10 @@ def test_business_skills_handoff_automatically_but_router_only_recommends(plugin
     rq = (skills / "calc-rq/SKILL.md").read_text(encoding="utf-8")
     spec = (skills / "calc-to-spec/SKILL.md").read_text(encoding="utf-8")
     execute = (skills / "calc-execute/SKILL.md").read_text(encoding="utf-8")
+    router_flat = " ".join(router.split())
     execute_flat = " ".join(execute.split())
 
-    assert "推荐已解析的工作流 sibling，不自动调用它" in router
-    assert "进展分支仅调用其只读 COT 视图" in router
+    assert "推荐 sibling，不自动调用它" in router_flat
     assert "直接进入 `$calc-to-spec`" in rq
     assert "直接进入 `$calc-execute`" in spec
     assert "先加载 `$calc-setup`" in execute_flat

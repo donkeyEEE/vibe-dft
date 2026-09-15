@@ -42,7 +42,8 @@ _Avoid_: 通用 Run，任务级后端方案，搜索授权
 _Avoid_: 简单纠错，结果解释，Spec 修改
 
 **Ask LYZ (`ask-lyz`)**:
-Calc Project 的显式路由接口；原名 `ask-dnk`，自 2026-09-13 起使用现名。过去文档中的旧名称保留为历史记录。
+Calc Project 面向用户的显式辅助入口，用于推荐工作接口、解释领域术语或查询进度；原名
+`ask-dnk`，自 2026-09-13 起使用现名。过去文档中的旧名称保留为历史记录。
 _Avoid_: ask-dnk（当前名称）
 
 关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Spec、计算任务、运行、计算归属树（COT）、Run-local inputs、计算模板、项目计算模板、插件计算模板。
