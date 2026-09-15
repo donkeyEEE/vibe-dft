@@ -16,6 +16,13 @@ grounded in the current definition and evidence. When multiple valid Runs
 conflict, stop automatic selection. Preserve each Run's status and evidence;
 the `Current` field selects a result and does not rewrite history.
 
+Whenever acceptance evidence changes, update the Run row's `Result` as a
+compact table entry. When applicable, prefer the order outcome, concise failure
+cause, material difference from the previous Run, then advancement. Cite an
+evidence path when useful. Keep raw excerpts, diagnostic reasoning, attempted
+fixes, and investigation history in Run logs or the troubleshooting record
+rather than the Spec table.
+
 After any upstream current-Run change, find every downstream task that used
 the former Run:
 

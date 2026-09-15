@@ -11,6 +11,13 @@
 
 上游来源和常用 skill 功能见 [README.md](README.md)。插件的 `skills/*/SKILL.md` 目录集合是 Skill roster；选择具体 skill 时读取其 `SKILL.md`。调用策略以该 skill 的 `agents/openai.yaml` 为准。
 
+## 版本安装边界
+
+原版与汉化版是互斥的整套发行版本；任一 Codex 环境同一时刻只能安装其中一版。
+`calc-project`、`paper-project`、`osm-project` 和 `skill-incubator` 必须全部来自同一版本，
+不得混用原版与汉化版插件。切换版本时，切换整套 marketplace 来源并重新安装所需插件，
+然后新建对话。
+
 ## 工作入口
 
 - 修改任一插件、插件清单、skill 或发布资源时，读取 `CONTEXT.md` 中对应章节。

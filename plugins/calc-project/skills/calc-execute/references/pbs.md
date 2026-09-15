@@ -55,8 +55,8 @@ performs no preparation, validation, copy, or edit of its own. It changes to the
 Run directory and submits exactly `inputs/run.pbs`, routing PBS stdout and
 stderr to `logs/pbs.stdout` and `logs/pbs.stderr`.
 
-Keep qsub's returned job ID visible and record that actual execution evidence
-in the Spec's Run row. A checksum is only a byte-identity guard. Submission
+Keep qsub's returned job ID visible and record it concisely in the Spec's Run
+row. A checksum is only a byte-identity guard. Submission
 still requires the explicit authorization scope defined by `calc-execute`; a
 changed proposal, silence, historical preference, or general delegation is not
 authorization.

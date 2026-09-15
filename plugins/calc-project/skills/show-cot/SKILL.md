@@ -18,7 +18,6 @@ RQ-NNN <title> [<status>]
         └── RUN-NNN [<status>]
 ```
 
-Task 依赖保留在 Spec 中，不绘制为 COT 边。
+Task 之间依赖保留在 Spec 中，不绘制为 COT 边。
 
-当 `calc-execute` 提供其交还控制权时所在的 Task 与 Run 时，在树前加一条简短行，
-标明该 Task、Run 及其已记录的 Run 状态。直接 COT 请求只输出树。
+使用 `▶` 和粗体突出当前活跃的 Spec、Task 与 Run。

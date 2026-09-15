@@ -64,6 +64,12 @@ expected products, output and log timestamps, and targeted completion or
 failure excerpts. Use the actual situation to choose the Run status. Queue
 disappearance alone does not establish successful completion.
 
+Update the Spec row with the actual result and whether the task may advance.
+Add a concise failure cause when failed and the material difference when a
+previous Run exists. Keep scheduler transcripts, raw excerpts, and detailed
+diagnosis in the Run logs or troubleshooting record, referenced by path rather
+than copied into `Result`.
+
 Keep HDF5, `CHGCAR`, and `WAVECAR` on the server. When results are ready to
 transfer, read [previewed synchronization](sync.md) and follow its reviewed
 transfer process.

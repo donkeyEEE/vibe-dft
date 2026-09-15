@@ -95,6 +95,22 @@ def test_execution_frontier_is_resolved_in_the_main_workflow(plugin_root):
     assert "## Close once" in advancement
 
 
+def test_result_updates_stay_compact_across_execution_branches(plugin_root):
+    references = plugin_root / "skills/calc-execute/references"
+    advancement = (references / "task-advancement.md").read_text(encoding="utf-8")
+    pbs = (references / "pbs.md").read_text(encoding="utf-8")
+    completion = (references / "remote-completion.md").read_text(encoding="utf-8")
+    correction = (references / "simple-correction.md").read_text(encoding="utf-8")
+
+    assert "compact table entry" in advancement
+    assert "prefer the order outcome, concise failure" in advancement
+    assert "returned job ID" in pbs
+    assert "whether the task may advance" in completion
+    assert "material difference from the prior attempt" in correction
+    for text in (advancement, completion, correction):
+        assert "Run logs or the\ntroubleshooting record" in text
+
+
 def test_calculation_troubleshooting_covers_simple_and_researched_paths(plugin_root):
     reference_path = plugin_root / TROUBLESHOOTING_REFERENCE
 

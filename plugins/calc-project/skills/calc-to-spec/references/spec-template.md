@@ -37,6 +37,10 @@ Spec 状态为 `ready | active | concluded`。Task 状态为 `pending | complete
 cancelled`；`submitted` 包含排队和执行。`Current` 为 `yes | no`，每个 Task 至多有
 一个 current Run。
 
+`Result` 是可扫描的执行摘要。适用时最好按“结果 → 失败原因 → 与上一 Run 的区别 → 推进”
+组织，只保留简短结论。保留程序原生结果值并可引用证据路径，但不粘贴原始日志、排障过程或
+详细诊断；这些内容留在 Run 日志或问题排查记录中。
+
 Task 路径相对于已配置的数据根目录；Run 路径相对于其 Task。`Blocked by` 仅列出此
 Spec 内的 `TASK-NNN` ID，且图必须无环。`Condition` 为 `always`，或一条基于已记录
 上游结果的自然语言句子。在其依赖和条件允许前，Task 保持 pending。条件被明确判定为假或

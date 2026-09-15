@@ -39,10 +39,13 @@ the repair is inside the user's current execution scope and changes only this
 eligible Run.
 New external authorization is still required for submission, cancellation,
 extra cost or resources, or mutation outside that scope. Before reusing a
-failed Run, record its scheduler identity and concise failure evidence in the
-Spec Run row. Then replace only the affected Run-local inputs and derived
-outputs or logs needed for a clean retry. Do not touch another Run, an accepted
-artifact, an approved upstream source, or the task-level sources.
+failed Run, record its scheduler identity and concise failure cause in the Spec
+Run row, leaving detailed diagnosis in the Run logs or troubleshooting record.
+After correction, record only the material difference from the prior attempt
+and the current advancement decision. Then replace only the affected Run-local
+inputs and derived outputs or logs needed for a clean retry. Do not touch
+another Run, an accepted artifact, an approved upstream source, or the
+task-level sources.
 
 Any in-place change invalidates the Run's previous digest, validation, and
 review. Prepare and validate the corrected snapshot, invoke a fresh transient

@@ -31,6 +31,19 @@ def test_spec_template_uses_reduced_task_statuses(plugin_root):
     assert "条件被明确判定为假或\nTask 被取消时，该 Task 的状态为 `failed`" in text
 
 
+def test_run_result_is_a_compact_advancement_summary(plugin_root):
+    text = (
+        plugin_root / "skills/calc-to-spec/references/spec-template.md"
+    ).read_text(encoding="utf-8")
+    flat = " ".join(text.split())
+
+    assert "`Result` 是可扫描的执行摘要" in flat
+    assert "最好按“结果 → 失败原因 → 与上一 Run 的区别 → 推进” 组织" in flat
+    assert "必须包含“结果”和“推进”" not in flat
+    assert "允许|不允许|待定" not in flat
+    assert "不粘贴原始日志、排障过程或详细诊断" in flat
+
+
 def test_design_flow_keeps_full_draft_internal_until_summary_approval(plugin_root):
     text = " ".join(
         (plugin_root / "skills/calc-to-spec/SKILL.md")
