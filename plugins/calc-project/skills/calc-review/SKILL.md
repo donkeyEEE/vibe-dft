@@ -1,71 +1,51 @@
 ---
 name: calc-review
-description: Review one exact prepared Calc Project Run as a transient, read-only pre-submit gate.
+description: 将一个精确的 prepared Calc Project Run 作为瞬时、只读的提交前门禁进行评审。
 ---
 
 # Calc Review
 
-Judge one exact prepared Run. Input must resolve uniquely to its task, current
-Spec, complete `inputs/` snapshot, named upstream handoffs, intended submission
-environment, and resource configuration. Read those authorities directly and
-use safe read-only inspection to resolve missing operational detail before
-deciding whether the user is needed.
+判定一个精确的 prepared Run。输入必须唯一解析到其 task、当前 Spec、完整 `inputs/` 快照、
+指定的上游 handoff、预期提交环境和资源配置。直接读取这些权威资料，并在决定是否需要用户前，
+通过安全的只读检查补足缺失的操作细节。
 
-## Review
+## 评审
 
-1. Establish enough reproducible evidence to identify the Run, task, Spec,
-   reviewed bytes, handoffs, target environment, resources, and expected
-   products. Choose the clearest evidence form for the risks present; no fixed
-   report schema is required. Keep the review transient and write no review
-   cache or authorization marker.
-2. Read [pre-submit checks](references/pre-submit.md) and [PBS
-   checks](references/pbs.md). Load only the backend checks required by the
-   prepared task:
+1. 建立足以识别 Run、task、Spec、受评字节、handoff、目标环境、资源和预期产品的可复现证据。
+   针对当前风险选择最清晰的证据形式；不要求固定报告 schema。评审应保持瞬时性，不写入评审缓存
+   或授权标记。
+2. 阅读[提交前检查](references/pre-submit.md)和 [PBS 检查](references/pbs.md)。仅加载
+   prepared task 所需的 backend 检查：
 
-   - VASP: [VASP](references/backends/vasp.md), plus [magnetic
-     ordering](references/backends/vasp-magnetic.md) for a magnetic task.
-   - DFT+DMFT: [DMFT](references/backends/dmft.md).
-   - Hefei-NAMD or NAMDwithSOC: [NAMD](references/backends/namd.md).
-   - Wannier90: [Wannier90](references/backends/wannier90.md).
-   - TB2J: [TB2J](references/backends/tb2j.md).
-   - VAMPIRE: [VAMPIRE](references/backends/vampire.md).
+   - VASP：[VASP](references/backends/vasp.md)；磁性 task 另加[磁有序]
+     (references/backends/vasp-magnetic.md)。
+   - DFT+DMFT：[DMFT](references/backends/dmft.md)。
+   - Hefei-NAMD 或 NAMDwithSOC：[NAMD](references/backends/namd.md)。
+   - Wannier90：[Wannier90](references/backends/wannier90.md)。
+   - TB2J：[TB2J](references/backends/tb2j.md)。
+   - VAMPIRE：[VAMPIRE](references/backends/vampire.md)。
 
-   Inspect only; the review step itself performs no preparation, repair,
-   transfer, submission, cancellation, or domain write.
-3. Return `pass` when the snapshot faithfully and safely implements its task,
-   or `pass_with_warnings` when every observation is informational and requires
-   no action or choice before submission. For any repairable defect, explain
-   the evidence and unfinished action, then return control to the active
-   execution flow. That flow diagnoses and repairs the defect, chooses a safe
-   eligible Run, and obtains fresh validation and review before submission.
+   仅执行检查；评审步骤本身不进行准备、修复、传输、提交、取消或领域写入。
+3. 快照忠实且安全地实现其 task 时返回 `pass`；每项观察都仅为信息性且提交前无需行动或选择时，
+   返回 `pass_with_warnings`。对于任何可修复缺陷，说明证据和未完成行动，再将控制权交回活跃执行流。
+   该执行流诊断并修复缺陷、选择安全且合格的 Run，并在提交前重新验证和评审。
 
-## Stop conditions
+## 停止条件
 
-Stop and ask the user only when continuing requires one of these:
+仅当继续操作需要下列事项之一时停止并询问用户：
 
-- a new scientific judgment that approved authorities cannot determine,
-  including a changed structure, magnetic order, scientific parameter, method,
-  provenance-bearing source, acceptance criterion, or stopping criterion;
-- new external authorization for submission, enlarged resources or cost,
-  synchronization, cancellation, overwrite, deletion, or another external side
-  effect outside the current authorization scope;
-- resolution of a concurrent writer when no wait, new Run, or other
-  non-destructive path can make progress safely; or
-- resolution of an authoritative object that safe inspection cannot identify
-  uniquely or reconcile across the current Spec, task, Run, and named sources.
+- 已批准权威资料无法确定的新科学判断，包括变更的结构、磁序、科学参数、方法、携带 provenance
+  的来源、验收准则或停止准则；
+- 提交、扩大资源或成本、同步、取消、覆盖、删除，或当前授权范围外其他外部副作用所需的新外部授权；
+- 等待、新建 Run 或其他非破坏性路径均无法安全推进时，对并发写入者的处理；或
+- 安全检查无法在当前 Spec、task、Run 和指定来源中唯一识别或调和的权威对象。
 
-Honor an explicit user pause. Otherwise continue automatically through the
-appropriate execution, configuration, or safe diagnostic path. A missing
-fixed-format report, repairable snapshot defect, stale configuration, or choice
-among equivalent technical implementations is not a reason to ask the user.
-Choose the lowest-risk, smallest, most directly verifiable implementation that
-preserves the approved scientific meaning.
+尊重用户明确要求的暂停。否则沿适当的执行、配置或安全诊断路径自动继续。缺少固定格式报告、
+可修复的快照缺陷、过时配置或等效技术实现之间的选择，都不是询问用户的理由。选择能够保持
+已批准科学含义、风险最低、改动最小且最容易直接验证的实现。
 
-## Transient boundary
+## 瞬时边界
 
-The judgment applies only to the exact snapshot and environment in the current
-execution chain. Any input, submission script, resource, handoff, target
-environment, or authoritative-task change requires another review. A direct
-user invocation is diagnostic only and cannot authorize a future submission.
-An unsubmitted prepared Run found in a new session is reviewed again. This
-skill grants no submission authorization and performs no pre-closure review.
+该判断仅适用于当前执行链中的精确快照和环境。任何输入、提交脚本、资源、handoff、目标环境或
+权威 task 的变更都需要再次评审。用户直接调用仅用于诊断，不能授权未来提交。新会话中发现的
+未提交 prepared Run 必须重新评审。此 skill 不授予提交授权，也不进行闭包前评审。

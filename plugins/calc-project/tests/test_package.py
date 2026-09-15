@@ -410,8 +410,8 @@ def test_documentation_distinguishes_skill_calls_from_local_file_references(
 ):
     rq = (plugin_root / "skills/calc-rq/SKILL.md").read_text(encoding="utf-8")
 
-    assert "invoke `$dev-engineering:grill-with-docs`" in rq
-    assert "[the RQ template](references/rq-template.md)" in rq
+    assert "调用 `$dev-engineering:grill-with-docs`" in rq
+    assert "[RQ 模板](references/rq-template.md)" in rq
     assert "]($" not in rq
 
 
@@ -423,12 +423,12 @@ def test_business_skills_handoff_automatically_but_router_only_recommends(plugin
     execute = (skills / "calc-execute/SKILL.md").read_text(encoding="utf-8")
     execute_flat = " ".join(execute.split())
 
-    assert "Recommend the resolved workflow sibling rather than invoking it automatically" in router
-    assert "the progress branch invokes only its read-only COT view" in router
-    assert "continue directly with `$calc-to-spec`" in rq
-    assert "continue directly with `$calc-execute`" in spec
-    assert "first load `$calc-setup`" in execute_flat
-    assert "invoke `$calc-rq`" in execute_flat
+    assert "推荐已解析的工作流 sibling，不自动调用它" in router
+    assert "进展分支仅调用其只读 COT 视图" in router
+    assert "直接进入 `$calc-to-spec`" in rq
+    assert "直接进入 `$calc-execute`" in spec
+    assert "先加载 `$calc-setup`" in execute_flat
+    assert "调用 `$calc-rq`" in execute_flat
     assert "does not invoke the sibling automatically" not in spec
     assert "not authorization to\ninvoke a sibling automatically" not in rq
 

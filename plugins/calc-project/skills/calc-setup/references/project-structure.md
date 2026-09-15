@@ -1,8 +1,8 @@
-# Calculation Project Structure
+# 计算项目结构
 
-Use this reference for an approved project initialization or reorganization.
+在已获批准的项目初始化或重组中使用本参考资料。
 
-## Base layout
+## 基础布局
 
 ```text
 <project-root>/
@@ -24,22 +24,18 @@ Use this reference for an approved project initialization or reorganization.
 └── structures/
 ```
 
-`01<main-line-slug>` uses a lowercase, hyphenated research-line name. The data
-root may instead be `02<slug>-原始数据/`. Base setup creates empty `01-rqs/`,
-data-root, `calculation_templates/`, `structures/`, and `06-文献笔记/`
-containers. It does not populate calculation templates or the literature
-container. The Paper Project literature workflow owns the latter's contents.
+`01<main-line-slug>` 使用小写、连字符连接的研究线名称。数据根也可为
+`02<slug>-原始数据/`。基础设置创建空的 `01-rqs/`、数据根、`calculation_templates/`、
+`structures/` 和 `06-文献笔记/` 容器；它不填充计算模板或文献容器，后者内容由 Paper
+Project 文献工作流负责。
 
-Create `software-profiles.md` only when cluster configuration is requested.
-Base setup creates no concrete RQ directory, Spec, task, Run,
-calculation input, scheduler script, or project index. Existing RQs and Specs
-are reported and left unchanged.
+仅在请求配置集群时创建 `software-profiles.md`。基础设置不创建具体 RQ 目录、Spec、
+任务、Run、计算输入、调度器脚本或项目索引。已有 RQ 和 Spec 仅报告并保持不变。
 
-## ARCHITECTURE.md contract
+## ARCHITECTURE.md 契约
 
-Record directory responsibilities, naming rules, and the Git/cluster data
-boundary. Consumers read the following exact section and field lines; they do
-not infer configuration from filenames:
+记录目录职责、命名规则及 Git/集群数据边界。消费者读取下列精确章节和字段行，
+不从文件名推断配置：
 
 ```markdown
 ## Calculation Configuration
@@ -50,32 +46,26 @@ RQ location: 01<main-line-slug>/01-rqs/<rq-id>-<slug>/
 Software profile: software-profiles.md
 ```
 
-Omit `Software profile:` until that file is configured. `Data root:` is the
-chosen project-relative data-root path. The initial and only configured Tracker
-adapter is `local-markdown`. `RQ location:` is a location convention, not a
-created RQ and not a state schema.
+在该文件配置前省略 `Software profile:`。`Data root:` 是选定的项目相对数据根路径。
+初始且唯一配置的 Tracker adapter 为 `local-markdown`。`RQ location:` 是位置约定，
+不是已创建的 RQ，也不是状态 schema。
 
-## Generated AGENTS.md contract
+## 生成的 AGENTS.md 契约
 
-Keep the generated file concise. It points agents to:
+生成的文件应保持简洁，并指引 agent 查阅：
 
-- project `CONTEXT.md` for terms and data boundaries;
-- `ARCHITECTURE.md` and its `## Calculation Configuration` before locating an
-  RQ, Spec, task, or Run;
-- the selected `RQ.md`, selected Spec, and only the Runs referenced by that Spec
-  before scientific-design or execution work;
-- the Git/cluster boundary: documents, templates, structures, scripts, and
-  lightweight results may be tracked locally, while HDF5, `CHGCAR`, `WAVECAR`,
-  and large calculation outputs remain server-side.
+- 项目 `CONTEXT.md`，以了解术语和数据边界；
+- 在定位 RQ、Spec、任务或 Run 前查阅 `ARCHITECTURE.md` 及其
+  `## Calculation Configuration`；
+- 在科学设计或执行工作前查阅选定的 `RQ.md`、选定 Spec，以及仅由该 Spec 引用的 Runs；
+- Git/集群边界：文档、模板、结构、脚本和轻量结果可在本地追踪，而 HDF5、`CHGCAR`、
+  `WAVECAR` 和大型计算输出保留在服务端。
 
-The generated file keeps project operation rules at project scope. The Spec is
-the sole authority for task state, DAG, Runs, current-Run designation,
-execution progress, and closure.
+生成的文件将项目操作规则保持在项目范围。Spec 是任务状态、DAG、Runs、current-Run
+指定、执行进度和闭包的唯一权威。
 
-## Project documents
+## 项目文档
 
-Generate concise project-specific documents. `CONTEXT.md` starts from
-[project context](project-context.md) plus confirmed project definitions.
-Preserve an existing `CONTEXT.md` unless the user approves each proposed
-change. `.gitignore` excludes editor/Python caches, HDF5, `CHGCAR`, `WAVECAR`,
-and other identified large calculation outputs.
+生成简洁的项目专用文档。`CONTEXT.md` 以[项目上下文](project-context.md)和已确认的
+项目定义为基础。除非用户逐项批准拟议变更，否则保留已有 `CONTEXT.md`。`.gitignore`
+排除编辑器/Python 缓存、HDF5、`CHGCAR`、`WAVECAR` 和其他已识别的大型计算输出。

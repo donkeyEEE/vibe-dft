@@ -6,20 +6,20 @@ def test_spec_template(plugin_root):
         "ID: SPEC-001",
         "Status: ready",
         "RQ: ../RQ.md",
-        "## Judgment",
-        "## Tasks",
+        "## 判断",
+        "## 任务",
         "### TASK-001:",
         "Blocked by:",
         "Condition:",
         "Acceptance:",
-        "#### Runs",
+        "#### 运行（Run）",
         "| Run | Status | Current | Path | Result |",
-        "## Context",
+        "## 上下文",
     ):
         assert field in text
 
-    assert "`Context` is the final section." in text
-    assert "Insert `Closure` immediately before `Context`" in text
+    assert "`Context` 是最后一节。" in text
+    assert "将 `Closure` 紧接在 `Context` 前插入" in text
 
 
 def test_spec_template_uses_reduced_task_statuses(plugin_root):
@@ -27,8 +27,8 @@ def test_spec_template_uses_reduced_task_statuses(plugin_root):
         plugin_root / "skills/calc-to-spec/references/spec-template.md"
     ).read_text()
 
-    assert "Task status is `pending | completed\n| failed | needs-review`" in text
-    assert "A decisively false condition or a cancelled task is\n`failed`" in text
+    assert "Task 状态为 `pending | completed\n| failed | needs-review`" in text
+    assert "条件被明确判定为假或\nTask 被取消时，该 Task 的状态为 `failed`" in text
 
 
 def test_design_flow_keeps_full_draft_internal_until_summary_approval(plugin_root):
@@ -38,18 +38,17 @@ def test_design_flow_keeps_full_draft_internal_until_summary_approval(plugin_roo
         .split()
     )
 
-    lower = text.casefold()
     assert "$dev-engineering:grill-with-docs" in text
     assert text.index("$dev-engineering:grill-with-docs") < text.index(
-        "Draft the Spec"
+        "用 [Spec 模板]"
     )
-    assert "keep the complete spec draft internal" in lower
-    assert "present only the target path, design summary" in lower
-    assert "approval does not require displaying the complete markdown" in lower
-    assert "output is one reviewable draft" not in lower
-    assert "full markdown draft" not in lower
-    assert "complete overwritten spec" not in lower
-    assert "each recorded run row has" not in lower
+    assert "完整 Spec 草案为内部内容" in text
+    assert "只展示目标路径、设计摘要" in text
+    assert "不要求展示任一成员的完整 Markdown" in text
+    assert "一份可审阅草案" not in text
+    assert "完整 Markdown 草案" not in text
+    assert "完整被覆盖 Spec" not in text
+    assert "每条记录的 Run 行" not in text
 
 
 def test_spec_separates_scientific_commitments_from_execution_discretion(plugin_root):
@@ -61,6 +60,6 @@ def test_spec_separates_scientific_commitments_from_execution_discretion(plugin_
     spec_flat = " ".join(spec.split())
     template_flat = " ".join(template.split())
     assert "execution-owned" in spec_flat
-    assert "minimum sufficient evidence" in spec_flat
-    assert "execution-owned" in template_flat
-    assert "favorable scientific outcome" in template_flat
+    assert "最低充分证据" in spec_flat
+    assert "由执行负责" in template_flat
+    assert "有利的科学结果" in template_flat

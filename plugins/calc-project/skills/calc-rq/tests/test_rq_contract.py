@@ -10,28 +10,28 @@ def test_rq_template(plugin_root):
     for field in (
         "ID: RQ-001",
         "Status: active",
-        "## Question",
+        "## 问题",
         "Boundary:",
-        "## Success Criterion",
-        "## Specs",
-        "## Decisions",
-        "## Context",
+        "## 成功判据",
+        "## 规范（Spec）",
+        "## 决策",
+        "## 上下文",
     ):
         assert field in text
 
-    assert text.index("## Specs") < text.index("## Decisions")
-    assert text.index("## Decisions") < text.index("## Context")
+    assert text.index("## 规范（Spec）") < text.index("## 决策")
+    assert text.index("## 决策") < text.index("## 上下文")
     assert "## Boundary" not in text
-    assert text.index("## Question") < text.index("Boundary:")
-    assert text.index("Boundary:") < text.index("## Success Criterion")
-    assert "RQ-scoped terminology and framing" in text
+    assert text.index("## 问题") < text.index("Boundary:")
+    assert text.index("Boundary:") < text.index("## 成功判据")
+    assert "RQ 范围内术语和框架" in text
 
 
 def test_rq_template_documents_allowed_statuses(plugin_root):
     text = (plugin_root / "skills/calc-rq/references/rq-template.md").read_text()
 
     assert _field_values(text, "Status") == ["active"]
-    assert "RQ status is `active | concluded`." in text
+    assert "RQ 状态为 `active | concluded`。" in text
 
 
 def test_rq_skill_has_only_its_rq_template(plugin_root):

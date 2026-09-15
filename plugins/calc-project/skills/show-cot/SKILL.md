@@ -1,18 +1,15 @@
 ---
 name: show-cot
-description: Display a calculation project's full Calculation Ownership Tree (COT) to inspect RQ, Spec, Task, and Run history.
+description: 展示计算项目的完整计算归属树（COT），以检查 RQ、Spec、Task 与 Run 历史。
 ---
 
 # Show COT
 
-Present a read-only Calculation Ownership Tree for one configured calculation
-project. Use a project root already resolved by the caller; for a direct
-invocation, locate the unique configured project from the current directory.
-Ask for a project location when that is ambiguous.
+展示一个已配置计算项目的只读计算归属树。使用调用者已解析的项目根目录；若直接调用，
+则从当前目录定位唯一已配置项目。若存在歧义，请求项目位置。
 
-Read the project's calculation configuration, then its RQ Tracker authorities:
-each `RQ.md`, the Specs it publishes, and each Spec's declared Tasks and Runs.
-Render the entire project as a stable tree:
+读取项目的计算配置，然后读取其 RQ Tracker 权威记录：每份 `RQ.md`、它发布的 Spec，
+以及每份 Spec 声明的 Task 和 Run。将整个项目渲染为稳定树：
 
 ```text
 RQ-NNN <title> [<status>]
@@ -21,9 +18,7 @@ RQ-NNN <title> [<status>]
         └── RUN-NNN [<status>]
 ```
 
-Task dependencies remain in the
-Spec and are not drawn as COT edges.
+Task 依赖保留在 Spec 中，不绘制为 COT 边。
 
-When `calc-execute` supplies the Task and Run at which it is returning control,
-precede the tree with one concise line naming that Task and Run and its recorded
-Run status. A direct COT request is only the tree.
+当 `calc-execute` 提供其交还控制权时所在的 Task 与 Run 时，在树前加一条简短行，
+标明该 Task、Run 及其已记录的 Run 状态。直接 COT 请求只输出树。

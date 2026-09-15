@@ -1,34 +1,24 @@
-# DFT+DMFT scientific design
+# DFT+DMFT 科学设计
 
-Use this reference when a Spec commits to a solid_dmft/DFT+DMFT calculation or
-interpretation. It owns design choices and decisive criteria, not Run
-preparation or postprocessing mechanics.
+当 Spec 承诺 solid_dmft/DFT+DMFT 计算或解释时使用本参考资料。它负责设计选择和决定性
+准则，不负责 Run 准备或后处理机制。
 
-## Evidence and approval inputs
+## 证据与批准输入
 
-Read the accepted RQ decisions, current scientific stage plan, project DMFT
-parameter records, PLO/local-orbital records, relevant prior Runs, and known
-self-energy or convergence failures. Obtain approval for PM/no-spin versus
-magnetic/spin scope, one-shot versus charge-self-consistent scope, the
-correlated subspace, PLO/local-orbital basis and orbital order, projection
-window, `U`/`J`, double counting, interaction convention, solver settings,
-requested observables, and their acceptance and stopping criteria.
+读取已接受 RQ 决策、当前科学阶段计划、项目 DMFT 参数记录、PLO/local-orbital 记录、
+相关既有 Runs 以及已知自能或收敛失败。对 PM/no-spin 与 magnetic/spin 范围、one-shot
+与 charge-self-consistent 范围、关联子空间、PLO/local-orbital 基与轨道顺序、投影窗口、
+`U`/`J`、double counting、相互作用约定、求解器设置、所需 observable 及其验收与停止准则
+取得批准。
 
-## Commitments to record
+## 应记录的承诺
 
-- Bind each DMFT task to the approved subspace, basis, orbital order, projection
-  window, interaction, solver, and interpretation scope.
-- State which convergence observables decide acceptance, such as the relevant
-  DMFT iterations, impurity occupancy, double occupancy, or self-energy
-  quantities, using project-approved criteria rather than an inferred
-  threshold.
-- Declare the lightweight postprocessing result needed for the judgment when
-  impurity spectral functions, self-energy MaxEnt, self-energy Pade, or
-  convergence plots are required. HDF5 handling remains an execution concern.
-- Preserve explicit provenance whenever a downstream comparison depends on a
-  prior calculation or postprocessing choice.
+- 将每项 DMFT 任务绑定到已批准子空间、基、轨道顺序、投影窗口、相互作用、求解器和解释范围。
+- 说明决定验收的收敛 observable，如相关 DMFT 迭代、杂质占据、双占据或自能量，并使用项目
+  已批准准则，而非推断阈值。
+- 当需要杂质谱函数、自能 MaxEnt、自能 Pade 或收敛图时，声明该判断所需的轻量后处理结果。
+  HDF5 处理仍属执行事项。
+- 只要下游比较依赖既有计算或后处理选择，就保留明确 provenance。
 
-Do not claim physical comparability across different PLO/local bases, double
-counting, `U`/`J`, or interaction forms without an approved rationale.
-Conflicting evidence or an ambiguous convergence judgment returns to Spec
-design; no generic template supplies a missing scientific value.
+未经批准理由，不得声称不同 PLO/local 基、double counting、`U`/`J` 或相互作用形式之间
+具有物理可比性。冲突证据或含糊的收敛判断应回到 Spec 设计；通用模板不能提供缺失科学数值。

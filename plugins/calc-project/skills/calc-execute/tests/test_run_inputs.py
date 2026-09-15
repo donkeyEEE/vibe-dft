@@ -24,15 +24,15 @@ def test_execute_skill_has_compact_three_part_contract(plugin_root):
     body = skill.split("---", 2)[2].strip()
     sections = [line for line in body.splitlines() if line.startswith("#")]
 
-    assert sections == ["# Calc Execute", "## Workflow", "## Principles"]
+    assert sections == ["# Calc Execute", "## 工作流", "## 原则"]
 
-    overview, remainder = body.split("## Workflow", 1)
+    overview, remainder = body.split("## 工作流", 1)
     overview_text = " ".join(overview.removeprefix("# Calc Execute").split())
     assert overview_text
     assert len(overview_text) <= 500
     assert "\n\n" not in overview.removeprefix("# Calc Execute").strip()
 
-    workflow, principles = remainder.split("## Principles", 1)
+    workflow, principles = remainder.split("## 原则", 1)
     workflow_steps = [
         line for line in workflow.splitlines() if line[:1].isdigit() and ". " in line
     ]
@@ -73,21 +73,21 @@ def test_execution_frontier_is_resolved_in_the_main_workflow(plugin_root):
         plugin_root / "skills/calc-execute/references/task-advancement.md"
     ).read_text(encoding="utf-8")
 
-    workflow = skill.split("## Workflow", 1)[1].split("## Principles", 1)[0]
+    workflow = skill.split("## 工作流", 1)[1].split("## 原则", 1)[0]
     first_step = " ".join(workflow.split("2.", 1)[0].split())
 
     for contract in (
-        "selected Spec",
-        "recorded Run",
-        "authority that is malformed, conflicting",
-        "inadequate to reconcile",
-        "runnable Task",
+        "选定 Spec",
+        "已记录 Run",
+        "权威资料格式错误",
+        "不足以调和",
+        "可运行 Task",
         "`submitted` Run",
-        "rather than allocating another",
-        "decisively false",
+        "不得直接另行分配 Run",
+        "确定为假的条件",
         "`failed`",
         "`$calc-to-spec`",
-        "Persist each deterministic state change",
+        "持久化每项确定的状态变更",
     ):
         assert contract in first_step
     assert "## Derive the frontier" not in advancement
@@ -125,8 +125,8 @@ def test_calculation_monitor_is_conditional_and_post_submission(plugin_root):
         plugin_root / "skills/calc-execute/references/calculation-monitor.md"
     ).exists()
     assert "references/remote-completion.md" in skill
-    assert "explicitly requested" in skill
-    assert skill_flat.index("update the Spec Run row to `submitted`") < skill_flat.index(
+    assert "明确请求提交后监控或继续执行" in skill
+    assert skill_flat.index("将 Spec 的 Run 行更新为 `submitted`") < skill_flat.index(
         "references/remote-completion.md"
     )
 
