@@ -17,15 +17,12 @@ Spec and current Run paths from the current authorities, and the thread from
 `CODEX_THREAD_ID`. If a required value is missing, leave monitoring inactive
 and report the job ID and a manual status command.
 
-Invoke `../scripts/calculation-monitor.py` through `systemd-run --user` with an
-argv array. Use a unit name made from the sanitized host and job ID and include:
-
-```text
---collect
---setenv=PATH=CURRENT_PATH
---property=StandardOutput=null
---property=StandardError=null
-```
+Start `../scripts/calculation-monitor.py` as a detached local process using the
+current platform's available supervisor. Prefer `systemd-run --user` when it is
+available; on other platforms, select an equivalent local background mechanism.
+Use an argv array, preserve the submitting process's `PATH`, discard monitor
+stdout and stderr, and report the launcher that was accepted. A missing suitable
+launcher leaves monitoring inactive; it does not affect the submitted job.
 
 Pass the Python executable, owning script path, and these script arguments
 separately:
@@ -40,9 +37,8 @@ separately:
 --interval 30
 ```
 
-Resolve `CURRENT_PATH` in the submitting Codex process. The local Run path must
-exist on the monitor machine. After launch, report whether systemd accepted the
-unit. A monitor failure does not change or repeat the submission.
+The local Run path must exist on the monitor machine. A monitor failure does
+not change or repeat the submission.
 
 ## Wait and resume
 

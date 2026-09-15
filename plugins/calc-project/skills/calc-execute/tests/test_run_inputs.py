@@ -147,16 +147,19 @@ def test_calculation_monitor_is_conditional_and_post_submission(plugin_root):
     )
 
     reference = reference_path.read_text(encoding="utf-8")
+    reference_flat = " ".join(reference.split())
     for contract in (
         "scripts/calculation-monitor.py",
         "CODEX_THREAD_ID",
-        "systemd-run --user",
-        "--collect",
-        "--setenv=PATH=",
-        "StandardOutput=null",
-        "StandardError=null",
+        "current platform's available supervisor",
+        "Prefer `systemd-run --user` when it is available",
+        "equivalent local background mechanism",
+        "argv array",
+        "submitting process's `PATH`",
+        "discard monitor stdout and stderr",
+        "missing suitable launcher leaves monitoring inactive",
     ):
-        assert contract in reference
+        assert contract in reference_flat
 
 
 def _expected_fingerprint(files: dict[str, bytes]) -> str:
