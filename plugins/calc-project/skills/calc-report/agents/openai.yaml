@@ -1,0 +1,4 @@
+interface:
+  display_name: "Calc Report"
+  short_description: "从计算证据生成阶段或结果汇报"
+  default_prompt: "$calc-report 为指定主题生成可追溯的计算汇报。"

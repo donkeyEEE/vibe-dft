@@ -20,6 +20,7 @@ SKILL_NAMES = (
     "calc-rq",
     "calc-to-spec",
     "calc-execute",
+    "calc-report",
     "calc-review",
     "show-cot",
 )
