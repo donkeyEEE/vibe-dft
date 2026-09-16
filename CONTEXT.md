@@ -46,7 +46,7 @@ Calc Project 面向用户的显式辅助入口，用于推荐工作接口、解�
 `ask-dnk`，自 2026-09-13 起使用现名。过去文档中的旧名称保留为历史记录。
 _Avoid_: ask-dnk（当前名称）
 
-关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Spec、计算任务、运行、计算归属树（COT）、Run-local inputs、计算模板、项目计算模板、插件计算模板。
+关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Spec、计算任务、运行、计算归属树（COT）、进展报告、Run-local inputs、计算模板、项目计算模板、插件计算模板。
 
 ## Paper Project
 

@@ -88,10 +88,10 @@ codex plugin add calc-project@yz-skills
 | [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 为一个 RQ 设计并发布完整科学 Spec 集，或替换一份现有 Spec。 |
 | [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 推进整份已就绪或活动中的 Spec，管理任务、Run、提交、同步、接收与闭合。 |
 | [calc-review](plugins/calc-project/skills/calc-review/SKILL.md) | 对指定的已准备 Run 快照做瞬时只读预提交评审。 |
-| [show-cot](plugins/calc-project/skills/show-cot/SKILL.md) | 显式只读展示计算项目完整的 RQ、Spec、Task 与 Run 归属树和执行历史。 |
+| [show-cot](plugins/calc-project/skills/show-cot/SKILL.md) | 显式只读展示完整 COT，并可在确认后生成 HTML 进展报告。 |
 
 六个工作接口均可由 Codex 根据任务自动选择，也可以显式调用。`show-cot` 是可显式
-调用的只读总览；已知目标时可直接调用对应技能，不确定应进入哪个接口时可使用
+调用的只读总览，并可按用户确认写出不拥有进度状态的派生报告；已知目标时可直接调用对应技能，不确定应进入哪个接口时可使用
 `ask-lyz`；需要解释 Calc Project 术语时也可使用该入口。
 
 #### 主要工作流

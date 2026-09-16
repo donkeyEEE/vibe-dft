@@ -66,6 +66,11 @@ _Avoid_: 计算任务，覆盖目录
 父 Spec 的任务 DAG，不是 COT 的父子边。
 _Avoid_: 任务 DAG，执行状态注册表
 
+**进展报告（Progress Report）**:
+从当时的 RQ、Spec、Task 与 Run 权威记录生成的可再生详细视图，也称 COT Report。
+报告不拥有计算事实或进度状态，删除后可从权威记录重新生成。
+_Avoid_: COT 状态，进度快照权威
+
 **Run 输入（Run Inputs）**:
 位于 `TASK-…/RUN-…/inputs/` 的实际执行输入，包含 `run.sh`、`run.pbs`、科学输入和
 由执行阶段确定的参数；每次验证和评审针对当时完整内容的精确快照。

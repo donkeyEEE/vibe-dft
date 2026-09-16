@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Calc Project",
     "shortDescription": "配置、RQ、Spec、执行、评审、路由与 COT 总览",
-    "longDescription": "calc-project 提供六个可自动选择的接口：ask-lyz 只负责路由；calc-setup 管理稳定项目结构与配置；calc-rq 管理研究问题及其已接受决策；calc-to-spec 为一个 RQ 设计并发布完整科学 Spec 集或替换一份 Spec；calc-execute 推进整份 ready 或 active Spec 的任务与 Run；calc-review 对一个准确的 prepared Run 快照执行瞬时只读评审。显式的 show-cot 从既有权威记录展示完整计算归属树。Spec 是任务 DAG、Run 记录、current Run、执行状态与闭合的唯一权威。",
+    "longDescription": "calc-project 提供六个可自动选择的接口：ask-lyz 只负责路由；calc-setup 管理稳定项目结构与配置；calc-rq 管理研究问题及其已接受决策；calc-to-spec 为一个 RQ 设计并发布完整科学 Spec 集或替换一份 Spec；calc-execute 推进整份 ready 或 active Spec 的任务与 Run；calc-review 对一个准确的 prepared Run 快照执行瞬时只读评审。显式的 show-cot 从既有权威记录展示完整计算归属树，并可按用户确认生成派生进展报告。Spec 是任务 DAG、Run 记录、current Run、执行状态与闭合的唯一权威。",
     "developerName": "donk",
     "category": "Productivity",
     "capabilities": [
