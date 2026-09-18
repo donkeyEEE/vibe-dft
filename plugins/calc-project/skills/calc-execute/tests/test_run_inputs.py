@@ -108,7 +108,8 @@ def test_result_updates_stay_compact_across_execution_branches(plugin_root):
     assert "whether the task may advance" in completion
     assert "material difference from the prior attempt" in correction
     for text in (advancement, completion, correction):
-        assert "Run logs or the\ntroubleshooting record" in text
+        assert "Run logs" in text
+        assert "troubleshooting record" in text
 
 
 def test_calculation_troubleshooting_covers_simple_and_researched_paths(plugin_root):

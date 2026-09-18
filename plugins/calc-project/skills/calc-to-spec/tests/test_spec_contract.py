@@ -41,7 +41,7 @@ def test_run_result_is_a_compact_advancement_summary(plugin_root):
     assert "最好按“结果 → 失败原因 → 与上一 Run 的区别 → 推进” 组织" in flat
     assert "必须包含“结果”和“推进”" not in flat
     assert "允许|不允许|待定" not in flat
-    assert "不粘贴原始日志、排障过程或详细诊断" in flat
+    assert "不粘贴原始日志、排障过程或 详细诊断" in flat
 
 
 def test_design_flow_keeps_full_draft_internal_until_summary_approval(plugin_root):
