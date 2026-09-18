@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/yz-skills-logo.png" alt="YZ Skills" width="460">
+  <img src="assets/yz-skills-logo.png" alt="vibe-dft" width="460">
 </p>
 
-# YZ Skills
+# vibe-dft
 
 面向科研计算、学术写作与个人项目日志的 Codex 插件集合。本仓库集中维护四个插件及其技能、脚本、模板和参考资料，每个 `plugins/<plugin-name>/` 目录都是独立的插件发布单元。
 
@@ -18,29 +18,29 @@
 ## 安装
 
 需要安装支持 `codex plugin` 命令的 Codex CLI。仓库自带名为
-`yz-skills` 的插件市场，可以从 GitHub 安装，也可以在参与开发时从本地目录安装。
+`vibe-dft` 的插件市场，可以从 GitHub 安装，也可以在参与开发时从本地目录安装。
 
 ### 从 GitHub 安装
 
 稳定使用建议固定到 `v0.1` 标签：
 
 ```bash
-codex plugin marketplace add donkeyEEE/yz-skills --ref v0.1
+codex plugin marketplace add donkeyEEE/vibe-dft --ref v0.1
 ```
 
 若希望使用 `main` 分支的最新开发内容：
 
 ```bash
-codex plugin marketplace add donkeyEEE/yz-skills --ref main
+codex plugin marketplace add donkeyEEE/vibe-dft --ref main
 ```
 
 注册插件市场后，按需安装插件：
 
 ```bash
-codex plugin add calc-project@yz-skills
-codex plugin add paper-project@yz-skills
-codex plugin add osm-project@yz-skills
-codex plugin add skill-incubator@yz-skills
+codex plugin add calc-project@vibe-dft
+codex plugin add paper-project@vibe-dft
+codex plugin add osm-project@vibe-dft
+codex plugin add skill-incubator@vibe-dft
 codex plugin list
 ```
 
@@ -52,10 +52,10 @@ codex plugin list
 需要修改或调试本仓库时，克隆后把仓库根目录注册为本地插件市场：
 
 ```bash
-git clone https://github.com/donkeyEEE/yz-skills.git
-cd yz-skills
+git clone https://github.com/donkeyEEE/vibe-dft.git
+cd vibe-dft
 codex plugin marketplace add "$(pwd)"
-codex plugin add calc-project@yz-skills
+codex plugin add calc-project@vibe-dft
 ```
 
 本地插件市场直接读取当前工作树；修改插件后重新执行对应的
@@ -65,12 +65,12 @@ codex plugin add calc-project@yz-skills
 ### 更新 GitHub 安装
 
 ```bash
-codex plugin marketplace upgrade yz-skills
-codex plugin add calc-project@yz-skills
+codex plugin marketplace upgrade vibe-dft
+codex plugin add calc-project@vibe-dft
 ```
 
 第二条命令用于重新安装已更新的插件。更新后同样需要新建对话。可以随时运行
-`codex plugin list --marketplace yz-skills` 查看该插件市场中的插件。插件市场如果
+`codex plugin list --marketplace vibe-dft` 查看该插件市场中的插件。插件市场如果
 固定在某个版本标签，升级命令仍会保持该标签；需要使用新版时，先把插件市场重新
 注册到新的标签或 `main`。
 

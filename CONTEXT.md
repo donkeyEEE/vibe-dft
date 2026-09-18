@@ -1,4 +1,4 @@
-# YZ Skills 开发上下文
+# vibe-dft 开发上下文
 
 本仓库集中维护四个 Codex 插件。插件发布单元位于 `plugins/`；资源优先与 owning skill 共置，只有多 skill 实际消费的资源进入插件级 `resources/`。
 

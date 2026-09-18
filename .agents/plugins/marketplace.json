@@ -1,7 +1,7 @@
 {
-  "name": "yz-skills",
+  "name": "vibe-dft",
   "interface": {
-    "displayName": "YZ Skills"
+    "displayName": "vibe-dft"
   },
   "plugins": [
     {

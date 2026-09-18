@@ -108,7 +108,7 @@ def check_repository_navigation_exposes_skill_incubator() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     paper_readme = (PAPER / "README.md").read_text(encoding="utf-8")
     assert "plugins/skill-incubator/" in agents
-    assert "skill-incubator@yz-skills" in readme
+    assert "skill-incubator@vibe-dft" in readme
     assert "plugins/skill-incubator/skills/paper2ppt/SKILL.md" in readme
     assert "plugins/skill-incubator/skills/ppt-master/SKILL.md" in readme
     assert "plugins/skill-incubator/skills/prl-polishing/SKILL.md" in readme
