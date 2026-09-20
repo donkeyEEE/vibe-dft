@@ -1,10 +1,10 @@
 # PR Introduction optimization protocol
 
-Use this workflow only after an explicit request to optimize `pr-intro`. Read
+This is a separately scoped repository-maintenance protocol, not a `pr-intro`
+runtime route. Every `pr-intro` invocation follows the writing workflow. Read
 [scoring-rubric.md](scoring-rubric.md) before scoring. The primary agent owns
 semantic diagnosis and edits; Python owns dataset validation, sanitized views,
-hashes, snapshots, diffs, and application. Ordinary writing never enters this
-workflow.
+hashes, snapshots, diffs, and application.
 
 ## Fixed model policy
 

@@ -1,7 +1,7 @@
 # PR Introduction
 
 `pr-intro` drafts or restructures evidence-grounded Introductions for the
-Physical Review journal family. Ordinary writing uses `SKILL.md` and the three
+Physical Review journal family. It always uses `SKILL.md` and the three
 references under `references/writing/`.
 
 The skill accepts a user draft or research material. It may retrieve literature
@@ -13,8 +13,7 @@ revision map. After confirmation, it reviews one paragraph at a time with the
 complete original and selectable `C1`, `C2`, ... changes containing `Before`,
 `After`, and `Why`. Each paragraph may be accepted, revised, kept verbatim, or
 skipped before final consolidation. An explicit one-shot request bypasses the
-intermediate decisions.
-
-The co-located maintenance workflow is a separate route entered only when the
-user explicitly asks to optimize `pr-intro`. Its protocol is intentionally not
-part of ordinary writing context.
+intermediate decisions. Before generated prose is shown, a selective embedded
+`$humanizer:humanizer` pass removes AI-writing patterns without changing its
+supported scientific content; user originals and locked paragraphs are never
+sent to that pass.

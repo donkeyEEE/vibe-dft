@@ -9,13 +9,12 @@ SOURCE_BOUNDARIES = "references/writing/source-boundaries.md"
 INTERACTION_PROTOCOL = "references/writing/interaction-protocol.md"
 
 
-def test_router_keeps_maintenance_explicit():
+def test_router_always_uses_the_writing_workflow():
     text = SKILL.read_text(encoding="utf-8")
     frontmatter = text.split("---", 2)[1]
-    assert "explicit request to optimize `pr-intro`" in text
-    assert "explicitly asks to optimize `pr-intro`" in frontmatter
-    assert "references/maintenance/optimization-protocol.md" in text
-    assert "Do not load maintenance" in text
+    assert "optimize `pr-intro`" not in text
+    assert "optimization" not in frontmatter
+    assert "references/maintenance/" not in text
 
 
 def test_router_names_existing_writing_references():
@@ -53,15 +52,13 @@ def test_interaction_protocol_preserves_stable_locators_and_user_decisions():
     assert "Do not invent" in protocol
 
 
-def test_ordinary_route_excludes_evaluation_and_maintenance_content():
+def test_runtime_contract_excludes_evaluation_and_maintenance_content():
     text = SKILL.read_text(encoding="utf-8")
-    ordinary_route = text.split("For ordinary writing", 1)[1]
 
-    assert text.count("references/maintenance/") == 1
     for forbidden in ("evaluation", "evals/", "dataset", "SCC", "FGCC"):
         assert forbidden not in text
     for forbidden in ("maintenance", "optimization", "references/maintenance/"):
-        assert forbidden not in ordinary_route
+        assert forbidden not in text
 
 
 def test_runtime_contract_names_grounding_and_argument_map():
@@ -96,9 +93,28 @@ def test_writing_references_encode_six_moves_and_source_boundaries():
         assert boundary in normalized_boundaries
 
 
-def test_openai_interface_allows_implicit_invocation():
+def test_openai_interface_relies_on_default_implicit_invocation():
     interface = (SKILL_ROOT / "agents/openai.yaml").read_text(encoding="utf-8")
-    assert "allow_implicit_invocation: true" in interface
+    assert "allow_implicit_invocation" not in interface
+
+
+def test_generated_prose_is_selectively_humanized_before_user_review():
+    protocol = (SKILL_ROOT / INTERACTION_PROTOCOL).read_text(encoding="utf-8")
+
+    assert "$humanizer:humanizer" in protocol
+    assert "embedded mode" in protocol
+    assert "newly generated `After` text" in protocol
+    for protected_content in (
+        "supported claim",
+        "source",
+        "citation",
+        "technical term",
+        "condition",
+        "scope limit",
+        "user's original draft",
+        "locked paragraphs",
+    ):
+        assert protected_content in protocol
 
 
 def test_repository_navigation_lists_pr_intro():

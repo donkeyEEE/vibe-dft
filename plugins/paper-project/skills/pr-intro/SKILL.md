@@ -1,22 +1,16 @@
 ---
 name: pr-intro
-description: Use when drafting or restructuring an evidence-grounded Introduction for a Physical Review journal, or when the user explicitly asks to optimize `pr-intro`.
-metadata:
-  version: "PRintro-v1"
+description: Use when drafting or restructuring an evidence-grounded Introduction for a Physical Review journal.
 ---
 
 # Physical Review Introduction
 
-## Route
+## Workflow
 
-If and only if the user makes an explicit request to optimize `pr-intro`, read
-`references/maintenance/optimization-protocol.md` and follow it.
-Do not load maintenance resources for ordinary writing.
-
-For ordinary writing, read `references/writing/pr-introduction-logic.md`,
+Read `references/writing/pr-introduction-logic.md`,
 `references/writing/source-boundaries.md`, and
 `references/writing/interaction-protocol.md`. Detect drafting versus
-restructuring, state the route, and build an available-facts view. For a whole
+restructuring and build an available-facts view. For a whole
 Introduction, propose an argument map before prose, then use the interactive
 protocol to keep paragraph changes stable and user-controlled. Never invent
 scientific content to fill a missing move.
