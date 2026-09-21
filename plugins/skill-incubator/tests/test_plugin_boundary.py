@@ -27,7 +27,6 @@ def check_skill_incubator_owns_expected_skills() -> None:
         "ppt-master",
         "prl-polishing",
         "scholar-evaluation",
-        "scientific-critical-thinking",
     }
     for skill_name in skill_names:
         assert (PLUGIN / "skills" / skill_name / "SKILL.md").is_file()
@@ -42,7 +41,6 @@ def check_paper_project_no_longer_owns_incubator_skills() -> None:
         "ppt-master",
         "prl-polishing",
         "scholar-evaluation",
-        "scientific-critical-thinking",
     ):
         assert not (PAPER / "skills" / skill_name).exists()
 

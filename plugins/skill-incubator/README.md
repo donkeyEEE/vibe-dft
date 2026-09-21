@@ -8,7 +8,6 @@ Skill Incubator 是可独立安装和发布的通用 skill 试验场。它允许
 - `ppt-master`：创建、填充、增强和验证可编辑 PPTX，并维护 Brand、Style、Layout 与 Deck 模板工作区。
 - `nature-response`：起草和审校 Nature 风格的审稿回复与返修材料。
 - `scholar-evaluation`：按结构化框架评价学术成果。
-- `scientific-critical-thinking`：批判性评估材料物理与计算研究主张。
 - `cangjie-skill`：仅限显式调用的待重设计知识蒸馏入口。
 - `prl-polishing`：按 claim、evidence、boundary 和 consequence 逻辑逐段审阅、重构或翻译物理论文。
 

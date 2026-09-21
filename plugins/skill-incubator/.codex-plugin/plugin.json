@@ -1,6 +1,6 @@
 {
   "name": "skill-incubator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An installable experimentation ground for skills that have not yet formed an independent plugin boundary.",
   "author": {
     "name": "donk"
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Skill Incubator",
     "shortDescription": "Installable experimentation ground for evolving skills",
-    "longDescription": "Skill Incubator packages evolving skills for normal installation, invocation, and release while their long-term plugin boundary remains a maintainer decision. It currently covers physics-manuscript polishing, presentations, reviewer responses, scholarly evaluation, scientific critical thinking, and an explicit-only knowledge-distillation entry point.",
+    "longDescription": "Skill Incubator packages evolving skills for normal installation, invocation, and release while their long-term plugin boundary remains a maintainer decision. It currently covers physics-manuscript polishing, presentations, reviewer responses, scholarly evaluation, and an explicit-only knowledge-distillation entry point.",
     "developerName": "donk",
     "category": "Productivity",
     "capabilities": [

@@ -140,4 +140,3 @@ $calc-project:calc-execute 推进 SPEC-001 中当前可执行的 Task 和 Run。
 | [ppt-master](plugins/skill-incubator/skills/ppt-master/SKILL.md) | 创建、填充、重建或增强可编辑的 PPTX 演示文稿。 |
 | [prl-polishing](plugins/skill-incubator/skills/prl-polishing/SKILL.md) | 按 PRL 风格润色、重构或翻译科学文本，保留证据边界，不补充未经给出的内容。 |
 | [scholar-evaluation](plugins/skill-incubator/skills/scholar-evaluation/SKILL.md) | 用 ScholarEval 框架评价学术工作的问题、方法、分析和写作，并给出可执行的反馈。 |
-| [scientific-critical-thinking](plugins/skill-incubator/skills/scientific-critical-thinking/SKILL.md) | 审视材料物理、DFT、磁性、光谱、合成与表征中的证据、局限和替代解释。 |
