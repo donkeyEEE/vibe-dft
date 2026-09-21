@@ -1,700 +1,82 @@
 ---
 name: literature-review
-description: Conduct comprehensive, systematic literature reviews using multiple academic databases (PubMed, arXiv, bioRxiv, Semantic Scholar, etc.). This skill should be used when conducting systematic literature reviews, meta-analyses, research synthesis, or comprehensive literature searches across biomedical, scientific, and technical domains. Creates professionally formatted markdown documents and PDFs with verified citations in multiple citation styles (APA, Nature, Vancouver, etc.).
-allowed-tools: Read Write Edit Bash
-license: MIT license
-metadata:
-  version: "1.0"
-  skill-author: K-Dense Inc.
+description: Produce an evidence-grounded literature review from Web sources or a user-specified Zotero collection and save the result as Markdown. Use only when the user explicitly invokes $literature-review.
 ---
 
 # Literature Review
 
-## Overview
+围绕用户的研究主题检索、阅读并综合文献，最终只交付一份 Markdown 文档。默认使用 Web；用户指定 Zotero 分类时，改用该分类及其全部子分类。
 
-Conduct systematic, comprehensive literature reviews following rigorous academic methodology. Search multiple literature databases, synthesize findings thematically, verify all citations for accuracy, and generate professional output documents in markdown and PDF formats.
+## 启动门槛
 
-This skill uses the **parallel-web skill** (`parallel-cli search`) as the primary web search tool for broad academic literature discovery, supplemented by specialized database access skills (gget, bioservices, datacommons-client). It provides specialized tools for citation verification, result aggregation, and document generation.
+开始检索前确认以下两项：
 
-## When to Use This Skill
+1. 研究主题或问题。
+2. Markdown 保存路径。
 
-Use this skill when:
-- Conducting a systematic literature review for research or publication
-- Synthesizing current knowledge on a specific topic across multiple sources
-- Performing meta-analysis or scoping reviews
-- Writing the literature review section of a research paper or thesis
-- Investigating the state of the art in a research domain
-- Identifying research gaps and future directions
-- Requiring verified citations and professional formatting
+缺少任一项时，先向用户询问。保存路径必须指向 `.md` 文件；在路径确认前不检索、不创建文件。若目标文件已经存在，停止写入并让用户选择新路径；只有用户明确要求时才覆盖或续写。创建尚不存在的父目录同样需要用户确认。
 
-## Visual Enhancement with Scientific Schematics
+时间范围、语言、综述侧重点和引用格式都是可选约束；用户未指定时，根据研究问题作合理选择。
 
-**⚠️ MANDATORY: Every literature review MUST include at least 1-2 AI-generated figures using the scientific-schematics skill.**
+## 来源模式
 
-This is not optional. Literature reviews without visual elements are incomplete. Before finalizing any document:
-1. Generate at minimum ONE schematic or diagram (e.g., PRISMA flow diagram for systematic reviews)
-2. Prefer 2-3 figures for comprehensive reviews (search strategy flowchart, thematic synthesis diagram, conceptual framework)
+每次运行只采用一种已确认的来源模式：
 
-**How to generate figures:**
-- Use the **scientific-schematics** skill to generate AI-powered publication-quality diagrams
-- Simply describe your desired diagram in natural language
-- Nano Banana Pro will automatically generate, review, and refine the schematic
+- **Web 模式**：默认模式。使用可用的 Web 检索能力查找论文，优先原始论文、出版社页面及可信学术索引。
+- **Zotero 模式**：当用户指定 Zotero 分类时采用。递归纳入该分类及全部子分类中的条目；通过 `get-zotero` 的只读接口获取题录、摘要、索引正文或 PDF。
+- **混合模式**：仅在用户明确要求同时使用 Web 和 Zotero 时采用。
 
-**How to generate schematics:**
-```bash
-python scripts/generate_schematic.py "your diagram description" -o figures/output.png
-```
+Zotero 分类不明确或无法唯一定位时，先让用户确认具体分类。Zotero 始终只读。
 
-The AI will automatically:
-- Create publication-quality images with proper formatting
-- Review and refine through multiple iterations
-- Ensure accessibility (colorblind-friendly, high contrast)
-- Save outputs in the figures/ directory
+### Zotero 只读获取契约
 
-**When to add schematics:**
-- PRISMA flow diagrams for systematic reviews
-- Literature search strategy flowcharts
-- Thematic synthesis diagrams
-- Research gap visualization maps
-- Citation network diagrams
-- Conceptual framework illustrations
-- Any complex concept that benefits from visualization
-
-For detailed guidance on creating schematics, refer to the scientific-schematics skill documentation.
-
----
-
-## Core Workflow
-
-Literature reviews follow a structured, multi-phase workflow:
-
-### Phase 1: Planning and Scoping
-
-1. **Define Research Question**: Use PICO framework (Population, Intervention, Comparison, Outcome) for clinical/biomedical reviews
-   - Example: "What is the efficacy of CRISPR-Cas9 (I) for treating sickle cell disease (P) compared to standard care (C)?"
-
-2. **Establish Scope and Objectives**:
-   - Define clear, specific research questions
-   - Determine review type (narrative, systematic, scoping, meta-analysis)
-   - Set boundaries (time period, geographic scope, study types)
-
-3. **Develop Search Strategy**:
-   - Identify 2-4 main concepts from research question
-   - List synonyms, abbreviations, and related terms for each concept
-   - Plan Boolean operators (AND, OR, NOT) to combine terms
-   - Select minimum 3 complementary databases
-   - **Use the parallel-web skill (`parallel-cli search`) for initial scoping** to quickly gauge the landscape before formal database searches
-
-4. **Set Inclusion/Exclusion Criteria**:
-   - Date range (e.g., last 10 years: 2015-2024)
-   - Language (typically English, or specify multilingual)
-   - Publication types (peer-reviewed, preprints, reviews)
-   - Study designs (RCTs, observational, in vitro, etc.)
-   - Document all criteria clearly
-
-### Phase 2: Systematic Literature Search
-
-1. **Multi-Database Search**:
-
-   Select databases appropriate for the domain. **Always start with parallel-web for broad academic coverage**, then supplement with domain-specific databases.
-
-   **Web-Based Academic Search (parallel-web skill — START HERE):**
-   - Use `parallel-cli search` with academic domain filtering for broad scholarly coverage
-   - Run two searches: academic-focused + general to catch all relevant sources
-   ```bash
-   # Academic-focused search across scholarly sources
-   parallel-cli search "your research topic" -q "keyword1" -q "keyword2" \
-     --json --max-results 10 --excerpt-max-chars-total 27000 \
-     --include-domains "scholar.google.com,arxiv.org,pubmed.ncbi.nlm.nih.gov,semanticscholar.org,biorxiv.org,medrxiv.org,ncbi.nlm.nih.gov,nature.com,science.org,ieee.org,acm.org,springer.com,wiley.com,cell.com,pnas.org,nih.gov" \
-     -o sources/litreview_<topic>-academic.json
-
-   # General search for supplementary sources
-   parallel-cli search "your research topic" -q "keyword1" -q "keyword2" \
-     --json --max-results 10 --excerpt-max-chars-total 27000 \
-     -o sources/litreview_<topic>-general.json
-   ```
-   - Use `parallel-cli extract` to fetch full content from specific paper URLs or PDFs found in search results
-   ```bash
-   parallel-cli extract "https://arxiv.org/abs/XXXX.XXXXX" --json
-   ```
-
-   **Biomedical & Life Sciences:**
-   - Use `gget` skill: `gget search pubmed "search terms"` for PubMed/PMC
-   - Use `gget` skill: `gget search biorxiv "search terms"` for preprints
-   - Use `bioservices` skill for ChEMBL, KEGG, UniProt, etc.
-
-   **General Scientific Literature:**
-   - Search arXiv via direct API (preprints in physics, math, CS, q-bio)
-   - Search Semantic Scholar via API (200M+ papers, cross-disciplinary)
-   - Use Google Scholar for comprehensive coverage (manual or careful scraping)
-
-   **Specialized Databases:**
-   - Use `gget alphafold` for protein structures
-   - Use `gget cosmic` for cancer genomics
-   - Use `datacommons-client` for demographic/statistical data
-   - Use specialized databases as appropriate for the domain
-
-2. **Document Search Parameters**:
-   ```markdown
-   ## Search Strategy
-
-   ### Database: PubMed
-   - **Date searched**: 2024-10-25
-   - **Date range**: 2015-01-01 to 2024-10-25
-   - **Search string**:
-     ```
-     ("CRISPR"[Title] OR "Cas9"[Title])
-     AND ("sickle cell"[MeSH] OR "SCD"[Title/Abstract])
-     AND 2015:2024[Publication Date]
-     ```
-   - **Results**: 247 articles
-   ```
-
-   Repeat for each database searched.
-
-3. **Export and Aggregate Results**:
-   - Export results in JSON format from each database
-   - Combine all results into a single file
-   - Use `scripts/search_databases.py` for post-processing:
-     ```bash
-     python search_databases.py combined_results.json \
-       --deduplicate \
-       --format markdown \
-       --output aggregated_results.md
-     ```
-
-### Phase 3: Screening and Selection
-
-1. **Deduplication**:
-   ```bash
-   python search_databases.py results.json --deduplicate --output unique_results.json
-   ```
-   - Removes duplicates by DOI (primary) or title (fallback)
-   - Document number of duplicates removed
-
-2. **Title Screening**:
-   - Review all titles against inclusion/exclusion criteria
-   - Exclude obviously irrelevant studies
-   - Document number excluded at this stage
-
-3. **Abstract Screening**:
-   - Read abstracts of remaining studies
-   - Apply inclusion/exclusion criteria rigorously
-   - Document reasons for exclusion
-
-4. **Full-Text Screening**:
-   - Obtain full texts of remaining studies
-   - Conduct detailed review against all criteria
-   - Document specific reasons for exclusion
-   - Record final number of included studies
-
-5. **Create PRISMA Flow Diagram**:
-   ```
-   Initial search: n = X
-   ├─ After deduplication: n = Y
-   ├─ After title screening: n = Z
-   ├─ After abstract screening: n = A
-   └─ Included in review: n = B
-   ```
-
-### Phase 4: Data Extraction and Quality Assessment
-
-1. **Extract Key Data** from each included study:
-   - Study metadata (authors, year, journal, DOI)
-   - Study design and methods
-   - Sample size and population characteristics
-   - Key findings and results
-   - Limitations noted by authors
-   - Funding sources and conflicts of interest
-
-2. **Assess Study Quality**:
-   - **For RCTs**: Use Cochrane Risk of Bias tool
-   - **For observational studies**: Use Newcastle-Ottawa Scale
-   - **For systematic reviews**: Use AMSTAR 2
-   - Rate each study: High, Moderate, Low, or Very Low quality
-   - Consider excluding very low-quality studies
-
-3. **Organize by Themes**:
-   - Identify 3-5 major themes across studies
-   - Group studies by theme (studies may appear in multiple themes)
-   - Note patterns, consensus, and controversies
-
-### Phase 5: Synthesis and Analysis
-
-1. **Create Review Document** from template:
-   ```bash
-   cp assets/review_template.md my_literature_review.md
-   ```
-
-2. **Write Thematic Synthesis** (NOT study-by-study summaries):
-   - Organize Results section by themes or research questions
-   - Synthesize findings across multiple studies within each theme
-   - Compare and contrast different approaches and results
-   - Identify consensus areas and points of controversy
-   - Highlight the strongest evidence
-
-   Example structure:
-   ```markdown
-   #### 3.3.1 Theme: CRISPR Delivery Methods
-
-   Multiple delivery approaches have been investigated for therapeutic
-   gene editing. Viral vectors (AAV) were used in 15 studies^1-15^ and
-   showed high transduction efficiency (65-85%) but raised immunogenicity
-   concerns^3,7,12^. In contrast, lipid nanoparticles demonstrated lower
-   efficiency (40-60%) but improved safety profiles^16-23^.
-   ```
-
-3. **Critical Analysis**:
-   - Evaluate methodological strengths and limitations across studies
-   - Assess quality and consistency of evidence
-   - Identify knowledge gaps and methodological gaps
-   - Note areas requiring future research
-
-4. **Write Discussion**:
-   - Interpret findings in broader context
-   - Discuss clinical, practical, or research implications
-   - Acknowledge limitations of the review itself
-   - Compare with previous reviews if applicable
-   - Propose specific future research directions
-
-### Phase 6: Citation Verification
-
-**CRITICAL**: All citations must be verified for accuracy before final submission.
-
-1. **Verify All DOIs**:
-   ```bash
-   python scripts/verify_citations.py my_literature_review.md
-   ```
-
-   This script:
-   - Extracts all DOIs from the document
-   - Verifies each DOI resolves correctly
-   - Retrieves metadata from CrossRef
-   - Generates verification report
-   - Outputs properly formatted citations
-
-2. **Review Verification Report**:
-   - Check for any failed DOIs
-   - Verify author names, titles, and publication details match
-   - Correct any errors in the original document
-   - Re-run verification until all citations pass
-
-3. **Format Citations Consistently**:
-   - Choose one citation style and use throughout (see `references/citation_styles.md`)
-   - Common styles: APA, Nature, Vancouver, Chicago, IEEE
-   - Use verification script output to format citations correctly
-   - Ensure in-text citations match reference list format
-
-### Phase 7: Document Generation
-
-1. **Generate PDF**:
-   ```bash
-   python scripts/generate_pdf.py my_literature_review.md \
-     --citation-style apa \
-     --output my_review.pdf
-   ```
-
-   Options:
-   - `--citation-style`: apa, nature, chicago, vancouver, ieee
-   - `--no-toc`: Disable table of contents
-   - `--no-numbers`: Disable section numbering
-   - `--check-deps`: Check if pandoc/xelatex are installed
-
-2. **Review Final Output**:
-   - Check PDF formatting and layout
-   - Verify all sections are present
-   - Ensure citations render correctly
-   - Check that figures/tables appear properly
-   - Verify table of contents is accurate
-
-3. **Quality Checklist**:
-   - [ ] All DOIs verified with verify_citations.py
-   - [ ] Citations formatted consistently
-   - [ ] PRISMA flow diagram included (for systematic reviews)
-   - [ ] Search methodology fully documented
-   - [ ] Inclusion/exclusion criteria clearly stated
-   - [ ] Results organized thematically (not study-by-study)
-   - [ ] Quality assessment completed
-   - [ ] Limitations acknowledged
-   - [ ] References complete and accurate
-   - [ ] PDF generates without errors
-
-## Database-Specific Search Guidance
-
-### PubMed / PubMed Central
-
-Access via `gget` skill:
-```bash
-# Search PubMed
-gget search pubmed "CRISPR gene editing" -l 100
-
-# Search with filters
-# Use PubMed Advanced Search Builder to construct complex queries
-# Then execute via gget or direct Entrez API
-```
-
-**Search tips**:
-- Use MeSH terms: `"sickle cell disease"[MeSH]`
-- Field tags: `[Title]`, `[Title/Abstract]`, `[Author]`
-- Date filters: `2020:2024[Publication Date]`
-- Boolean operators: AND, OR, NOT
-- See MeSH browser: https://meshb.nlm.nih.gov/search
-
-### bioRxiv / medRxiv
-
-Access via `gget` skill:
-```bash
-gget search biorxiv "CRISPR sickle cell" -l 50
-```
-
-**Important considerations**:
-- Preprints are not peer-reviewed
-- Verify findings with caution
-- Check if preprint has been published (CrossRef)
-- Note preprint version and date
-
-### arXiv
-
-Access via direct API or WebFetch:
-```python
-# Example search categories:
-# q-bio.QM (Quantitative Methods)
-# q-bio.GN (Genomics)
-# q-bio.MN (Molecular Networks)
-# cs.LG (Machine Learning)
-# stat.ML (Machine Learning Statistics)
-
-# Search format: category AND terms
-search_query = "cat:q-bio.QM AND ti:\"single cell sequencing\""
-```
-
-### Semantic Scholar
-
-Access via direct API (requires API key, or use free tier):
-- 200M+ papers across all fields
-- Excellent for cross-disciplinary searches
-- Provides citation graphs and paper recommendations
-- Use for finding highly influential papers
-
-### Specialized Biomedical Databases
-
-Use appropriate skills:
-- **ChEMBL**: `bioservices` skill for chemical bioactivity
-- **UniProt**: `gget` or `bioservices` skill for protein information
-- **KEGG**: `bioservices` skill for pathways and genes
-- **COSMIC**: `gget` skill for cancer mutations
-- **AlphaFold**: `gget alphafold` for protein structures
-- **PDB**: `gget` or direct API for experimental structures
-
-### Citation Chaining
-
-Expand search via citation networks:
-
-1. **Forward citations** (papers citing key papers):
-   - Use `parallel-cli search` to find papers citing a specific work:
-     ```bash
-     parallel-cli search "papers citing [Author et al. Year] [paper title]" \
-       -q "citing" -q "[key author]" \
-       --json --max-results 10 --excerpt-max-chars-total 27000 \
-       --include-domains "scholar.google.com,semanticscholar.org,arxiv.org,pubmed.ncbi.nlm.nih.gov" \
-       -o sources/litreview_forward_citations.json
-     ```
-   - Use Google Scholar "Cited by"
-   - Use Semantic Scholar or OpenAlex APIs
-   - Identifies newer research building on seminal work
-
-2. **Backward citations** (references from key papers):
-   - Use `parallel-cli extract` to fetch full text of key papers and extract their reference lists:
-     ```bash
-     parallel-cli extract "https://doi.org/10.xxxx/yyyy" --json
-     ```
-   - Extract references from included papers
-   - Identify highly cited foundational work
-   - Find papers cited by multiple included studies
-
-## Citation Style Guide
-
-Detailed formatting guidelines are in `references/citation_styles.md`. Quick reference:
-
-### APA (7th Edition)
-- In-text: (Smith et al., 2023)
-- Reference: Smith, J. D., Johnson, M. L., & Williams, K. R. (2023). Title. *Journal*, *22*(4), 301-318. https://doi.org/10.xxx/yyy
-
-### Nature
-- In-text: Superscript numbers^1,2^
-- Reference: Smith, J. D., Johnson, M. L. & Williams, K. R. Title. *Nat. Rev. Drug Discov.* **22**, 301-318 (2023).
-
-### Vancouver
-- In-text: Superscript numbers^1,2^
-- Reference: Smith JD, Johnson ML, Williams KR. Title. Nat Rev Drug Discov. 2023;22(4):301-18.
-
-**Always verify citations** with verify_citations.py before finalizing.
-
-### Prioritizing High-Impact Papers (CRITICAL)
-
-**Always prioritize influential, highly-cited papers from reputable authors and top venues.** Quality matters more than quantity in literature reviews.
-
-#### Citation Count Thresholds
-
-Use citation counts to identify the most impactful papers:
-
-| Paper Age | Citation Threshold | Classification |
-|-----------|-------------------|----------------|
-| 0-3 years | 20+ citations | Noteworthy |
-| 0-3 years | 100+ citations | Highly Influential |
-| 3-7 years | 100+ citations | Significant |
-| 3-7 years | 500+ citations | Landmark Paper |
-| 7+ years | 500+ citations | Seminal Work |
-| 7+ years | 1000+ citations | Foundational |
-
-#### Journal and Venue Tiers
-
-Prioritize papers from higher-tier venues:
-
-- **Tier 1 (Always Prefer):** Nature, Science, Cell, NEJM, Lancet, JAMA, PNAS, Nature Medicine, Nature Biotechnology
-- **Tier 2 (Strong Preference):** High-impact specialized journals (IF>10), top conferences (NeurIPS, ICML for ML/AI)
-- **Tier 3 (Include When Relevant):** Respected specialized journals (IF 5-10)
-- **Tier 4 (Use Sparingly):** Lower-impact peer-reviewed venues
-
-#### Author Reputation Assessment
-
-Prefer papers from:
-- **Senior researchers** with high h-index (>40 in established fields)
-- **Leading research groups** at recognized institutions (Harvard, Stanford, MIT, Oxford, etc.)
-- **Authors with multiple Tier-1 publications** in the relevant field
-- **Researchers with recognized expertise** (awards, editorial positions, society fellows)
-
-#### Identifying Seminal Papers
-
-For any topic, identify foundational work by:
-1. **High citation count** (typically 500+ for papers 5+ years old)
-2. **Frequently cited by other included studies** (appears in many reference lists)
-3. **Published in Tier-1 venues** (Nature, Science, Cell family)
-4. **Written by field pioneers** (often cited as establishing concepts)
-
-## Best Practices
-
-### Search Strategy
-1. **Start with parallel-web**: Use `parallel-cli search` with academic domains for initial broad coverage before querying specialized databases
-2. **Use multiple databases** (minimum 3): Ensures comprehensive coverage — parallel-web counts as one source
-3. **Include preprint servers**: Captures latest unpublished findings
-4. **Document everything**: Search strings, dates, result counts for reproducibility — save all parallel-cli output to `sources/`
-5. **Test and refine**: Run pilot searches, review results, adjust search terms
-6. **Sort by citations**: When available, sort search results by citation count to surface influential work first
-7. **Use parallel-cli extract**: Fetch full content from promising URLs found during search to verify relevance before full-text screening
-
-### Screening and Selection
-1. **Use multiple databases** (minimum 3): Ensures comprehensive coverage
-2. **Include preprint servers**: Captures latest unpublished findings
-3. **Document everything**: Search strings, dates, result counts for reproducibility
-4. **Test and refine**: Run pilot searches, review results, adjust search terms
-
-### Screening and Selection
-1. **Use clear criteria**: Document inclusion/exclusion criteria before screening
-2. **Screen systematically**: Title → Abstract → Full text
-3. **Document exclusions**: Record reasons for excluding studies
-4. **Consider dual screening**: For systematic reviews, have two reviewers screen independently
-
-### Synthesis
-1. **Organize thematically**: Group by themes, NOT by individual studies
-2. **Synthesize across studies**: Compare, contrast, identify patterns
-3. **Be critical**: Evaluate quality and consistency of evidence
-4. **Identify gaps**: Note what's missing or understudied
-
-### Quality and Reproducibility
-1. **Assess study quality**: Use appropriate quality assessment tools
-2. **Verify all citations**: Run verify_citations.py script
-3. **Document methodology**: Provide enough detail for others to reproduce
-4. **Follow guidelines**: Use PRISMA for systematic reviews
-
-### Writing
-1. **Be objective**: Present evidence fairly, acknowledge limitations
-2. **Be systematic**: Follow structured template
-3. **Be specific**: Include numbers, statistics, effect sizes where available
-4. **Be clear**: Use clear headings, logical flow, thematic organization
-
-## Common Pitfalls to Avoid
-
-1. **Single database search**: Misses relevant papers; always search multiple databases
-2. **No search documentation**: Makes review irreproducible; document all searches
-3. **Study-by-study summary**: Lacks synthesis; organize thematically instead
-4. **Unverified citations**: Leads to errors; always run verify_citations.py
-5. **Too broad search**: Yields thousands of irrelevant results; refine with specific terms
-6. **Too narrow search**: Misses relevant papers; include synonyms and related terms
-7. **Ignoring preprints**: Misses latest findings; include bioRxiv, medRxiv, arXiv
-8. **No quality assessment**: Treats all evidence equally; assess and report quality
-9. **Publication bias**: Only positive results published; note potential bias
-10. **Outdated search**: Field evolves rapidly; clearly state search date
-
-## Example Workflow
-
-Complete workflow for a biomedical literature review:
+先运行 `doctor --json`。调用 `collections --json` 得到分类 key 与 `parentCollection`，从用户确认的根 key 递归计算后代 key；对每个 key 调用：
 
 ```bash
-# 1. Create review document from template
-cp assets/review_template.md crispr_sickle_cell_review.md
-
-# 2. Start with parallel-web for broad academic search
-parallel-cli search "CRISPR Cas9 sickle cell disease gene therapy efficacy" \
-  -q "CRISPR" -q "sickle cell" -q "gene therapy" \
-  --json --max-results 10 --excerpt-max-chars-total 27000 \
-  --include-domains "scholar.google.com,arxiv.org,pubmed.ncbi.nlm.nih.gov,semanticscholar.org,biorxiv.org,nature.com,science.org,cell.com,pnas.org,nih.gov" \
-  -o sources/litreview_crispr_scd-academic.json
-
-parallel-cli search "CRISPR sickle cell disease clinical trials treatment" \
-  -q "CRISPR" -q "sickle cell" \
-  --json --max-results 10 --excerpt-max-chars-total 27000 \
-  -o sources/litreview_crispr_scd-general.json
-
-# 3. Search specialized databases using appropriate skills
-# - Use gget skill for PubMed, bioRxiv
-# - Use direct API access for arXiv, Semantic Scholar
-# - Export results in JSON format
-
-# 4. Aggregate and process results (combine parallel-cli + database results)
-python scripts/search_databases.py combined_results.json \
-  --deduplicate \
-  --rank citations \
-  --year-start 2015 \
-  --year-end 2024 \
-  --format markdown \
-  --output search_results.md \
-  --summary
-
-# 5. Screen results and extract data
-# - Use parallel-cli extract to fetch full content from promising URLs
-# - Manually screen titles, abstracts, full texts
-# - Extract key data into the review document
-# - Organize by themes
-
-# 6. Write the review following template structure
-# - Introduction with clear objectives
-# - Detailed methodology section
-# - Results organized thematically
-# - Critical discussion
-# - Clear conclusions
-
-# 7. Verify all citations
-python scripts/verify_citations.py crispr_sickle_cell_review.md
-
-# Review the citation report
-cat crispr_sickle_cell_review_citation_report.json
-
-# Fix any failed citations and re-verify
-python scripts/verify_citations.py crispr_sickle_cell_review.md
-
-# 8. Generate professional PDF
-python scripts/generate_pdf.py crispr_sickle_cell_review.md \
-  --citation-style nature \
-  --output crispr_sickle_cell_review.pdf
-
-# 9. Review final PDF and markdown outputs
+python3 <plugin-root>/skills/get-zotero/scripts/zotero.py inventory \
+  --collection-key <collection-key> --json
 ```
 
-## Integration with Other Skills
+合并并按父条目 key 去重后，再为候选条目调用：
 
-This skill works seamlessly with other scientific skills:
-
-### Web Search & Extraction (parallel-web skill — PRIMARY)
-- **parallel-cli search**: Broad academic and general web search with domain filtering — use for initial scoping, finding papers, citation chaining, and supplementary searches
-- **parallel-cli extract**: Fetch full content from paper URLs, journal websites, and preprint servers — use for reading abstracts, extracting reference lists, and verifying paper details
-- **parallel-cli search --include-domains**: Academic-focused search across scholarly domains (arxiv.org, pubmed, nature.com, etc.)
-
-### Database Access Skills
-- **gget**: PubMed, bioRxiv, COSMIC, AlphaFold, Ensembl, UniProt
-- **bioservices**: ChEMBL, KEGG, Reactome, UniProt, PubChem
-- **datacommons-client**: Demographics, economics, health statistics
-
-### Analysis Skills
-- **pydeseq2**: RNA-seq differential expression (for methods sections)
-- **scanpy**: Single-cell analysis (for methods sections)
-- **anndata**: Single-cell data (for methods sections)
-- **biopython**: Sequence analysis (for background sections)
-
-### Visualization Skills
-- **matplotlib**: Generate figures and plots for review
-- **seaborn**: Statistical visualizations
-
-### Writing Skills
-- **brand-guidelines**: Apply institutional branding to PDF
-- **internal-comms**: Adapt review for different audiences
-
-## Resources
-
-### Bundled Resources
-
-**Scripts:**
-- `scripts/verify_citations.py`: Verify DOIs and generate formatted citations
-- `scripts/generate_pdf.py`: Convert markdown to professional PDF
-- `scripts/search_databases.py`: Process, deduplicate, and format search results
-
-**References:**
-- `references/citation_styles.md`: Detailed citation formatting guide (APA, Nature, Vancouver, Chicago, IEEE)
-- `references/database_strategies.md`: Comprehensive database search strategies
-
-**Assets:**
-- `assets/review_template.md`: Complete literature review template with all sections
-
-### External Resources
-
-**Guidelines:**
-- PRISMA (Systematic Reviews): http://www.prisma-statement.org/
-- Cochrane Handbook: https://training.cochrane.org/handbook
-- AMSTAR 2 (Review Quality): https://amstar.ca/
-
-**Tools:**
-- MeSH Browser: https://meshb.nlm.nih.gov/search
-- PubMed Advanced Search: https://pubmed.ncbi.nlm.nih.gov/advanced/
-- Boolean Search Guide: https://www.ncbi.nlm.nih.gov/books/NBK3827/
-
-**Citation Styles:**
-- APA Style: https://apastyle.apa.org/
-- Nature Portfolio: https://www.nature.com/nature-portfolio/editorial-policies/reporting-standards
-- NLM/Vancouver: https://www.nlm.nih.gov/bsd/uniform_requirements.html
-
-## Dependencies
-
-### Required CLI Tools
 ```bash
-# parallel-cli (PRIMARY — for web search and URL extraction)
-curl -fsSL https://parallel.ai/install.sh | bash
-# Or: uv tool install "parallel-web-tools[cli]"
-# Authenticate: parallel-cli auth
+python3 <plugin-root>/skills/get-zotero/scripts/zotero.py content \
+  <item-key> --mode auto --out-dir <temporary-directory>
 ```
 
-### Required Python Packages
-```bash
-pip install requests  # For citation verification
-```
+验证 stdout manifest 的 `schema_version == 1`、`item_key` 与请求一致、`content.kind` 有效且文件 artifact 存在后才读取。`text-file` 可作为正文证据；`pdf-file` 在任何需要支撑具体结果、数值、方法比较或局限性的全文主张时定向解析，图、表、公式或页内位置同样如此；`metadata-only` 只能用于题录和原始摘要；`error` 按 `code` 与 `next_step` 处理且不写成无全文。不得直接调用 Zotero HTTP API、导入 `get-zotero` Python 模块或访问 Zotero 配置/附件路径。
 
-### Required System Tools
-```bash
-# For PDF generation
-brew install pandoc  # macOS
-apt-get install pandoc  # Linux
+## 证据门槛
 
-# For LaTeX (PDF generation)
-brew install --cask mactex  # macOS
-apt-get install texlive-xetex  # Linux
-```
+- 至少读到摘要，文献才可进入正文综合。
+- 涉及具体结果、数值、方法比较或研究局限时，读取可获得的正文证据。
+- 只有标题或题录、且内容不足以核对的文献可作为候选，但不能支撑正文结论。
+- 核对作者、题名、年份、期刊以及 DOI 或稳定链接；无法核验的字段明确标注，不猜测补全。
+- 区分同行评议论文与预印本，并在结论力度上反映证据差异。
 
-Check dependencies:
-```bash
-python scripts/generate_pdf.py --check-deps
-```
+本 skill 不要求保存检索式、每轮结果数、筛选流水、PRISMA 图或其他可复现检索记录。用户明确要求正式系统综述或 PRISMA 流程时，先说明当前轻量工作流不覆盖该方法学承诺，再确认是否仍按本流程完成普通文献综述。
 
-## Summary
+## 综合与写作
 
-This literature-review skill provides:
+根据主题选择足够覆盖问题的文献，兼顾奠基性工作、当前进展、相互冲突的结果和重要限制。正文按研究问题或主题综合，不写成逐篇摘要清单，也不以引用量、期刊名或作者声望替代证据判断。
 
-1. **Systematic methodology** following academic best practices
-2. **Parallel-web powered search** using `parallel-cli search` for fast, broad academic literature discovery with scholarly domain filtering
-3. **Multi-database integration** via existing scientific skills (gget, bioservices, datacommons-client)
-4. **Citation verification** ensuring accuracy and credibility
-5. **Professional output** in markdown and PDF formats
-6. **Comprehensive guidance** covering the entire review process
-7. **Quality assurance** with verification and validation tools
-8. **Reproducibility** through detailed documentation requirements
+文档结构随问题调整，但必须包含：
 
-Conduct thorough, rigorous literature reviews that meet academic standards and provide comprehensive synthesis of current knowledge in any domain.
+- 清楚界定的主题与范围；
+- 按主题组织的证据综合；
+- 共识、分歧、局限和仍未解决的问题；
+- 正文引用与完整参考文献表。
 
+默认使用作者—年份引用格式，并尽量为每条参考文献提供 DOI 或稳定链接；用户指定目标格式时遵从用户要求。图件不是必需交付物，不生成 PDF。
+
+## 写入与完成标准
+
+将最终内容写入用户确认的 Markdown 路径。完成前检查：
+
+- 文件存在且为可读的 Markdown；
+- 正文中的每项实质性文献主张都有已读取证据支撑；
+- 正文引用与参考文献表逐一对应；
+- 来源限制、全文不可得或证据不足等重要边界已在文中说明；
+- 除用户明确要求外，没有创建其他交付文件。
+
+最后向用户返回 Markdown 文件路径，并用几句话概括覆盖范围与主要证据限制。

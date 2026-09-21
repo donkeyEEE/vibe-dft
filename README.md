@@ -116,7 +116,7 @@ $calc-project:calc-execute 推进 SPEC-001 中当前可执行的 Task 和 Run。
 | --- | --- |
 | [get-zotero](plugins/paper-project/skills/get-zotero/SKILL.md) | 从 Zotero Desktop 只读获取题录、索引正文或本地 PDF。 |
 | [get-notes](plugins/paper-project/skills/get-notes/SKILL.md) | 将选定的 Zotero 文献整理为项目内中文研究笔记或稿件素材库。 |
-| [literature-review](plugins/paper-project/skills/literature-review/SKILL.md) | 跨学术数据库开展系统文献检索、综述与证据综合。 |
+| [literature-review](plugins/paper-project/skills/literature-review/SKILL.md) | 从 Web 或指定 Zotero 分类检索证据并生成 Markdown 文献综述。 |
 | [liteparse](plugins/paper-project/skills/liteparse/SKILL.md) | 提取 PDF、Office 文档和图片的文字与版面坐标，支持 OCR 和页面渲染。 |
 | [citation-validator](plugins/paper-project/skills/citation-validator/SKILL.md) | 检查 Word 稿件中的引用是否支持对应论断，并结合 Zotero 文献评估支持程度。 |
 | [pr-intro](plugins/paper-project/skills/pr-intro/SKILL.md) | 撰写或重构以证据为基础的 Physical Review 论文引言。 |

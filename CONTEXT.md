@@ -52,6 +52,10 @@ _Avoid_: ask-dnk（当前名称）
 
 `plugins/paper-project` 面向学术研究与论文工作；写作资源全部下放到实际消费它们的 skill 的 `references/`，不保留插件级 `resources/`。
 
+**文献综述来源模式（Literature Review Source Mode）**:
+`literature-review` 单次运行所采用的证据入口。Web 模式是未指定来源时的默认入口；Zotero 模式递归使用用户指定分类及全部子分类；只有用户明确要求时才同时采用两者组成混合模式。来源模式决定本次可纳入的文献边界，不代表正式系统综述的可复现检索协议。
+_Avoid_: 数据库类型、检索策略、系统综述模式
+
 **遮蔽续写测试（Masked Continuation Evaluation）**:
 向受测 agent 只提供 Introduction 的可见前文与候选 skill，由其生成被遮蔽的后续论证；评估以修辞功能、科学内容兼容性、信息密度和无虚构为主，不要求逐字复现原文。
 _Avoid_: 原文复现测试、字面续写测试

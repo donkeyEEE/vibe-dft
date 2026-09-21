@@ -38,7 +38,7 @@ python3 <plugin-root>/skills/get-zotero/scripts/zotero.py content \
 - `indexed-text`：要求索引正文并写入 UTF-8 TXT artifact；不可用时返回结构化错误。
 - `pdf`：返回所属 PDF 的只读本地路径；不可访问时返回结构化错误。
 
-需要先定位文献时使用 `search`；需要检查附件、批注或 child notes 时使用 `children`；需要用户当前选择的 collection 时使用 `selected-target`。PDF 的读取和 OCR 边界见 [PDF 证据策略](references/pdf-evidence-strategy.md)。
+需要先定位文献时使用 `search`；需要列出某个用户指定分类中的父条目时使用 `inventory --collection-key <collection-key> --json`；需要检查附件、批注或 child notes 时使用 `children`；需要用户当前选择的 collection 时使用 `selected-target`。PDF 的读取和 OCR 边界见 [PDF 证据策略](references/pdf-evidence-strategy.md)。
 
 ## Content artifact contract
 

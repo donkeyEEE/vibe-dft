@@ -623,6 +623,9 @@ def cmd_probe(args: argparse.Namespace, client: ZoteroClient) -> None:
 
 def cmd_inventory(args: argparse.Namespace, client: ZoteroClient) -> None:
     endpoint = "items" if args.include_children else "items/top"
+    if args.collection_key:
+        collection_key = urllib.parse.quote(args.collection_key, safe="")
+        endpoint = f"collections/{collection_key}/{endpoint}"
     params = query({"sort": "title", "direction": "asc"})
     rows = [summarize_item(item) for item in api_get(client, f"{LOCAL_USER}/{endpoint}?{params}")]
     dump_json(rows) if args.json else print_items(rows)
@@ -773,6 +776,10 @@ def build_parser() -> argparse.ArgumentParser:
     inventory = subcommands.add_parser("inventory", help="List Zotero items")
     inventory.add_argument(
         "--include-children", action="store_true", help="Include child notes and attachments"
+    )
+    inventory.add_argument(
+        "--collection-key",
+        help="List items in one user-selected Zotero collection",
     )
     inventory.add_argument(
         "--all", action="store_true", dest="include_children", help=argparse.SUPPRESS
