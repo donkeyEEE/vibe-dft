@@ -1,6 +1,6 @@
-# vibe-dft
+# vibe-dft-auto
 
-`vibe-dft` 是一组面向科研计算、学术写作和项目日志的 Codex 插件。仓库包含四个可独立发布的插件；它们的 skill、脚本、模板和参考资料都放在各自的 `plugins/<plugin-name>/` 目录中。
+这个仓库维护科研计算、学术写作和项目日志相关的 Codex 插件。四个插件分别发布，各自的 skill、脚本、模板和参考资料放在 `plugins/<plugin-name>/` 下。插件市场名称仍是 `vibe-dft`。
 
 ## 插件
 
@@ -13,7 +13,7 @@
 
 ## 安装
 
-需要使用支持 `codex plugin` 命令的 Codex CLI。仓库提供名为 `vibe-dft` 的插件市场，可从 GitHub 或本地工作树注册。
+安装需要支持 `codex plugin` 命令的 Codex CLI。可以从 GitHub 或本地工作树注册插件市场 `vibe-dft`。
 
 ### 从 GitHub 安装与更新
 
@@ -39,7 +39,7 @@ codex plugin add skill-incubator@vibe-dft
 codex plugin list
 ```
 
-如果只做科研计算，安装 `calc-project` 即可。安装或重新安装插件后，请新建 Codex 对话，使其进入会话上下文。
+只做科研计算时，安装 `calc-project` 即可。安装或重新安装插件后，新建 Codex 对话以加载插件。
 
 更新已注册的 GitHub 市场时，运行：
 
@@ -48,7 +48,7 @@ codex plugin marketplace upgrade vibe-dft
 codex plugin add calc-project@vibe-dft
 ```
 
-第二条命令会重新安装已更新的插件。若市场固定在某个版本标签，升级仍会停留在该标签；要切换到新版本，请重新注册到目标标签或 `main`。可用 `codex plugin list --marketplace vibe-dft` 查看该市场中的插件。
+第二条命令会重新安装已更新的插件。固定在版本标签上的市场不会因升级切换到其他版本；需要切换时，重新注册到目标标签或 `main`。用 `codex plugin list --marketplace vibe-dft` 查看已注册市场中的插件。
 
 ### 从本地工作树安装
 
@@ -61,11 +61,11 @@ codex plugin marketplace add "$(pwd)"
 codex plugin add calc-project@vibe-dft
 ```
 
-本地市场直接读取当前工作树。修改插件后重新执行对应的 `codex plugin add`，再新建对话验证。不要同时注册同一仓库的 GitHub 副本和本地副本，以免使用同名市场。
+本地市场读取当前工作树。修改插件后，重新运行对应的 `codex plugin add`，再新建对话验证。不要同时注册本地副本和同一仓库的 GitHub 副本，两者会使用相同的市场名称。
 
 ## Skills
 
-插件下实际存在的 `skills/*/SKILL.md` 是该插件的 skill roster。下列链接指向对应的说明文件；标注为“仅显式调用”的 skill 会在 `agents/openai.yaml` 中禁止 Codex 自动选择。
+每个插件的 `skills/*/SKILL.md` 构成其 skill 列表。下表链接到各 skill 的说明文件。仅限显式调用的 skill 会在 `agents/openai.yaml` 中关闭自动选择。
 
 ### calc-project
 
@@ -84,24 +84,32 @@ Calc Project 按 `RQ → Spec → Task → Run` 组织计算工作：
 
 ```text
 RQ ─────────────▶ Spec ─────────────▶ Task ─────────────▶ Run
-研究问题           已批准科学设计       可执行工作单元       一次具体执行尝试
+研究问题           已发布科学设计       可执行工作单元       一次具体执行尝试
   │                  │                   │                   │
 calc-rq          calc-to-spec        calc-execute        calc-execute
 ```
 
-- **RQ（研究问题）**：在一条研究主线内记录要回答的问题、研究边界、成功标准和已接受决策。一个 RQ 可以发布多份分别承担不同主要判断的 Spec。
-- **Spec（计算规范）**：围绕一个主要判断形成的当前科学设计，定义任务依赖图，并记录任务目的、条件、验收规则、状态、Run 和闭合结论。
-- **Task（计算任务）**：Spec 中为支持主要判断而声明的可执行工作单元；其身份、目的、依赖、条件和验收标准由父 Spec 管理。
+- **RQ（研究问题）**：记录一条研究主线中的问题、边界、成功标准和已接受决策。一个 RQ 可以有多份 Spec，各自回答不同的主要判断。
+- **Spec（计算规范）**：针对一个主要判断制定科学设计，定义任务依赖，并记录任务目的、条件、验收规则、状态、Run 和闭合结论。
+- **Task（计算任务）**：Spec 中支持主要判断的可执行工作单元。父 Spec 管理它的身份、目的、依赖、条件和验收标准。
 - **Run（运行）**：一个 Task 的一次具体执行尝试。Run 在独立目录中保存实际输入、输出和日志。每次验证与评审固定当时的输入快照；新的尝试使用新的 Run 编号，符合条件的当前 Run 可原地纠正。
 
-通常先用 `calc-setup` 建立项目根目录、数据根、RQ Tracker 和集群配置，再依次推进：
+通常先用 `calc-setup` 建立项目根目录、数据根、RQ Tracker 和集群配置，然后推进 RQ、Spec 和 Run：
 
 1. 用 `calc-rq` 建立或推进 RQ，并把用户在访谈中确认的答案写入 RQ 的 `## Decisions`。
-2. 用 `calc-to-spec` 为 RQ 当前有依据的主要判断设计并自主发布一份完整 Spec；后续判断可随结果渐进发布。Spec 的证据档位优先采用自身设置，否则继承 RQ，均未设置时为轻量。
-3. 用 `calc-execute` 推进已发布的 Spec：选择当前可执行的 Task，创建或继续 Run，准备并验证输入，评审通过后自主提交作业，接收结果并按验收规则处理后续 Task；若出现新的科学设计需求，交回 `calc-to-spec`。
-4. 全部 Task 得到明确处置后，由 `calc-execute` 提出 Spec 闭合；研究结论是否影响 RQ，则交由后续 `calc-rq` 流程处理。
+2. 用 `calc-to-spec` 为 RQ 当前有依据的主要判断设计并发布一份完整 Spec。后续判断可根据结果逐份发布。证据档位优先采用 Spec 的设置，其次继承 RQ；都未设置时采用轻量档。
+3. 用 `calc-execute` 推进已发布的 Spec：选择可执行的 Task，创建或继续 Run，准备并验证输入。评审通过后自主提交作业，接收结果并处理后续 Task。需要改变科学设计时，交由 `calc-to-spec`。
+4. 全部 Task 都已处理且闭合证据充分时，`calc-execute` 自主结束 Spec。需要调整 RQ 时，交由后续 `calc-rq` 流程。
 
-无法判断入口时使用 `ask-lyz`；它也能解释项目术语或查询进度。`calc-review` 是 Run 提交前的瞬时只读关口：通常由 `calc-execute` 对准确的已准备输入快照调用。输入、资源或执行环境改变后，必须重新验证和评审。它不管理 Task、Run 或 Spec 状态，直接调用不启动执行链。
+### Calc Project 的自主执行与人工参与
+
+在已接受 RQ 和用户明确约束内，`calc-to-spec` 可自主发布新 Spec，也可替换未结束 Spec 的当前设计。Spec 可以随研究进展逐份发布，无需事先列齐。设计证据不足时，agent 可自行调研。默认的轻量档只要求当前判断和必要交接所需的检查；用户可在 RQ 或 Spec 中明确要求严格档。
+
+用户委托执行选定 Spec 后，`calc-execute` 可以准备和评审 Run，提交、监控和排查作业问题，同步结果，调整资源或成本，取消过时作业，处理执行产物，并在证据充分时结束 Spec。若委托范围是推进整个 RQ，有依据的下一项判断可继续进入新 Spec。需要修改执行中的科学设计时，`calc-to-spec` 会安全替换当前设计，并保留旧 Run 证据。
+
+若已接受 RQ、项目证据和可靠文献仍不足以解决关键科学问题，agent 会请用户参与判断。修改或重开已结束（`concluded`）的 Spec 需要针对具体变更取得授权。改变 RQ 的已接受决策、超出用户明确边界的行动也需另行处理。执行过程继续保留安全检查、提交前快照评审和证据记录。
+
+不确定该用哪个 skill 时，可以使用 `ask-lyz`；它也能解释项目术语和查询进度。`calc-review` 通常由 `calc-execute` 在提交 Run 前调用，对已准备的输入快照做一次只读评审。输入、资源或执行环境改变后，必须重新验证和评审。直接调用 `calc-review` 不会启动执行，也不会改变 Task、Run 或 Spec 的状态。
 
 ```text
 $calc-project:calc-setup 为当前目录建立计算项目配置。
