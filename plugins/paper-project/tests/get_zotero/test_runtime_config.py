@@ -18,6 +18,7 @@ from runtime_config import (  # noqa: E402
     default_gateway,
     is_wsl,
     load_runtime_config,
+    powershell_wsl_host,
     wsl_default_gateway,
 )
 
@@ -189,3 +190,22 @@ def test_wsl_default_gateway_invokes_ip_without_shell() -> None:
             {"check": True, "capture_output": True, "text": True},
         )
     ]
+
+
+def test_powershell_wsl_host_reads_virtual_switch_without_shell() -> None:
+    calls: list[tuple[object, object]] = []
+
+    def run(command, **kwargs):
+        calls.append((command, kwargs))
+        return subprocess.CompletedProcess(command, 0, "172.28.64.1\n", "")
+
+    assert powershell_wsl_host(run, lambda name: "/mnt/c/powershell.exe") == "172.28.64.1"
+    command, kwargs = calls[0]
+    assert command[:4] == [
+        "/mnt/c/powershell.exe",
+        "-NoProfile",
+        "-NonInteractive",
+        "-Command",
+    ]
+    assert "vEthernet (WSL*" in command[4]
+    assert kwargs == {"check": True, "capture_output": True, "text": True}

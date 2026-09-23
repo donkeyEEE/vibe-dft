@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import ipaddress
+import shutil
 import subprocess
 import tomllib
 from collections.abc import Callable, Mapping
@@ -238,6 +239,44 @@ def wsl_default_gateway(
     except (OSError, subprocess.SubprocessError) as error:
         raise ConfigError(f"Could not inspect the WSL gateway: {error}") from error
     return default_gateway(completed.stdout)
+
+
+def powershell_wsl_host(
+    run: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
+    which: Callable[[str], str | None] = shutil.which,
+) -> str:
+    """Read the Windows-side WSL virtual-switch address without changing networking."""
+    executable = which("powershell.exe")
+    if executable is None:
+        mounted = Path("/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
+        if mounted.exists():
+            executable = str(mounted)
+    if executable is None:
+        raise ConfigError("Windows PowerShell was not found from WSL")
+
+    command = (
+        "Get-NetIPAddress -AddressFamily IPv4 | "
+        "Where-Object { $_.InterfaceAlias -like 'vEthernet (WSL*' } | "
+        "Select-Object -ExpandProperty IPAddress"
+    )
+    try:
+        completed = run(
+            [executable, "-NoProfile", "-NonInteractive", "-Command", command],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.SubprocessError) as error:
+        raise ConfigError(f"Could not inspect the Windows WSL interface: {error}") from error
+
+    for line in completed.stdout.splitlines():
+        try:
+            address = ipaddress.IPv4Address(line.strip())
+        except ipaddress.AddressValueError:
+            continue
+        if not (address.is_loopback or address.is_unspecified or address.is_multicast):
+            return str(address)
+    raise ConfigError("No usable Windows WSL interface address was found")
 
 
 def candidate_endpoints(

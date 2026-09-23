@@ -149,11 +149,28 @@ def test_wsl_gateway_failure_keeps_loopback_candidate() -> None:
         raise ConfigError("no gateway")
 
     endpoints, gateway_error = zotero.runtime_endpoints(
-        runtime(), gateway_loader=unavailable_gateway
+        runtime(),
+        gateway_loader=unavailable_gateway,
+        windows_host_loader=lambda: "172.28.64.1",
+    )
+
+    assert [endpoint.url for endpoint in endpoints] == [
+        "http://127.0.0.1:24000",
+        "http://172.28.64.1:24000",
+    ]
+    assert gateway_error is None
+
+
+def test_wsl_discovery_reports_error_only_when_both_host_methods_fail() -> None:
+    def unavailable():
+        raise ConfigError("unavailable")
+
+    endpoints, discovery_error = zotero.runtime_endpoints(
+        runtime(), gateway_loader=unavailable, windows_host_loader=unavailable
     )
 
     assert [endpoint.url for endpoint in endpoints] == ["http://127.0.0.1:24000"]
-    assert gateway_error == "no gateway"
+    assert discovery_error == "unavailable; unavailable"
 
 
 def test_doctor_reports_sources_without_local_paths() -> None:

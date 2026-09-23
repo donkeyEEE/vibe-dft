@@ -8,9 +8,9 @@ python3 <plugin-root>/skills/get-zotero/scripts/zotero.py doctor --json
 
 ## Zotero 不可达
 
-确认 Zotero Desktop 正在目标机器运行。原生 Windows、macOS 和 Linux 默认连接 `127.0.0.1:23119`。WSL 先尝试 loopback，再动态读取 Windows 主机地址。
+确认 Zotero Desktop 正在目标机器运行。原生 Windows、macOS 和 Linux 默认连接 `127.0.0.1:23119`。WSL 先尝试 loopback，再动态读取 Linux 默认网关和 Windows `vEthernet (WSL…)` 接口地址。
 
-不要写死其他机器的 WSL 网关。动态发现失败时，请用户提供当前 Windows 主机地址；按 `configuration.md` 展示并确认配置后再写入。
+不要写死其他机器的 WSL 网关。动态发现失败时，检查 WSL 网络模式、Windows Local API 与防火墙边界；保持自动探测，不创建用户配置文件。
 
 ## 本地 API 未启用
 
@@ -18,7 +18,7 @@ python3 <plugin-root>/skills/get-zotero/scripts/zotero.py doctor --json
 
 ## 显式 host 不可达
 
-显式 host 不会自动回退。核对 host、port 和运行环境；修改配置前再次展示拟写 TOML 并取得确认。不要在 Get Zotero 流程中自行创建防火墙规则、端口代理或远程转发。
+显式 host 不会自动回退。核对命令行参数、环境变量和已有配置中的 host、port 与运行环境。不要在 Get Zotero 流程中自行创建配置、防火墙规则、端口代理或远程转发。
 
 ## PDF 附件不可访问
 
@@ -26,7 +26,7 @@ python3 <plugin-root>/skills/get-zotero/scripts/zotero.py doctor --json
 
 - 标准 Windows 盘符由 WSL 自动转换，例如 `C:\Papers\a.pdf` → `/mnt/c/Papers/a.pdf`。
 - UNC、网络盘、云盘和自定义挂载需要用户提供 Windows 路径前缀与本地挂载前缀。
-- Codex 按 `configuration.md` 展示映射，确认后写入并重新验证。
+- 非标准挂载无法自动解析时返回结构化限制，不在 Get Zotero 流程中创建路径映射配置。
 - 不扫描磁盘寻找附件，不在普通回复或笔记中暴露完整本地路径。
 
 ## 配置解析失败

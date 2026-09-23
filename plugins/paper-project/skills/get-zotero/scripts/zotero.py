@@ -24,6 +24,7 @@ from runtime_config import (
     candidate_endpoints,
     config_path,
     load_runtime_config,
+    powershell_wsl_host,
     wsl_default_gateway,
 )
 
@@ -185,15 +186,33 @@ def api_get(client: ZoteroClient, path: str) -> Any:
 def runtime_endpoints(
     config: RuntimeConfig,
     gateway_loader: Callable[[], str] = wsl_default_gateway,
+    windows_host_loader: Callable[[], str] = powershell_wsl_host,
 ) -> tuple[tuple[Endpoint, ...], str | None]:
     gateway = None
-    gateway_error = None
+    discovery_errors: list[str] = []
     if config.mode == "wsl" and not config.host:
         try:
             gateway = gateway_loader()
         except ConfigError as error:
-            gateway_error = str(error)
-    return candidate_endpoints(config, gateway), gateway_error
+            discovery_errors.append(str(error))
+        endpoints = list(candidate_endpoints(config, gateway))
+        try:
+            windows_host = windows_host_loader()
+        except ConfigError as error:
+            discovery_errors.append(str(error))
+        else:
+            url = f"http://{windows_host}:{config.port}"
+            if all(endpoint.url != url for endpoint in endpoints):
+                endpoints.append(
+                    Endpoint(
+                        url=url,
+                        host_header=f"127.0.0.1:{config.port}",
+                        source="automatic-windows-wsl-interface",
+                    )
+                )
+        error = "; ".join(discovery_errors) if len(endpoints) == 1 else None
+        return tuple(endpoints), error
+    return candidate_endpoints(config, gateway), None
 
 
 def query(params: dict[str, str | int | bool | None]) -> str:
