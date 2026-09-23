@@ -26,7 +26,7 @@ integration points once each:
 body. It requires a declared regular source and an existing destination
 directory below this Run's `inputs/`. It uses server-side `rsync`, preserves the
 source, accepts an already identical regular destination, and rejects links or
-a differing destination. An authorized in-place correction removes or replaces
+a differing destination. An eligible in-place correction removes or replaces
 the named affected destination before invoking `prepare`; the helper never
 decides correction eligibility. Name every copied file; do not use a directory
 glob.

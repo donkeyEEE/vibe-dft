@@ -24,6 +24,6 @@ commands are networkless and the candidate source is read-only.
 - A missing handoff blocks before `qsub`. A post-review snapshot change must
   reject submission with the stale reviewed digest. Continued submission is
   valid only after fresh validation and an actual fresh `calc-review` on the
-  changed bytes, with unchanged Spec settings/resources and the same exact
-  authorization scope; only then may fake `qsub` have exactly one call.
+  changed bytes, with unchanged Spec settings and respect for the user's
+  explicit constraints; only then may fake `qsub` have exactly one call.
 - No task-level inputs or locally copied CHGCAR/WAVECAR/HDF5 appear.

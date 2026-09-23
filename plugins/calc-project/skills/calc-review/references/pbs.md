@@ -12,7 +12,7 @@ current profile/probe evidence without modifying or executing them.
   and declared products are checked before success.
 - Queue, nodes, processors, walltime, executable, environment, and any backend
   resource values must match the current Spec, project profile, intended
-  submission environment, and authorization scope. A generic historical
+  submission environment, and the user's explicit constraints. A generic historical
   default is not evidence.
 - `run.sh submit` must verify the unchanged reviewed snapshot and submit the
   exact `inputs/run.pbs` from the Run directory. Preparation or validation

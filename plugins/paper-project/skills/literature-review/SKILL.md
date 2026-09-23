@@ -1,11 +1,13 @@
 ---
 name: literature-review
-description: Produce an evidence-grounded literature review from Web sources or a user-specified Zotero collection and save the result as Markdown. Use only when the user explicitly invokes $literature-review.
+description: Produce an evidence-grounded literature review from Web sources or a user-specified Zotero collection and save the result as Markdown. Standalone use requires explicit invocation; calc-to-spec may call it for design research.
 ---
 
 # Literature Review
 
 围绕用户的研究主题检索、阅读并综合文献，最终只交付一份 Markdown 文档。默认使用 Web；用户指定 Zotero 分类时，改用该分类及其全部子分类。
+独立使用时仅接受用户显式调用。`$calc-project:calc-to-spec` 为已解析 RQ 的科学设计
+补证据时，可明确调用本 skill；这不是面向普通请求的隐式调用入口。
 
 ## 启动门槛
 
@@ -14,7 +16,11 @@ description: Produce an evidence-grounded literature review from Web sources or 
 1. 研究主题或问题。
 2. Markdown 保存路径。
 
-缺少任一项时，先向用户询问。保存路径必须指向 `.md` 文件；在路径确认前不检索、不创建文件。若目标文件已经存在，停止写入并让用户选择新路径；只有用户明确要求时才覆盖或续写。创建尚不存在的父目录同样需要用户确认。
+独立调用缺少任一项时，先向用户询问。由 `$calc-project:calc-to-spec` 调用时，
+研究问题由其当前 Spec 设计缺口给定，保存路径由其在已解析研究主线的 `06-文献笔记/`
+中选择唯一 `.md` 文件；仅在该范围内可自行创建缺失的父目录。目标文件已存在时
+另选唯一文件名，不覆盖或续写。其他调用中，路径必须先由用户确认；已有文件或
+缺失父目录也按用户确认处理。
 
 时间范围、语言、综述侧重点和引用格式都是可选约束；用户未指定时，根据研究问题作合理选择。
 
@@ -71,7 +77,7 @@ python3 <plugin-root>/skills/get-zotero/scripts/zotero.py content \
 
 ## 写入与完成标准
 
-将最终内容写入用户确认的 Markdown 路径。完成前检查：
+将最终内容写入按启动门槛确定的 Markdown 路径。完成前检查：
 
 - 文件存在且为可读的 Markdown；
 - 正文中的每项实质性文献主张都有已读取证据支撑；

@@ -4,14 +4,15 @@ Use this reference when a Spec commits to a VASP-to-Hefei-NAMD/NAMDwithSOC
 representation or band window. The version-specific rules below were verified
 for NAMDwithSOC 1.5.2; other versions require their own evidence.
 
-## Evidence and approval inputs
+## Design evidence
 
 Read the accepted RQ decisions, installed NAMD implementation/version evidence,
 source VASP records, and representative `OUTCAR` and `EIGENVAL` evidence across
-the intended snapshots. Obtain approval for the physical representation,
-`SOCTYPE`, band-window fields and bounds, initial-condition meaning, source
-snapshot set, requested observables, and production acceptance and stopping
-criteria. An interface smoke test is not approval of a production trajectory.
+the intended snapshots. Set the physical representation, `SOCTYPE`, band-window
+fields and bounds, initial-condition meaning, source snapshot set, requested
+observables, and production acceptance and stopping criteria from the RQ and
+evidence. An interface smoke test does not establish
+a production trajectory's scientific validity.
 
 ## Representation commitments
 
@@ -29,7 +30,7 @@ while WAVECAR stores spinor coefficients. The verified representation for that
 case is the spin-adiabatic `SOCTYPE=1` branch. `LSORBIT=.TRUE.` or
 `LNONCOLLINEAR=.TRUE.` alone does not establish `SOCTYPE=2`.
 
-Before approving band commitments, inspect effective `ISPIN`, `NKPTS`,
+Before setting band commitments, inspect effective `ISPIN`, `NKPTS`,
 `NBANDS`, `LSORBIT`, and `LNONCOLLINEAR` for every included snapshot and check
 band indices and occupations across all frames. The Spec must make `SOCTYPE`,
 band fields, and `INICON` column meaning agree. Representation uncertainty or

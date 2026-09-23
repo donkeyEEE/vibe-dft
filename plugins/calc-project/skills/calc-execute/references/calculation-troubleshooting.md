@@ -51,16 +51,17 @@ authorization.
 
 For every viable solution, relate the evidence to the suspected cause and name
 the intended changes, affected Run artifacts, material risks, scientific or
-cost effects, and targeted checks. When competing solutions remain, present
-them to the user and wait for a choice.
+cost effects, and targeted checks. When competing technical solutions remain,
+choose the one best supported by evidence, then test it against the targeted checks.
+Preserve alternatives and the reason for the choice in the troubleshooting record.
 
-A single technical solution may proceed without another choice when it stays
-inside the approved scientific meaning, current execution scope, and existing
-resource and cost authorization. A solution that changes a scientific
-commitment or requires a Spec change goes through `$calc-to-spec`. Stable
-project configuration changes go through `$calc-setup`. Submission,
-cancellation, synchronization, increased resources or cost, deletion, and
-mutation outside the current scope retain their existing authorization gates.
+Technical solutions proceed within the approved scientific meaning and the
+user's explicit constraints. A solution that changes a scientific commitment
+or requires a Spec change goes through `$calc-to-spec` for approval. Stable
+project configuration changes go through `$calc-setup`. Handle submission,
+cancellation, synchronization, resource or cost changes, and cleanup as part of
+the selected Spec's execution; inspect the target and impact before acting and
+record the result.
 
 Apply the selected solution through the owning execution path. Change the set
 of coupled variables the diagnosis requires; calculation troubleshooting does
@@ -84,8 +85,8 @@ causes, remaining hypotheses, attempted solutions, and available next actions;
 leave the authoritative task and Run states truthful.
 
 After success, report the effective solution, evidence, and applicability
-boundary. Ask the user whether the reusable knowledge should be written as an
-independent stable note under `02-计算规范/`. Promote the temporary research
-evidence only with that approval. This workflow does not create a
+boundary. When the finding is reusable and verified, write an independent stable
+note under `02-计算规范/`, citing the temporary research evidence and its
+applicability boundary. This workflow does not create a
 task-specific record under `04-问题排查/`, and an unverified solution is never
 promoted as stable calculation knowledge.

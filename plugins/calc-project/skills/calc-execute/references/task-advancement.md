@@ -13,7 +13,10 @@ evidence to `$calc-to-spec`.
 The first accepted Run that satisfies the current task definition may become
 `Current: yes`. Replacing an existing current Run requires an explicit reason
 grounded in the current definition and evidence. When multiple valid Runs
-conflict, stop automatic selection. Preserve each Run's status and evidence;
+conflict, compare them against the approved task definition and available evidence;
+select one only when that evidence resolves the conflict. Otherwise retain their
+states, mark the task `needs-review`, and report the unresolved scientific question.
+Preserve each Run's status and evidence;
 the `Current` field selects a result and does not rewrite history.
 
 Whenever acceptance evidence changes, update the Run row's `Result` as a
@@ -40,11 +43,13 @@ update to the Spec's current task state, never a separate invalidation cache.
 
 ## Close once
 
-Normal and early closure use the same gate. First derive an empty or otherwise
-terminal frontier from the current Spec and evidence. Then present one concrete
-proposal containing the principal judgment, accepted tasks and current Runs,
-the disposition of every unfinished task, the closure reason, and proposed RQ
-impact. Only explicit approval of this unchanged proposal permits setting the
-same Spec to `concluded` and adding one `## Closure` with `Judgment`, `Evidence`,
-and `RQ impact`. A concluded Spec is immutable. Its RQ impact remains a proposal
-until a later, separately approved `$calc-rq` update.
+Normal and early closure use the same evidence gate. Derive an empty or otherwise
+terminal frontier from the current Spec and evidence. Record the principal judgment,
+accepted tasks and current Runs, disposition of every unfinished task, closure
+reason, and proposed RQ impact. When each point follows from the approved Spec and
+observed evidence, set the Spec to `concluded` and add one `## Closure` with
+`Judgment`, `Evidence`, and `RQ impact`; report the completed closure to the user.
+If closure requires a new scientific design judgment, route that change through
+`$calc-to-spec` before continuing. A concluded Spec remains closed unless the
+user specifically authorizes its concrete modification or reopening.
+Its RQ impact remains a proposal until a later `$calc-rq` update.

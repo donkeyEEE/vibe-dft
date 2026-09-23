@@ -6,6 +6,7 @@ def test_spec_template(plugin_root):
         "ID: SPEC-001",
         "Status: ready",
         "RQ: ../RQ.md",
+        "Evidence level: light",
         "## 判断",
         "## 任务",
         "### TASK-001:",
@@ -44,7 +45,7 @@ def test_run_result_is_a_compact_advancement_summary(plugin_root):
     assert "不粘贴原始日志、排障过程或 详细诊断" in flat
 
 
-def test_design_flow_keeps_full_draft_internal_until_summary_approval(plugin_root):
+def test_design_flow_is_incremental_and_only_interviews_for_critical_gaps(plugin_root):
     text = " ".join(
         (plugin_root / "skills/calc-to-spec/SKILL.md")
         .read_text(encoding="utf-8")
@@ -52,16 +53,25 @@ def test_design_flow_keeps_full_draft_internal_until_summary_approval(plugin_roo
     )
 
     assert "$dev-engineering:grill-with-docs" in text
-    assert text.index("$dev-engineering:grill-with-docs") < text.index(
-        "用 [Spec 模板]"
-    )
-    assert "完整 Spec 草案为内部内容" in text
-    assert "只展示目标路径、设计摘要" in text
-    assert "不要求展示任一成员的完整 Markdown" in text
-    assert "一份可审阅草案" not in text
-    assert "完整 Markdown 草案" not in text
-    assert "完整被覆盖 Spec" not in text
-    assert "每条记录的 Run 行" not in text
+    assert "无需预先穷尽该 RQ 的全部 Spec" in text
+    assert "只有影响主要判断、必要 可比性或验收" in text
+    assert "没有关键缺口时自主完成设计" in text
+    assert "新建与安全替换不另设发布批准" in text
+    assert "`concluded` Spec 可只读引用" in text
+    assert "直接进入 `$calc-execute`" in text
+
+
+def test_evidence_level_inheritance_and_research_handoff(plugin_root):
+    spec = (plugin_root / "skills/calc-to-spec/SKILL.md").read_text(encoding="utf-8")
+    template = (plugin_root / "skills/calc-to-spec/references/spec-template.md").read_text(encoding="utf-8")
+    rq_template = (plugin_root / "skills/calc-rq/references/rq-template.md").read_text(encoding="utf-8")
+
+    assert "Spec 的明确设置优先" in spec
+    assert "两者都未设置时为 `light`" in spec
+    assert "证据档位" in template
+    assert "Evidence level:" in rq_template
+    assert "$dev-engineering:research" in spec
+    assert "$paper-project:literature-review" in spec
 
 
 def test_spec_separates_scientific_commitments_from_execution_discretion(plugin_root):

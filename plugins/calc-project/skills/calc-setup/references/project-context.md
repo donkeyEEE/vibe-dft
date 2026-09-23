@@ -46,9 +46,17 @@ _Avoid_: Tracker 数据库，进度缓存，会话注册表
 _Avoid_: 研究计划目录，任务列表
 
 **计算规范（Spec）**:
-一个主判断的当前已批准科学设计，也是其任务目的、DAG、状态、Runs、current Run、
+一个主判断的当前已发布科学设计，也是其任务目的、DAG、状态、Runs、current Run、
 执行记录和闭包的唯一权威。Spec 不维护修订历史。
 _Avoid_: Tracker 状态，工作流状态文件
+
+**证据档位（Evidence Level）**:
+RQ 或 Spec 对验收与可比性检查采用的 `light | strict` 设置。Spec 的明确设置优先，
+否则在发布时继承 RQ；两者均缺失时为 `light`。`light` 要求足以回答 Task Purpose
+的直接结果和必要交接，不默认增加独立收敛扫描、参数敏感性、重复 Run 或替代方法对照；
+判断本身必需的检查始终保留。`strict` 增加与主要判断相关的增强检查，并遵循
+用户或已接受 RQ 的明确要求。
+_Avoid_: Run 状态，执行批准
 
 **计算任务（Calculation Task）**:
 Spec 中为支持主判断声明的可执行工作。身份、目的、依赖、条件、验收和状态由父 Spec
@@ -57,8 +65,8 @@ _Avoid_: 独立任务元数据，目录 README 权威
 
 **运行（Run）**:
 一个任务的一次执行尝试。每个 Run 在自己的 `inputs/` 中记录实际采用的科学承诺和
-执行参数，并有 `outputs/` 和 `logs/`。尚未形成需保留科学证据的当前 Run 可按明确授权
-原地纠正；已接受、需比较或来源不确定的执行使用独立 Run。
+执行参数，并有 `outputs/` 和 `logs/`。尚未形成需保留科学证据的当前 Run 可在选定
+Spec 的执行范围内原地纠正；已接受、需比较或来源不确定的执行使用独立 Run。
 _Avoid_: 计算任务，覆盖目录
 
 **计算归属树（Calculation Ownership Tree, COT）**:

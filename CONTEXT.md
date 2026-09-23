@@ -34,7 +34,7 @@ _Avoid_: 计算模板，任务专用脚本
 _Avoid_: watcher，完成判定器，Run 状态数据库
 
 **执行研究（Execution Research）**:
-`calc-execute` 在任务执行中遇到不确定性时，为补充软件用法、输入格式、命令、环境要求、产物与机械校验规则而开展的临时研究。其结果先作为临时证据，只有经用户接受后才沉淀为计算规范；它不是任务级执行方案，也不取代 Spec 的科学权威。
+`calc-execute` 在任务执行中遇到不确定性时，为补充软件用法、输入格式、命令、环境要求、产物与机械校验规则而开展的临时研究。其结果先作为临时证据，经排障验证且可复用时可沉淀为计算规范；它不是任务级执行方案，也不取代 Spec 的科学权威。
 _Avoid_: 通用 Run，任务级后端方案，搜索授权
 
 **计算排障（Calculation Troubleshooting）**:
@@ -47,6 +47,7 @@ Calc Project 面向用户的显式辅助入口，用于推荐工作接口、解�
 _Avoid_: ask-dnk（当前名称）
 
 关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Spec、计算任务、运行、计算归属树（COT）、进展报告、计算汇报、汇报源数据、Run-local inputs、计算模板、项目计算模板、插件计算模板。
+证据档位（`light | strict`）的完整定义也在该领域术语文档中。
 
 ## Paper Project
 

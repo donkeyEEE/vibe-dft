@@ -29,16 +29,15 @@ Create a new Run when any of these applies:
   may write the Run.
 
 A required Spec change is not made here. Preserve the current Run and route the
-proposal to `$calc-to-spec`; after approval, execute it in a new Run.
+change to `$calc-to-spec`; after safe replacement, execute it in a new Run.
 
 ## Apply and requalify
 
 Establish the evidence, root cause, exact changes, selected Run path, artifacts
 that will be replaced, and effects before writing. Continue automatically when
-the repair is inside the user's current execution scope and changes only this
-eligible Run.
-New external authorization is still required for submission, cancellation,
-extra cost or resources, or mutation outside that scope. Before reusing a
+the repair preserves the approved scientific meaning and the user's explicit
+constraints. Handle submission, cancellation, resource changes, and affected
+Run-local replacement through the normal execution path. Before reusing a
 failed Run, record its scheduler identity and concise failure cause in the Spec
 Run row, leaving detailed diagnosis in the Run logs or troubleshooting record.
 After correction, record only the material difference from the prior attempt
@@ -49,8 +48,7 @@ task-level sources.
 
 Any in-place change invalidates the Run's previous digest, validation, and
 review. Prepare and validate the corrected snapshot, invoke a fresh transient
-review, and submit only that unchanged reviewed snapshot under a concrete
-submission authorization. Update the same Run record from new scheduler and
+review, and submit only that unchanged reviewed snapshot. Update the same Run record from new scheduler and
 result evidence, and accept it only through the unchanged approved criteria.
 
 When the root cause is not yet established, return to [calculation

@@ -21,7 +21,7 @@ Run 执行、任务验收和 Spec 闭包。
    对已有 Run 的 Task 按该 Run 的实际状态分类：`submitted` Run 进入观察或监控，`prepared` Run
    进入验证和评审，`finished` Run 进入验收，`failed` Run 进入排障，不得直接另行分配 Run。
    持久化每项确定的状态变更，但本步骤不创建 Run，也不提交作业。
-2. 在用户声明的工作、并发和提交范围内选择一个彼此独立的可运行 Task。首个 Task 开始时，将 ready
+2. 在选定 Spec 的执行目标和用户明确约束内选择一个彼此独立的可运行 Task。首个 Task 开始时，将 ready
    Spec 置为 `active`。按照分类状态继续选定 Task 的已记录 Run；只有不存在需要推进的已记录 Run
    时才创建新 Run。对于异常 Task，使用[计算排障](references/calculation-troubleshooting.md)定位问题；
    它把已直接确定的执行错误路由到[简单纠错](references/simple-correction.md)，随后选择合格的
@@ -30,20 +30,22 @@ Run 执行、任务验收和 Spec 闭包。
    backend 参考资料准备选定 Run。若稳定项目配置必须变更，先加载 `$calc-setup` 并通过该工作流修改。
    未解决的软件用法视为异常 Task，并回到计算排障；该分支负责所有 `$dev-engineering:research` 调用。
 4. 验证 prepared Run，并针对 prepared 快照调用 `$calc-review`。解决执行发现，必要时重新评审。
-   仅当评审通过且提交处于用户当前授权范围内时提交。
+   评审通过且复核后的输入仍是同一快照时，自主提交；遵守用户明确给出的提交、并发或资源边界。
 5. 提交后记录调度器响应，并将 Spec 的 Run 行更新为 `submitted`。阅读[远程完成]
-   (references/remote-completion.md)；仅在明确请求提交后监控或继续执行时启动 Calculation Monitor。
+   (references/remote-completion.md)；需要等待异步作业并恢复本次执行时启动 Calculation Monitor。
    传输文件时使用[预览式同步](references/sync.md)。根据实际情况和下列定义选择 Run 状态。
 6. 验收 Task、变更其 current Run、传播失效或关闭 Spec 时，阅读[任务推进]
-   (references/task-advancement.md)。应用 Spec 中该 Task 已批准的 Acceptance，再继续下一个可用任务。
-   Spec 完成时提出闭包，并在用户接受后结束它。若随后必须变更 RQ，调用 `$calc-rq` 并向用户展示提案。
+   (references/task-advancement.md)。应用当前 Spec 中该 Task 的 Acceptance，再继续下一个可用任务。
+   Spec 完成时核实闭包证据并自主结束它。若用户委托推进 RQ，且结果支持其边界内的
+   下一主要判断，调用 `$calc-to-spec` 渐进发布并继续；达到 RQ 成功判据、没有有依据的
+   下一判断、关键科学缺口未解决或触及用户边界时停止。RQ 本身需要变更时调用 `$calc-rq`。
    交还控制前，以已解析的项目根和本执行步骤处理的 Task、Run 调用 `$show-cot`。展示完整项目总览，
    使答复明确执行结束所在的 Task。
 
 ## 原则
 
-- 提交、同步、取消、增加资源或成本、删除，以及当前工作范围以外的覆盖都需要用户授权。
+- 用户请求执行选定 Spec 后，按任务需要自主提交、同步、取消、调整资源或成本，以及处理执行产生的临时或失败产物；先核实目标、影响和可恢复性，记录实际动作。保留已接受的科学证据、其他 Run 和用户明确排除的对象。对用户明确限定的操作或预算遵守其边界。
 - Run 正常结束且产生可供任务验收的结果时为 `finished`；未成功结束且没有完整可验收结果时为
   `failed`；执行已实际取消且不会继续运行或写入结果时为 `cancelled`。
-- 科学定义或 provenance 的变更使用新 Run。若同时需要变更 Spec，调用 `$calc-to-spec` 生成修改提案，
-  询问用户是否接受，并仅在接受后继续。
+- 科学定义或 provenance 的变更使用新 Run。若同时需要变更当前 Spec，调用
+  `$calc-to-spec` 安全替换后继续；`concluded` Spec 的修改或重开仍需具体人工授权。

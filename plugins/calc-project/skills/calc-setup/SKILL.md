@@ -12,8 +12,9 @@ description: 初始化、重组或维护一个计算项目的稳定结构、Trac
 2. 初始化或重组时，读取[项目结构](references/project-structure.md)和
    [项目上下文](references/project-context.md)。提出准确路径与文档变更，包括
    `ARCHITECTURE.md` 的 `## Calculation Configuration` 字段。
-3. 写入前取得该具体提案的批准。对未经批准的数据移动、替换或删除必须停止。保留计算数据，
-   并在变更前比较既有项目文档。
+3. 独立初始化或维护项目时，写入前取得该具体提案的批准。由 `$calc-execute` 为选定 Spec 的
+   执行所需配置调用时，在用户明确约束内自主完成变更；保留计算数据，并在变更前比较既有
+   项目文档。科学设计变更交由 `$calc-to-spec` 自主处理；已闭合 Spec 的修改仍需具体授权。
 4. 仅创建或更新已批准的稳定结构和配置，使根 `.gitignore` 包含 `/.calc-project/`，以排除
    按需生成的派生报告。报告既有 RQ 与 Spec，但不得接管或修改它们。
 5. 请求集群配置时，读取[集群软件配置](references/cluster-software-profiles.md)。将已审查的

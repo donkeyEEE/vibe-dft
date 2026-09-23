@@ -74,11 +74,11 @@ codex plugin add calc-project@vibe-dft
 | [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 显式辅助入口，用于推荐工作接口、解释项目术语或查询进度。 |
 | [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、Tracker 配置、数据边界和集群配置。 |
 | [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），将获批答案记录为已接受决策。 |
-| [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 为一个 RQ 设计并发布完整的科学 Spec 集，或替换已有 Spec。 |
+| [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 为已接受 RQ 渐进发布完整的单份 Spec，或安全替换当前设计。 |
 | [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 推进已就绪或活动中的 Spec，处理 Run 的准备、评审、提交、跟踪、同步与验收。 |
 | [calc-report](plugins/calc-project/skills/calc-report/SKILL.md) | 根据 RQ、Spec、Run 与已有结果生成可追溯的阶段或结果汇报。 |
 | [calc-review](plugins/calc-project/skills/calc-review/SKILL.md) | 对指定 prepared Run 做瞬时、只读的提交前评审。 |
-| [show-cot](plugins/calc-project/skills/show-cot/SKILL.md) | 显式、只读地展示计算归属树（COT），并可在确认后生成 HTML 进展报告。 |
+| [show-cot](plugins/calc-project/skills/show-cot/SKILL.md) | 显式、只读地展示计算归属树（COT）；直接调用时可在确认后生成 HTML 进展报告，执行交接时可自主生成。 |
 
 Calc Project 按 `RQ → Spec → Task → Run` 组织计算工作：
 
@@ -90,23 +90,23 @@ calc-rq          calc-to-spec        calc-execute        calc-execute
 ```
 
 - **RQ（研究问题）**：在一条研究主线内记录要回答的问题、研究边界、成功标准和已接受决策。一个 RQ 可以发布多份分别承担不同主要判断的 Spec。
-- **Spec（计算规范）**：围绕一个主要判断形成的当前已批准科学设计，定义任务依赖图，并记录任务目的、条件、验收规则、状态、Run 和闭合结论。
+- **Spec（计算规范）**：围绕一个主要判断形成的当前科学设计，定义任务依赖图，并记录任务目的、条件、验收规则、状态、Run 和闭合结论。
 - **Task（计算任务）**：Spec 中为支持主要判断而声明的可执行工作单元；其身份、目的、依赖、条件和验收标准由父 Spec 管理。
 - **Run（运行）**：一个 Task 的一次具体执行尝试。Run 在独立目录中保存实际输入、输出和日志。每次验证与评审固定当时的输入快照；新的尝试使用新的 Run 编号，符合条件的当前 Run 可原地纠正。
 
 通常先用 `calc-setup` 建立项目根目录、数据根、RQ Tracker 和集群配置，再依次推进：
 
 1. 用 `calc-rq` 建立或推进 RQ，并把用户在访谈中确认的答案写入 RQ 的 `## Decisions`。
-2. 用 `calc-to-spec` 识别回答 RQ 所需的主要判断，为每个判断设计 Spec，明确 Task、依赖、条件、验收与停止规则；获批后发布完整 Spec 集。
-3. 用 `calc-execute` 推进已发布的 Spec：选择当前可执行的 Task，创建或继续 Run，准备并验证输入，在获得具体提交授权后提交作业，接收结果并按验收规则处理后续 Task。
+2. 用 `calc-to-spec` 为 RQ 当前有依据的主要判断设计并自主发布一份完整 Spec；后续判断可随结果渐进发布。Spec 的证据档位优先采用自身设置，否则继承 RQ，均未设置时为轻量。
+3. 用 `calc-execute` 推进已发布的 Spec：选择当前可执行的 Task，创建或继续 Run，准备并验证输入，评审通过后自主提交作业，接收结果并按验收规则处理后续 Task；若出现新的科学设计需求，交回 `calc-to-spec`。
 4. 全部 Task 得到明确处置后，由 `calc-execute` 提出 Spec 闭合；研究结论是否影响 RQ，则交由后续 `calc-rq` 流程处理。
 
-无法判断入口时使用 `ask-lyz`；它也能解释项目术语或查询进度。`calc-review` 是 Run 提交前的瞬时只读关口：通常由 `calc-execute` 对准确的已准备输入快照调用。输入、资源或执行环境改变后，必须重新验证和评审。它不管理 Task、Run 或 Spec 状态，直接调用也不会产生后续提交授权。
+无法判断入口时使用 `ask-lyz`；它也能解释项目术语或查询进度。`calc-review` 是 Run 提交前的瞬时只读关口：通常由 `calc-execute` 对准确的已准备输入快照调用。输入、资源或执行环境改变后，必须重新验证和评审。它不管理 Task、Run 或 Spec 状态，直接调用不启动执行链。
 
 ```text
 $calc-project:calc-setup 为当前目录建立计算项目配置。
 $calc-project:calc-rq 为这条研究主线建立 RQ-001。
-$calc-project:calc-to-spec 为 RQ-001 设计并发布回答该 RQ 所需的完整 Spec 集。
+$calc-project:calc-to-spec 为 RQ-001 当前有依据的下一主要判断设计并发布一份完整 Spec。
 $calc-project:calc-execute 推进 SPEC-001 中当前可执行的 Task 和 Run。
 ```
 

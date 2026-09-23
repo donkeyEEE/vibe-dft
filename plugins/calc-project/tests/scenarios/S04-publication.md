@@ -1,46 +1,42 @@
-# S04 — Spec publication
+# S04 — Incremental autonomous Spec publication
 
 Each probe natively invokes `calc-project:calc-to-spec` in a fresh fixture.
 
 ## Exact prompts
 
-`S04-approved-publication`:
+`S04-next-spec`:
 
-> Run the required scientific-design interview, then publish the resulting Spec to data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-001-stability.md. I approve this design summary: judge synthetic stability with one unconditional SCF task; accept when outputs/result.txt records the completed stability result; stop when that task is accepted. I also approve exactly one RQ.md ## Specs entry '- [SPEC-001: Stability](specs/SPEC-001-stability.md)'.
+> RQ-001 is accepted and asks whether the synthetic structure is stable. Publish the next Spec supported by its current evidence. The RQ has no Evidence level and does not request execution.
 
-`S04-complete-set-before-execution`:
+`S04-incremental-rq`:
 
-> Design every Spec needed to answer RQ-001, then continue with execution. The accepted RQ requires two independent principal judgments: synthetic structural stability and synthetic magnetic ordering. I approve one complete-set proposal with data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-001-stability.md for the stability judgment and data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-002-magnetism.md for the magnetic judgment, together with exactly these two RQ.md ## Specs entries: '- [SPEC-001: Stability](specs/SPEC-001-stability.md)' and '- [SPEC-002: Magnetism](specs/SPEC-002-magnetism.md)'. Publish both before handing the remaining request to calc-execute.
+> Advance accepted RQ-001 through its currently supported stability judgment. Magnetic ordering may become a later question but is not yet determined by the available evidence. Do not invent the later Spec now.
+
+`S04-strict-inheritance`:
+
+> Publish the next complete Spec for RQ-001. Its RQ.md says Evidence level: strict and the user has not set a Spec override.
+
+`S04-critical-gap`:
+
+> Design the next Spec, but the accepted RQ and available evidence leave two scientifically different methods whose choice changes the principal judgment. Research before deciding; interview if that critical gap remains.
 
 `S04-incomplete-design`:
 
-> Run the required scientific-design interview for SPEC-002, but publish it even if the intended judgment still has no acceptance criterion or stopping rule.
-
-`S04-draft-unapproved`:
-
-> Inspect drafts/SPEC-002-draft.md for RQ-001 and tell me what concrete publication proposal requires approval.
+> Publish a Spec even though the intended judgment still has no acceptance criterion or stopping rule.
 
 `S04-repeat-idempotent`:
 
-> Repeat publication of the already identical SPEC-001 at data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-001-stability.md with the already present index link. I approve exactly the identical file and identical single link; do not add a duplicate.
+> Retry publication of an already identical SPEC-001 and RQ index link. Keep one Spec and one link.
 
 `S04-owner-conflict`:
 
-> Publish SPEC-001 for RQ-001 at data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-001-stability.md, but first inspect the existing target. I approve only a matching-owner publication, not mutation of another RQ's Spec.
+> Publish SPEC-001 for RQ-001 at an existing target owned by another RQ. Inspect the target before writing.
 
 ## Expected observations
 
-- The design interview runs before every draft. Publication writes only the
-  Spec or complete Spec set represented by the approved targets, design
-  summaries, and exact aggregate RQ index change; the approval proposal
-  displays those concise fields rather than the complete Markdown drafts, and
-  publication does not adopt unapproved drafts.
-- New-Spec mode identifies every independent principal judgment before
-  drafting, publishes one Spec for each judgment in the approved complete set,
-  confirms every member and the aggregate RQ index change, and only then hands
-  remaining execution intent to `calc-execute`. It never hands off after only
-  the first member.
-- Repeating identical publication leaves one link.
-- A different owner at the target stops all writes.
-- An incomplete scientific design leaves both the Spec target and RQ index
-  unchanged and identifies `calc-to-spec` as the owner.
+- The next complete Spec publishes without a separate approval or mandatory interview, uses `light` by default, updates one accurate RQ index entry, and stops when execution was not requested.
+- Incremental publication does not invent or require a complete future Spec set. When RQ advancement includes execution intent, it hands the published Spec to `calc-execute`.
+- An RQ strict setting is resolved and written into the Spec at publication. Later RQ changes do not silently modify it.
+- Missing scientific evidence triggers targeted research or literature review; only an unresolved critical scientific gap triggers `grill-with-docs`.
+- An incomplete design and a conflicting owner leave the target and RQ index unchanged.
+- Repeating identical publication leaves one Spec and one index link.

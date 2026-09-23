@@ -125,9 +125,9 @@ def test_calculation_troubleshooting_covers_simple_and_researched_paths(plugin_r
         "`$dev-engineering:research`",
         "luna",
         "`/tmp`",
-        "competing solutions",
+        "competing technical solutions",
         "targeted checks",
-        "ask the user whether",
+        "write an independent stable",
     ):
         assert contract in normalized
 
@@ -142,7 +142,7 @@ def test_calculation_monitor_is_conditional_and_post_submission(plugin_root):
         plugin_root / "skills/calc-execute/references/calculation-monitor.md"
     ).exists()
     assert "references/remote-completion.md" in skill
-    assert "明确请求提交后监控或继续执行" in skill
+    assert "需要等待异步作业并恢复本次执行" in skill
     assert skill_flat.index("将 Spec 的 Run 行更新为 `submitted`") < skill_flat.index(
         "references/remote-completion.md"
     )

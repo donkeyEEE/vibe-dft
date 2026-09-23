@@ -62,6 +62,6 @@ immediately before submission.
 
 An interface smoke test establishes only the tested file/representation
 contract. It is not production-trajectory validation and cannot replace the
-Spec's production observables, acceptance criteria, or submission approval.
-Keep failed logs and staged evidence; deletion requires its own explicit user
-authorization.
+Spec's production observables or acceptance criteria.
+Keep failed logs and staged evidence while diagnosis is active; clean up only
+after the needed Run evidence and provenance are retained.

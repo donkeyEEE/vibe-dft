@@ -24,6 +24,6 @@ python <calc-execute-skill-root>/scripts/sync/sync_calc_data.py push <task-root>
 python <calc-execute-skill-root>/scripts/sync/sync_calc_data.py pull <task-root>/calc-sync.yaml --yes
 ```
 
-`inspect` is an optional remote listing for diagnosis. `plan` defaults to pull and runs one `rsync --dry-run`; it prints the report and saves no synchronization state. Present that report for review. After the user or agent accepts it, run the matching `push` or `pull` with `--yes`. Execution reads the current configuration and filesystem directly; it does not bind itself to the earlier report or account for changes since review.
+`inspect` is an optional remote listing for diagnosis. `plan` defaults to pull and runs one `rsync --dry-run`; it prints the report and saves no synchronization state. Inspect the plan, check that paths and transfer direction serve the selected Run, then run the matching `push` or `pull` with `--yes`. Report the transfer afterward. Execution reads the current configuration and filesystem directly; it does not bind itself to the earlier report or account for changes since review.
 
 HDF5 files in every extension case, `CHGCAR`, and `WAVECAR` remain server-side. Both directions exclude `calc-sync.yaml`, `.calc-sync/`, local caches, configured patterns, and symbolic links. Transfers use no deletion mode. The helper validates the configuration and task-root location, but performs no per-file remote probes, saved-plan checks, fingerprints, expiry checks, or immutable-input comparisons.

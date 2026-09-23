@@ -4,6 +4,7 @@
 ID: SPEC-001
 Status: ready
 RQ: ../RQ.md
+Evidence level: light
 
 ## 判断
 
@@ -32,6 +33,9 @@ Acceptance: <acceptance condition>
 `Context` 是最后一节。它记录解释判断、Task、条件、验收规则、Run 以及（如存在）
 Closure 所需的 Spec 范围内术语和框架。
 
+`Evidence level` 是证据档位，取值为 `light | strict`，发布时记录生效档位：Spec 的明确设置优先，
+否则继承 RQ 的设置；两者均缺失时为 `light`。档位在本 Spec 发布时固定。
+
 Spec 状态为 `ready | active | concluded`。Task 状态为 `pending | completed
 | failed | needs-review`。Run 状态为 `prepared | submitted | finished | failed |
 cancelled`；`submitted` 包含排队和执行。`Current` 为 `yes | no`，每个 Task 至多有
@@ -52,7 +56,10 @@ Task 被取消时，该 Task 的状态为 `failed`；不明确之处回到 Spec 
 
 `Acceptance` 说明 `Purpose` 已被回答所需的最小充分证据。它可以要求成功产出指定
 工件或诊断，而不要求得到有利的科学结果。仅当 Task 的 Purpose 或主要判断依赖它们时，
-才加入收敛、质量、比较或交接阈值。concluded Spec 在同一文件中加入以下一节：
+才加入收敛、质量、比较或交接阈值。`light` 不默认增加独立收敛扫描、参数敏感性、
+重复 Run 或替代方法对照；判断本身必需的物理有效性与交接检查仍保留。`strict`
+按主要判断加入相关增强检查并满足用户或已接受 RQ 的明确要求，不套固定清单。
+concluded Spec 在同一文件中加入以下一节：
 
 ```markdown
 ## 闭合（Closure）

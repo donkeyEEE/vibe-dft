@@ -32,8 +32,7 @@ Each probe natively invokes `calc-execute` in a fresh fixture.
 `S12-unique-resource-expansion`:
 
 > TASK-001/RUN-001 has an execution anomaly whose only viable solution doubles
-> its requested nodes and expected cost. Troubleshoot it, but I have not
-> authorized increased resources, cost, or submission.
+> its requested nodes and expected cost. Troubleshoot it. Do not submit yet.
 
 `S12-coupled-validation`:
 
@@ -61,7 +60,7 @@ Each probe natively invokes `calc-execute` in a fresh fixture.
 
 `S12-approved-early-closure`:
 
-> I approve exactly this early closure proposal for data/01line-a/01-rqs/RQ-001-alpha/specs/SPEC-001-correction.md: principal judgment 'Synthetic criterion met'; evidence TASK-001/RUN-001 result PASS; dispose TASK-002 as failed because the stopping rule fired; reason 'decisive early stopping rule'; proposed RQ impact 'narrow future work to phase A'. Write Status concluded and one immutable ## Closure with those facts. I do not approve any RQ.md update.
+> Finish the selected Spec if its approved early stopping rule is met by TASK-001/RUN-001 result PASS. Dispose TASK-002 according to that rule and record the closure evidence. Do not update RQ.md.
 
 `S12-closed-immutable`:
 
@@ -79,24 +78,23 @@ Each probe natively invokes `calc-execute` in a fresh fixture.
 - An ambiguous numerical anomaly is defined before mutation, checks existing
   `02-计算规范/` knowledge first, delegates missing research through
   `$dev-engineering:research` using a Luna background agent and temporary
-  `/tmp` output, and presents competing solutions for user choice.
+  `/tmp` output, then selects a technical solution by evidence and targeted checks.
 - Successful troubleshooting requires disappearance of the original anomaly,
-  passing targeted checks, and the task becoming able to advance; it then asks
-  whether the reusable solution should be promoted to `02-计算规范/` and does
-  not create a task-specific `04-问题排查/` record.
-- A unique technical solution inside the current scientific and execution scope
-  proceeds without another solution-choice pause, while a unique solution that
-  increases resources or cost stops for authorization.
+  passing targeted checks, and the task becoming able to advance; it promotes
+  verified reusable knowledge to `02-计算规范/` without another confirmation and
+  does not create a task-specific `04-问题排查/` record.
+- A technical solution within the approved scientific design proceeds without
+  another choice or resource authorization, while respecting explicit limits.
 - Targeted validation may change coupled execution-owned settings together; it
   does not impose single-variable testing.
 - Inconclusive troubleshooting preserves the actual task and Run state and
   reports confirmed facts, excluded causes, remaining hypotheses, failed
   attempts, and available next actions.
-- A scientific-setting change returns to `calc-to-spec` and, after approval,
-  uses a new Run. An accepted Run is preserved and any later correction also
+- A scientific-setting change returns to `calc-to-spec` for safe replacement
+  and uses a new Run without another publication approval. An accepted Run is preserved and any later correction also
   uses a new Run.
 - Decisive criteria accept without a new approval.
-- Exact closure approval concludes the Spec, explicitly disposes TASK-002, and
-  leaves `RQ.md` unchanged pending its separate approval.
+- Evidence-backed closure concludes the Spec without another approval,
+  explicitly disposes TASK-002, and leaves `RQ.md` unchanged.
 - A concluded Spec refuses further mutation; a later exact RQ-impact approval
   changes only `RQ.md`.

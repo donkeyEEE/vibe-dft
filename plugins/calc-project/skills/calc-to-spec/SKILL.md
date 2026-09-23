@@ -1,71 +1,71 @@
 ---
 name: calc-to-spec
-description: 为一个已接受 RQ 设计并发布完整的计算 Spec 集合，或替换一个既有 Spec。
+description: 为已接受 RQ 渐进设计并自主发布完整的单份 Spec，或安全替换既有 Spec 的当前设计。
 ---
 
 # Calc to Spec
 
-负责一个 RQ 的完整新 Spec 集合，或一个待替换既有 Spec 的科学设计。新 Spec 输入恰为
-一个已接受 RQ 及完整预期答复范围；替换输入恰为一个既有 Spec。输出是批准前的一份简洁
-发布提案，以及仅在明确批准后生成的完整拟议集合及其汇总 RQ 索引变更。此 skill 声明任务；
-它不创建任务目录或 Run，也不执行计算或提交。
+围绕一个已接受 RQ 的当前下一项主要判断设计并发布 Spec；研究推进时可逐份发布，
+无需预先穷尽该 RQ 的全部 Spec。每份 Spec 自身必须完整。也可替换一个既有、尚未闭合
+Spec 的当前科学设计。新建与安全替换不另设发布批准；用户明确给出的范围和约束始终有效。
+`concluded` Spec 可只读引用，通常以新 Spec 承载后续判断；修改或重开它需要针对具体
+变更的人工授权。
 
 ## 流程
 
-1. 解析唯一计算项目，再读取其 `ARCHITECTURE.md` 中的
-   `## Calculation Configuration`。解析 `Data root:`、`Tracker adapter:`
-   和 `RQ location:`；要求 adapter 为 `local-markdown`。配置命名 `Software profile:`
-   时，将该精确档案作为项目能力记录读取。解析唯一 RQ，并读取其 `RQ.md`、相关已接受
-   Decisions、关联证据及相关已发布 Specs。替换时，通过该 RQ 解析既有 Spec，不能将其
-   局部范围的 `SPEC-NNN` 视作全局唯一。权威含糊或缺失时停止。
-2. 仅加载拟议任务需要的精确科学设计参考资料：
-
-   - VASP 物理承诺：[VASP 设计](references/backends/vasp.md)。
-   - 方向性 SOC-MAE（连同 VASP 设计）：[VASP MAE 设计](references/backends/vasp-mae.md)。
-   - DFT+DMFT：[DMFT 设计](references/backends/dmft.md)。
-   - Hefei-NAMD/NAMDwithSOC：[NAMD 设计](references/backends/namd.md)。
-   - VASP → Wannier90 → TB2J → VAMPIRE：[磁性设计](references/backends/magnetic.md)，
-     以及该阶段需要科学承诺时上列 VASP 或 Wannier 参考资料。
-   - 交换参数能量映射：[能量映射设计](references/backends/energy-mapping.md)。
-   - 自旋分辨 Wannier 窗口：[Wannier90 设计](references/backends/wannier90.md)。
-   将模板视为实现基线，绝不作为科学数值的证据。所需参考资料、项目能力或证据来源不可用时，
-   停止，而非在运行时发现替代 backend 资源。
-3. 起草前，在当前对话中调用 `$dev-engineering:grill-with-docs` 形成科学设计。将访谈
-   产出的 Spec 范围术语和框架记录在每份受影响 Spec 的最终 `## Context`；仓库根
-   `CONTEXT.md` 只保留稳定的全项目领域术语。在新 Spec 模式中，先确定回答已接受 RQ
-   所需的完整、相互独立的主要判断集合，再起草任一成员。将真正未解决的 RQ 级问题交回
-   `$calc-rq`；其被接受解决后，从权威 RQ 恢复完整集合设计。访谈依赖不可用时，暂停并报告。
-4. 用 [Spec 模板](references/spec-template.md)起草 Spec 集合，每个成员使用一次，且在发布前
-   对所有成员保持完整 Spec 草案为内部内容。每个独立主要判断对应一个 Spec，一个判断只在
-   一个 Spec 内。包含回答该判断所需的任务、依赖、条件、验收准则和停止规则。`SPEC-NNN`
-   仅在解析出的 RQ 内分配，`TASK-NNN` 仅在该 Spec 内，`RUN-NNN` 仅在其任务内。依赖只命名
-   同一 Spec 的任务且构成无环图。条件只使用已记录的上游结果。将验收表述为任务 Purpose
-   已得到回答所需的最低充分证据。把 execution-owned 选择留给 `$calc-execute`：环境和
-   可执行文件路径、启动与并行机制、日志和重启控制，以及具有确定性 backend、software-profile
-   或上游证据默认值且不改变科学含义的辅助参数。明确 Spec 值具有约束力。将稳定项目能力或
-   配置缺口交回 `$calc-setup`。
-5. 替换时，读取当前 Spec、每个已记录任务和 Run、引用的物理 Run 目录及当前调度器状态。
-   已结束 Spec 不可变。可能被失效或造成不一致的活跃执行阻止替换。提案保留所有物理 Run
-   目录，只覆盖当前 Spec 设计；不创建过时设计历史或修订计数器。
-6. 对每个拟议成员只展示目标路径、设计摘要和精确 `RQ.md` 索引变更。新 Spec 模式中，
-   将所有成员及精确汇总索引变更合并为一份完整集合提案。替换模式还应确认保留物理 Run
-   目录。对展示的提案取得一次明确批准；批准不要求展示任一成员的完整 Markdown。沉默、
-   历史偏好和一般性委托均不满足批准门槛。目标、科学设计、索引条目或所述替换效果的任意
-   变化都会使批准失效。
-7. 写入前立即重新读取 `RQ.md`、每个目标 Spec 以及用于替换的全部权威资料。预检整个已批准
-   集合：要求 RQ 所有权匹配、新 Spec 目标未使用或字节完全相同、设计完整、ID 与链接唯一，
-   并在适用时可安全替换。发生任一冲突即在写入前停止，而非修复另一所有者的权威资料。否则
-   写入每个已批准 Spec 和精确汇总 RQ 索引变更，再重新读取所有成员及 `RQ.md` 予以确认。
-   中断写入通过重读整个批准集合调和；发布相同成员和链接是幂等的，任何差异都需要新提案和批准。
-8. 报告每个已发布成员或被替换的 Spec。仅在新完整 Spec 集合的每个成员及其汇总 RQ 索引变更
-   都确认后，若仍有执行意图则直接进入 `$calc-execute`；绝不可只在集合前缀后交接。安全替换的
-   活跃 Spec 可照常继续。携带已解析身份、路径、已批准内容和剩余意图。交接不增加提交或其他
-   外部操作授权；`$calc-execute` 应用自身门槛。
+1. 解析唯一计算项目，读取 `ARCHITECTURE.md` 的 `## Calculation Configuration`、
+   已接受的 `RQ.md`、相关已发布 Specs、前序结果和用户明确约束。新建要求 RQ 为
+   `active`。读取配置的 `Data root:`、`Tracker adapter:`、`RQ location:` 和适用的
+   `Software profile:`；要求 `local-markdown`。
+   新建时确认当前主要判断直接服务于该 RQ 的问题、`Boundary:` 和成功判据；替换时通过
+   RQ 解析唯一目标 Spec。权威含糊、所有权冲突或既有设计已 `concluded` 而缺少具体
+   重开授权时停止，不猜测或覆盖。
+2. 解析本次 Spec 的证据档位。Spec 的明确设置优先，其次继承 RQ 的 `Evidence level:`，
+   两者都未设置时为 `light`。`strict` 只来自用户明确要求或已接受的 RQ 设置；
+   不自行降低已接受的严格要求。发布时将生效的 `Evidence level: light | strict`
+   写入 Spec，之后 RQ 档位变化不自动改动既有 Spec。
+3. 仅加载当前判断需要的科学设计参考资料：VASP [设计](references/backends/vasp.md)、
+   [MAE](references/backends/vasp-mae.md)、[DMFT](references/backends/dmft.md)、
+   [NAMD](references/backends/namd.md)、[磁性链](references/backends/magnetic.md)、
+   [能量映射](references/backends/energy-mapping.md)或[Wannier90](references/backends/wannier90.md)。
+   模板只提供实现基线，不提供科学数值。项目与参考资料不足时，自主选择
+   `$dev-engineering:research` 或 `$paper-project:literature-review` 补证据；前者的定向
+   Markdown 暂存于独立 `/tmp` 路径，后者使用当前研究主线 `06-文献笔记/` 下唯一的
+   Markdown 路径。设计只采用可核对的原始证据，并在 Spec 中引用实际使用的来源。
+4. 根据已接受 RQ、结果和调研证据判断是否有关键科学缺口：只有影响主要判断、必要
+   可比性或验收，且现有证据仍无法决定的选择才调用 `$dev-engineering:grill-with-docs`。
+   访谈形成的 Spec 范围术语和框架写入该 Spec 的 `## 上下文`；真正需要改动 RQ 问题、
+   边界或成功判据的事项交回 `$calc-rq`。没有关键缺口时自主完成设计。
+5. 用 [Spec 模板](references/spec-template.md)起草当前 Spec。它围绕一个主要判断，
+   完整声明 Task、无环依赖、条件、以最低充分证据表述的验收和停止规则。`SPEC-NNN`
+   只在所属 RQ 内编号，`TASK-NNN` 只在所属 Spec 内编号，`RUN-NNN` 只在所属 Task
+   内编号；依赖仅引用同一 Spec 中的 Task，条件只依据已记录的上游结果。
+   `light` 只要求能回答
+   Task Purpose 的直接结果、必要交接和判断本身必需的物理有效性；不默认增加独立
+   收敛扫描、参数敏感性、重复 Run 或替代方法对照。`strict` 依主要判断加入
+   相关的收敛、敏感性或对照检查，并满足用户或已接受 RQ 的明确要求，不套固定清单。
+   把不改变科学含义且有确定依据的实现值留给
+   `$calc-execute`；Spec 中的明确值具有约束力。缺少必要科学证据时保持未发布。
+6. 替换时读取目标 Spec、全部 Task 和 Run 记录、物理 Run 目录及调度器事实。
+   如仍有写入者，先经 `$calc-execute` 核实并按情况取消或等待，直至无写入风险。
+   保留每个旧 Run 及其状态和产物；已有 Run 的 Task 身份须保持可追溯，若新设计
+   无法容纳旧任务与 Run 记录，就另建后续 Spec。新设计使已接受证据失效时，清除相应
+   `Current` 选择，将受影响 Task 恢复为 `pending`；已接受的下游 Task 按依赖变化
+   置为 `needs-review`，未提交的 prepared 快照重建并重评。变更科学含义的
+   下一次执行使用新 Run。替换只修改当前 Spec 设计及必要状态，不覆盖物理 Run。
+7. 写入前重读 RQ、目标 Spec、现有索引和替换所需的权威证据，检查 RQ 归属、
+   ID 和路径唯一、设计完整、现有目标未被其他所有者占用、替换安全。冲突先调和；
+   不能安全调和则停止。新建时写入一份完整 Spec 及一条准确的 `RQ.md` Spec 索引；
+   替换时更新同一 Spec。重新读取并核实写入结果。相同内容重试保持幂等，差异由
+   当前权威资料重新评估，不依赖旧会话提案或批准缓存。
+8. 报告发布或替换的 Spec、证据档位和本次研究前沿。若用户只要求设计或发布，
+   到此结束。若用户已委托推进该 RQ 的计算，直接进入 `$calc-execute` 继续当前 Spec；
+   每份 Spec 完成后，仅在已接受 RQ 和结果直接支持下一主要判断时继续发布下一份。
+   达到 RQ 成功判据、无证据支持下一判断、关键科学缺口未解决或触及用户边界时停止。
+   新 RQ 的发现与创建属于另一个待议问题，本流程不把它作为默认下一步。
 
 ## 权威边界
 
-此 skill 拥有每份 Spec 中当前主要判断、科学承诺、任务 DAG、任务声明、条件、验收规则和
-停止规则。`$calc-execute` 拥有 Spec 省略的 execution-owned 选择，并在 Run 输入和证据中
-记录其实现值；它不能覆盖明确的 Spec 值。每份 Spec 是其任务与 Run 记录的唯一权威。此 skill
-不实体化这些声明、不更改物理 Run 数据、不持久化完整集合状态或另一并行工作流记录，也不正式更新
-RQ 结论。
+此 skill 拥有 Spec 的主要判断、科学承诺、任务 DAG、条件、验收和停止规则。
+`$calc-execute` 拥有 execution-owned 选择、物理 Run 和执行事实。每份 Spec 是其
+Task 与 Run 记录的唯一权威；本 skill 不改变 RQ 的问题、边界、成功判据或已接受决策。

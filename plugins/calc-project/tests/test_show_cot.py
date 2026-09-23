@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 
-def test_show_cot_keeps_authority_read_only_and_gates_report_generation(plugin_root):
+def test_show_cot_keeps_authority_read_only_and_scopes_report_choice(plugin_root):
     text = (plugin_root / "skills/show-cot/SKILL.md").read_text(encoding="utf-8")
 
     assert "在对话中展示完整 COT 后" in text
     assert "询问用户是否需要 HTML" in text
-    assert "只有本次调用已得到用户确认时才生成报告" in text
+    assert "由 `$calc-execute` 在交还控制前调用时" in text
+    assert "无需再次询问" in text
     assert "对 RQ、Spec、Task、Run 及其他权威记录保持只读" in text
     assert "不拥有计算事实或进度状态" in text
 

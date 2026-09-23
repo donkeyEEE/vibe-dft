@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: amended by ADR-0016
 ---
 
 # Stage execution research before promotion

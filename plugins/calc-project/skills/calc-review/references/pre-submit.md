@@ -24,4 +24,4 @@ Inspect the exact prepared Run and report evidence; change nothing.
 
 `pass_with_warnings` is limited to findings that require no action or decision
 before submission. A checksum establishes identity only; it is neither review
-nor authorization.
+nor submission permission.

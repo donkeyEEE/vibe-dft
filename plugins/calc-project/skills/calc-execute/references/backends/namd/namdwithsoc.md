@@ -51,8 +51,8 @@ NAMDwithSOC executable; it does not scan for snapshots or repair names.
 Preserve the full log and staging on failure. Targeted scans treat `File I/O
 error`, `No. of spin components does NOT match`, fatal, abort, and segmentation
 markers as failure evidence. These markers identify a preflight category, not
-an authorized patch; missing knowledge or competing diagnoses stop the
-workflow.
+an established patch; missing knowledge or competing diagnoses enter
+calculation troubleshooting.
 
 For the five-snapshot interface case, success requires evidence of four
 coupling intervals plus nonempty `COUPCAR`, `NATXT`, `EIGTXT`, and at least one

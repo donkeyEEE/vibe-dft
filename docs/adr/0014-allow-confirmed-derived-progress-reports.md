@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: amended by ADR-0016
 ---
 
 # Allow confirmed derived progress reports from Show COT

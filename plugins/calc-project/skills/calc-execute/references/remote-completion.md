@@ -6,8 +6,8 @@ synchronization.
 
 ## Start the Calculation Monitor
 
-Start monitoring only when the current execution chain explicitly requested
-post-submission monitoring or continuation. The monitor is a local coordination
+Start monitoring when the selected Spec's execution needs to wait for an
+asynchronous job and resume afterward. The monitor is a local coordination
 aid; `calc-execute` remains responsible for Run status, acceptance, and Spec
 updates.
 

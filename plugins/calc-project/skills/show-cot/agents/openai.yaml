@@ -1,6 +1,6 @@
 interface:
   display_name: "Show COT"
-  short_description: "只读展示完整 COT，并可按需生成进展报告"
+  short_description: "只读展示完整 COT，并按调用来源生成进展报告"
   default_prompt: "$show-cot 展示此计算项目的完整 Calculation Ownership Tree。"
 
 policy:

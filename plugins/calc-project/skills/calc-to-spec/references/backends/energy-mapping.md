@@ -5,14 +5,15 @@ It records the assumptions and fit diagnostics required for the scientific
 judgment; it does not choose a Hamiltonian, cutoff, configuration subset, or
 physical acceptance criterion.
 
-## Evidence and approval inputs
+## Design evidence
 
 Read the accepted RQ decisions, approved structures and magnetic
 configurations, relevant computed or planned energies, symmetry/equivalence
-evidence, and prior model evidence. Obtain approval for the Hamiltonian and
-fitted unknowns, simulation cell, configuration set, reference-energy
-convention, interaction cutoff, bond-equivalence assumptions, and the rank,
-coverage, residual, and physical criteria that will decide acceptance.
+evidence, and prior model evidence. Set the Hamiltonian and fitted unknowns,
+simulation cell, configuration set, reference-energy convention, interaction
+cutoff, bond-equivalence assumptions, and acceptance criteria from the RQ and
+evidence. Add extra coverage or sensitivity studies only when the judgment
+requires them or the strict level calls for them.
 
 ## Required design and acceptance record
 
@@ -29,4 +30,4 @@ constraints. A zero-RMSE exactly determined subset does not by itself establish
 reliable exchange parameters, and selecting a subset to obtain a desired fitted
 sign is not valid validation. Numerical signs or a small residual alone do not
 establish a magnetic ground state. Interface bond equivalence, model, cutoffs,
-and physical interpretation remain explicit approved modelling choices.
+and physical interpretation remain explicit modelling choices supported by evidence.
