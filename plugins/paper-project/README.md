@@ -10,7 +10,7 @@ Codex 插件。插件中的技能通过 `paper-project:<skill-name>` 命名空�
 - `prl-figure`：创建、修改和审查投稿级科学图件。
 - `citation-validator`：检查 DOCX 稿件中的引用是否真正支持相邻主张。
 - `get-zotero`：从 Zotero 只读获取题录、索引正文或本地 PDF。
-- `get-notes`：通过 `get-zotero` 获取内容并生成项目内中文阅读笔记或稿件素材库。
+- `get-notes`：通过 `get-zotero` 获取选定文献并生成项目内中文研究笔记。
 其余可用技能以安装后 `codex plugin list` 和 Codex 技能列表为准。
 
 Paper Project 的写作参考资料均位于对应 skill 的 `references/`，插件根目录不维护共享 `resources/`。通用物理论文逐段润色已迁移到 Skill Incubator 的 `prl-polishing`。

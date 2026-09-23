@@ -1,7 +1,7 @@
 interface:
-  display_name: "文献笔记与素材库"
-  short_description: "将指定文献集合转为项目本地中文研究笔记或论文写作素材库"
-  default_prompt: "使用 $get-notes 从我明确选择的一个 Zotero 文献集合创建研究笔记或论文写作素材库。"
+  display_name: "Zotero 研究笔记"
+  short_description: "将选定 Zotero 文献转为项目内中文研究笔记"
+  default_prompt: "使用 $get-notes 将我选定的 Zotero 文献整理为项目内中文研究笔记。"
 
 policy:
   allow_implicit_invocation: true

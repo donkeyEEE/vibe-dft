@@ -59,10 +59,7 @@ def test_release_contains_skill_owned_resources_without_retired_knowledge(
         "skills/get-zotero/scripts/zotero.py",
         "skills/get-zotero/references/configuration.md",
         "skills/get-zotero/references/troubleshooting.md",
-        "skills/get-notes/scripts/research_note_storage.py",
-        "skills/get-notes/scripts/writing_library_storage.py",
-        "skills/get-notes/scripts/_storage_support.py",
-        "skills/get-notes/references/writing-material-library.md",
+        "skills/get-notes/references/研究笔记模板.md",
     ):
         assert PREFIX + relative in release_files
     assert (

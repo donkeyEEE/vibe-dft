@@ -38,17 +38,12 @@ def test_get_zotero_owns_only_acquisition_resources() -> None:
     assert not (GET_ZOTERO / "references/论文精读模板.md").exists()
 
 
-def test_get_notes_owns_storage_and_note_resources() -> None:
-    expected = {
-        "scripts/research_note_storage.py",
-        "scripts/writing_library_storage.py",
-        "scripts/_storage_support.py",
-        "references/writing-material-library.md",
-        "references/研究问题卡片模板.md",
-        "references/论文精读模板.md",
-    }
-    for relative in expected:
-        assert (GET_NOTES / relative).is_file(), relative
+def test_get_notes_has_one_research_note_resource() -> None:
+    assert (GET_NOTES / "references/研究笔记模板.md").is_file()
+    assert not (GET_NOTES / "references/writing-material-library.md").exists()
+    assert not (GET_NOTES / "references/研究问题卡片模板.md").exists()
+    assert not (GET_NOTES / "references/论文精读模板.md").exists()
+    assert not list((GET_NOTES / "scripts").glob("*.py"))
     assert not (GET_NOTES / "scripts/zotero.py").exists()
     assert not (GET_NOTES / "scripts/project_storage.py").exists()
     assert not (GET_NOTES / "references/configuration.md").exists()
@@ -62,6 +57,17 @@ def test_get_notes_consumes_content_artifacts_without_direct_zotero_access() -> 
     assert "scripts/runtime_config.py" not in text
     assert "scripts/attachment_paths.py" not in text
     assert "/api/users/0" not in text
+
+
+def test_get_notes_has_one_output_and_no_material_library_route() -> None:
+    skill = (GET_NOTES / "SKILL.md").read_text()
+    metadata = yaml.safe_load((GET_NOTES / "agents/openai.yaml").read_text())
+
+    assert "<target-directory>/<item-key>.md" in skill
+    assert "研究笔记模板.md" in skill
+    for retired_term in ("论文素材库", "07-论文写作库", "zotero-project-map.yaml"):
+        assert retired_term not in skill
+        assert retired_term not in metadata["interface"]["default_prompt"]
 
 
 def test_get_zotero_documents_the_versioned_artifact_contract() -> None:
