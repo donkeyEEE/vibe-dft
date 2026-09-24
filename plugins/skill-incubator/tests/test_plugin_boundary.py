@@ -22,6 +22,7 @@ def check_skill_incubator_owns_expected_skills() -> None:
     }
     assert skill_names == {
         "cangjie-skill",
+        "domain-research",
         "nature-response",
         "paper2ppt",
         "ppt-master",
@@ -36,6 +37,7 @@ def check_skill_incubator_owns_expected_skills() -> None:
 def check_paper_project_no_longer_owns_incubator_skills() -> None:
     for skill_name in (
         "cangjie-skill",
+        "domain-research",
         "nature-response",
         "paper2ppt",
         "ppt-master",

@@ -115,3 +115,6 @@ _Avoid_: sibling 共享脚本、插件共享资源、跨 skill Python 导入
 ## Skill Incubator
 
 `plugins/skill-incubator` 是可安装的通用 skill 试验场，收纳尚未形成独立插件边界的工作流。`prl-polishing` 在此继续提供通用物理论文逐段润色；Physical Review Introduction 的专用写作与重构由 Paper Project 的 `pr-intro` 负责。
+
+**研究术语文件（Research Term List）**：
+研究项目独立维护的可复用专有术语清单，每项只记录名称、简短解释和适用范围。`domain-research` 在研究交互与汇报写作中用它对齐物理概念和用语；一次性描述不进入清单。

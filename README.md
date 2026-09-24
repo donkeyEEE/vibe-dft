@@ -150,6 +150,7 @@ $calc-project:calc-execute 推进 SPEC-001 中当前可执行的 Task 和 Run。
 | Skill | 用途 |
 | --- | --- |
 | [cangjie-skill](plugins/skill-incubator/skills/cangjie-skill/SKILL.md) | Cangjie 资源蒸馏工作流正在重新设计期间的显式入口。 |
+| [domain-research](plugins/skill-incubator/skills/domain-research/SKILL.md) | 在研究讨论和汇报写作中沿用项目术语，防止自造概括词与概念偏移。 |
 | [nature-response](plugins/skill-incubator/skills/nature-response/SKILL.md) | 起草、审查或修订 Nature 风格的审稿回复、rebuttal、修回信和 LaTeX 模板。 |
 | [paper2ppt](plugins/skill-incubator/skills/paper2ppt/SKILL.md) | 将论文、预印本、文章或阅读笔记整理为以证据为主线的中文演示文稿。 |
 | [ppt-master](plugins/skill-incubator/skills/ppt-master/SKILL.md) | 创建、填充、重建或增强可编辑的 PPTX 演示文稿。 |
