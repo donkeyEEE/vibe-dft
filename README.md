@@ -93,6 +93,7 @@ calc-rq          calc-to-spec        calc-execute        calc-execute
 - **Spec（计算规范）**：针对一个主要判断制定科学设计，定义任务依赖，并记录任务目的、条件、验收规则、状态、Run 和闭合结论。
 - **Task（计算任务）**：Spec 中支持主要判断的可执行工作单元。父 Spec 管理它的身份、目的、依赖、条件和验收标准。
 - **Run（运行）**：一个 Task 的一次具体执行尝试。Run 在独立目录中保存实际输入、输出和日志。每次验证与评审固定当时的输入快照；新的尝试使用新的 Run 编号，符合条件的当前 Run 可原地纠正。
+- **Progress Tracker（进度跟踪表）**：每个 RQ 目录下的 `tracker.json`，随该 RQ 及其 Spec、Task、Run 状态变化直接维护。项目 COT 按需汇总各表；RQ.md 和 Spec 仍是权威记录。
 
 通常先用 `calc-setup` 建立项目根目录、数据根、RQ 存储配置和集群配置，然后推进 RQ、Spec 和 Run：
 

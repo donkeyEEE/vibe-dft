@@ -26,7 +26,7 @@ Skill 是否允许 Codex 隐式选择的运行时策略；默认允许隐式调�
 _Avoid_: Tracker 数据库，进度缓存，session registry
 
 **进度跟踪表（Progress Tracker）**:
-由智能体随状态变化直接维护的 RQ、Spec、Task、Run 派生摘要，用于查询项目已记录进度。
+由智能体随状态变化直接维护的单个 RQ 及其 Spec、Task、Run 派生摘要；每个 RQ 一份，项目总览按需汇总。
 跟踪表可从权威记录重建；RQ.md 与 Spec 保持状态权威，RQ 存储配置定义这些记录的存储位置。
 _Avoid_: 进度索引，独立状态权威
 

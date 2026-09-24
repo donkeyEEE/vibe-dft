@@ -16,9 +16,10 @@ description: 初始化、重组或维护一个计算项目的稳定结构、RQ �
    执行所需配置调用时，在用户明确约束内自主完成变更；保留计算数据，并在变更前比较既有
    项目文档。科学设计变更交由 `$calc-to-spec` 自主处理；已闭合 Spec 的修改仍需具体授权。
 4. 仅创建或更新已批准的稳定结构和配置，使根 `.gitignore` 包含 `/.calc-project/`，以排除
-   派生索引和报告。读取[进度跟踪表契约](../../resources/progress-tracker.md)，
+   派生报告。读取[进度跟踪表契约](../../resources/progress-tracker.md)，
    将维护约定写入项目 `AGENTS.md`，
-   创建或修复 `.calc-project/tracker.json`。报告既有 RQ 与 Spec，但不得接管或修改它们。
+   为每个已有 RQ 创建或修复其目录下的 `tracker.json`；无 RQ 时不建表。旧项目级跟踪表
+   按共享契约迁移。报告既有 RQ 与 Spec，但不得接管或修改它们。
 5. 请求集群配置时，读取[集群软件配置](references/cluster-software-profiles.md)。将已审查的
    项目特定值记录在 `software-profiles.md`；用随附验证器探测每个值，并保留如实的 `verified`
    或 `unavailable` 证据。

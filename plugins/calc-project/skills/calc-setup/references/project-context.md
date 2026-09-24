@@ -46,8 +46,8 @@ _Avoid_: Tracker 数据库，进度缓存，会话注册表
 _Avoid_: 研究计划目录，任务列表
 
 **进度跟踪表（Progress Tracker）**:
-`.calc-project/tracker.json` 中由智能体直接维护的 RQ、Spec、Task、Run 派生摘要。
-任一对象状态变化后立即同步；COT 默认读取此索引，缺失或异常时从权威记录修复。
+每个 RQ 目录下 `tracker.json` 中由智能体直接维护的该 RQ、Spec、Task、Run 派生摘要。
+任一对象状态变化后立即同步所属 RQ 的表；项目 COT 汇总各表，缺失或异常时按 RQ 修复。
 维护契约写在项目 `AGENTS.md`。索引可重建，不拥有科学设计或执行状态的权威。
 
 **计算规范（Spec）**:

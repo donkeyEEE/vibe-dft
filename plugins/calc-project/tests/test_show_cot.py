@@ -50,3 +50,28 @@ def test_legacy_query_delegates_project_rules_to_setup(plugin_root):
     assert "本次查询可继续，不自行修改项目 `AGENTS.md`" in query
     assert "`calc-setup` 拥有项目 AGENTS 维护约定的写入和迁移" in contract
     assert "由智能体直接编辑 JSON，无需统一更新脚本" in contract
+
+
+def test_progress_trackers_are_scoped_to_rq_and_aggregated_without_omissions(plugin_root):
+    contract = (plugin_root / "resources/progress-tracker.md").read_text(encoding="utf-8")
+    query = (plugin_root / "skills/show-cot/SKILL.md").read_text(encoding="utf-8")
+    assert "每个 RQ 在 `RQ.md` 同级保存一份 `tracker.json`" in contract
+    assert "单个 `rq` 对象" in contract
+    assert "空项目不创建跟踪表" in contract
+    assert "跨 RQ 移动对象时更新源和目标两份表" in contract
+    assert "按 `RQ location:` 枚举配置范围内实际 RQ 目录" in query
+    assert "不能因缺少 tracker 而跳过该 RQ" in query
+    assert "不保存项目级跟踪表" in query
+    for name in ("calc-rq", "calc-to-spec", "calc-execute"):
+        writer = (plugin_root / "skills" / name / "SKILL.md").read_text(encoding="utf-8")
+        assert "所属 RQ 目录下的 `tracker.json`" in writer
+        assert ".calc-project/tracker.json" not in writer
+
+
+def test_project_tracker_migration_preserves_authorities_and_other_reports(plugin_root):
+    contract = (plugin_root / "resources/progress-tracker.md").read_text(encoding="utf-8")
+    assert "从各 RQ 权威记录" in contract
+    assert "全部完成后删除旧项目级派生表" in contract
+    assert "迁移未完成时保留旧文件" in contract
+    assert "不回退到旧项目表" in contract
+    assert "保留 `.calc-project/` 内的其他文件" in contract

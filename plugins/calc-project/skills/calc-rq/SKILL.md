@@ -28,7 +28,7 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
    concluded Spec 的 Closure 影响在批准前仍是提案；报告其为已接受、已拒绝或待定。批准创建后，
    创建配置的 RQ 目录及其中的 `RQ.md` 与 `specs/`。
 6. 每次写入后重读 `RQ.md`；RQ 状态或其他索引字段变化、新增 RQ 时，立即直接维护
-   `.calc-project/tracker.json` 并核对一致性。遵循项目 `AGENTS.md` 和
+   所属 RQ 目录下的 `tracker.json` 并核对一致性。遵循项目 `AGENTS.md` 和
    [进度跟踪表契约](../../resources/progress-tracker.md)；缺少项目约定时，规则补齐交由 `$calc-setup`。
    当已接受决策足以覆盖预期回答范围，且用户未完成请求包含 Spec 设计时，
    直接进入 `$calc-to-spec`，携带已解析 RQ、路径、已接受决策和完整剩余意图，使其能设计
