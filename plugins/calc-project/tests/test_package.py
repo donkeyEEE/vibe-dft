@@ -85,6 +85,8 @@ def test_runtime_package(plugin_root, tmp_path):
     }
     assert names == expected
     assert ".codex-plugin/plugin.json" in names
+    assert "resources/progress-tracker.md" in names
+    assert "resources/README.md" in names
     assert "skills/calc-execute/assets/templates/common/run.sh.template" in names
     assert REQUIRED_DT005_ASSETS <= set(names)
     assert not any(
@@ -102,7 +104,7 @@ def test_runtime_inventory_is_sorted_and_independently_contains_dt005_assets(
     names = _runtime_names(builder, plugin_root)
 
     assert names == sorted(names)
-    assert len(names) == 84
+    assert len(names) == 86
     assert REQUIRED_DT005_ASSETS <= set(names)
 
 
@@ -171,11 +173,20 @@ def test_ninth_skill_is_rejected(plugin_root, tmp_path):
         builder.runtime_files(copy)
 
 
+def test_missing_progress_tracker_contract_is_rejected(plugin_root, tmp_path):
+    builder = _load_builder()
+    copy = _copy_plugin(plugin_root, tmp_path)
+    (copy / "resources/progress-tracker.md").unlink()
+
+    with pytest.raises(ValueError, match="required shared resource"):
+        builder.runtime_files(copy)
+
+
 @pytest.mark.parametrize(
     ("relative", "kind"),
     (
         ("README.md", "file"),
-        ("resources", "directory"),
+        ("unknown-resources", "directory"),
         (".codex-plugin/extra.json", "file"),
         ("skills/calc-rq/NOTES.md", "file"),
     ),

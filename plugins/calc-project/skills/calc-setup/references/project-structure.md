@@ -29,11 +29,12 @@
 `structures/` 和 `06-文献笔记/` 容器；它不填充计算模板或文献容器，后者内容由 Paper
 Project 文献工作流负责。
 
-`.gitignore` 包含 `/.calc-project/`。该隐藏目录不在初始化时创建；用户确认由 `show-cot`
-生成进展报告时才按需创建，其中内容是可再生的派生视图，不属于计算项目结构或进度权威。
+`.gitignore` 包含 `/.calc-project/`。该隐藏目录保存 `tracker.json` 和按需生成的进展报告，
+其中内容是可再生的派生视图，不属于计算项目结构或进度权威。初始化时创建空进度跟踪表；
+维护已有项目时，从配置范围内全部 RQ 与已发布 Spec 建立或修复进度跟踪表，保留权威记录。
 
 仅在请求配置集群时创建 `software-profiles.md`。基础设置不创建具体 RQ 目录、Spec、
-任务、Run、计算输入、调度器脚本或项目索引。已有 RQ 和 Spec 仅报告并保持不变。
+任务、Run、计算输入或调度器脚本。已有 RQ 和 Spec 保持不变。
 
 ## ARCHITECTURE.md 契约
 
@@ -50,7 +51,7 @@ Software profile: software-profiles.md
 ```
 
 在该文件配置前省略 `Software profile:`。`Data root:` 是选定的项目相对数据根路径。
-初始且唯一配置的 Tracker adapter 为 `local-markdown`。`RQ location:` 是位置约定，
+RQ 存储配置沿用机器字段 `Tracker adapter:`，初始且唯一值为 `local-markdown`。`RQ location:` 是位置约定，
 不是已创建的 RQ，也不是状态 schema。
 
 ## 生成的 AGENTS.md 契约
@@ -66,6 +67,9 @@ Software profile: software-profiles.md
 
 生成的文件将项目操作规则保持在项目范围。Spec 是任务状态、DAG、Runs、current-Run
 指定、执行进度和闭包的唯一权威。
+
+初始化或维护项目时，按[进度跟踪表契约](../../../resources/progress-tracker.md)
+将维护约定写入项目 `AGENTS.md`，保留其他项目规则；字段和重建要求以该共享契约为准。
 
 ## 项目文档
 

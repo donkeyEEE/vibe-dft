@@ -1,6 +1,6 @@
 ---
 name: calc-setup
-description: 初始化、重组或维护一个计算项目的稳定结构、Tracker 配置、数据边界和可选集群软件配置。
+description: 初始化、重组或维护一个计算项目的稳定结构、RQ 存储配置、数据边界和可选集群软件配置。
 ---
 
 # 计算项目配置
@@ -9,14 +9,16 @@ description: 初始化、重组或维护一个计算项目的稳定结构、Trac
 
 1. 解析唯一项目路径，并在存在时读取其 `AGENTS.md`、`CONTEXT.md` 和 `ARCHITECTURE.md`。
    若目标有歧义，询问用户。
-2. 初始化或重组时，读取[项目结构](references/project-structure.md)和
+2. 初始化、重组或维护时，读取[项目结构](references/project-structure.md)和
    [项目上下文](references/project-context.md)。提出准确路径与文档变更，包括
    `ARCHITECTURE.md` 的 `## Calculation Configuration` 字段。
 3. 独立初始化或维护项目时，写入前取得该具体提案的批准。由 `$calc-execute` 为选定 Spec 的
    执行所需配置调用时，在用户明确约束内自主完成变更；保留计算数据，并在变更前比较既有
    项目文档。科学设计变更交由 `$calc-to-spec` 自主处理；已闭合 Spec 的修改仍需具体授权。
 4. 仅创建或更新已批准的稳定结构和配置，使根 `.gitignore` 包含 `/.calc-project/`，以排除
-   按需生成的派生报告。报告既有 RQ 与 Spec，但不得接管或修改它们。
+   派生索引和报告。读取[进度跟踪表契约](../../resources/progress-tracker.md)，
+   将维护约定写入项目 `AGENTS.md`，
+   创建或修复 `.calc-project/tracker.json`。报告既有 RQ 与 Spec，但不得接管或修改它们。
 5. 请求集群配置时，读取[集群软件配置](references/cluster-software-profiles.md)。将已审查的
    项目特定值记录在 `software-profiles.md`；用随附验证器探测每个值，并保留如实的 `verified`
    或 `unavailable` 证据。
@@ -25,7 +27,7 @@ description: 初始化、重组或维护一个计算项目的稳定结构、Trac
 
 ## 权威范围
 
-此 skill 拥有稳定项目结构、数据边界、Tracker 存储配置、生成的 Agent 指针和维护的
+此 skill 拥有稳定项目结构、数据边界、RQ 存储配置、生成的 Agent 指针和维护的
 集群/软件配置。它不创建 RQ、Spec、Task 或 Run，不进行数据同步、作业提交或可变
 Run 环境验证。
 

@@ -14,7 +14,7 @@ description: 显式辅助 Calc Project 用户选择工作接口、解释项目�
 
 | 用户目标 | 推荐 |
 |---|---|
-| 缺失或变更了稳定项目、Tracker、数据边界或集群配置 | `$calc-setup` |
+| 缺失或变更了稳定项目、RQ 存储配置、数据边界或集群配置 | `$calc-setup` |
 | RQ 生命周期、已接受决策、未回答的 RQ 问题，或 concluded Spec 对 RQ 的影响 | `$calc-rq` |
 | RQ 当前下一主要判断的 Spec、科学承诺、Task DAG、条件、验收、停止规则或替换一份 Spec | `$calc-to-spec` |
 | 推进 ready/active Spec；准备、提交、跟踪、同步、接受、纠正或闭合其 Run 与 Task | `$calc-execute` |

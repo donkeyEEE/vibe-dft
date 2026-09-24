@@ -32,3 +32,21 @@ def test_calc_setup_ignores_generated_project_reports(plugin_root):
     assert "根 `.gitignore` 包含 `/.calc-project/`" in skill
     assert "`.gitignore` 包含 `/.calc-project/`" in structure
     assert "不属于计算项目结构或进度权威" in structure
+
+
+def test_progress_tracker_consumers_use_shared_contract(plugin_root):
+    for name in ("calc-setup", "calc-rq", "calc-to-spec", "calc-execute", "show-cot"):
+        skill = plugin_root / "skills" / name / "SKILL.md"
+        text = skill.read_text(encoding="utf-8")
+        assert "(../../resources/progress-tracker.md)" in text
+        assert "../calc-setup/references/project-structure.md" not in text
+
+
+def test_legacy_query_delegates_project_rules_to_setup(plugin_root):
+    query = (plugin_root / "skills/show-cot/SKILL.md").read_text(encoding="utf-8")
+    contract = (plugin_root / "resources/progress-tracker.md").read_text(encoding="utf-8")
+
+    assert "规则补齐交由 `$calc-setup` 按其授权规则处理" in query
+    assert "本次查询可继续，不自行修改项目 `AGENTS.md`" in query
+    assert "`calc-setup` 拥有项目 AGENTS 维护约定的写入和迁移" in contract
+    assert "由智能体直接编辑 JSON，无需统一更新脚本" in contract

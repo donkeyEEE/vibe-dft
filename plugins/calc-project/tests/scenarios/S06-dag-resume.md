@@ -26,6 +26,11 @@ Each probe natively invokes `calc-project:calc-execute` in a fresh fixture.
   failed only if the authoritative Spec update is safe.
 - The vague threshold returns to design with no guessed value.
 - The vanished job is not successful; fresh context uses only Spec, Run, and
-  fake scheduler/accounting facts and creates no cache.
+  fake scheduler/accounting facts to determine execution state. The derived
+  `.calc-project/tracker.json` cannot supply missing completion evidence.
+- Every persisted Spec, Task, or Run state change is immediately reflected in
+  the progress tracker before proceeding or handing off. Unrelated branches survive; no
+  shared update script is required. A legacy project can rebuild a complete tracker from its configured authorities;
+  AGENTS maintenance is delegated to calc-setup under its existing authorization rules.
 - A pending task without `Purpose` stops the requested advancement with no
   mutation and identifies the task declaration as owned by `calc-to-spec`.

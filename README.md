@@ -72,7 +72,7 @@ codex plugin add calc-project@vibe-dft
 | Skill | 用途 |
 | --- | --- |
 | [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 显式辅助入口，用于推荐工作接口、解释项目术语或查询进度。 |
-| [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、Tracker 配置、数据边界和集群配置。 |
+| [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、RQ 存储配置、数据边界和集群配置。 |
 | [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），将获批答案记录为已接受决策。 |
 | [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 为已接受 RQ 渐进发布完整的单份 Spec，或安全替换当前设计。 |
 | [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 推进已就绪或活动中的 Spec，处理 Run 的准备、评审、提交、跟踪、同步与验收。 |
@@ -94,7 +94,7 @@ calc-rq          calc-to-spec        calc-execute        calc-execute
 - **Task（计算任务）**：Spec 中支持主要判断的可执行工作单元。父 Spec 管理它的身份、目的、依赖、条件和验收标准。
 - **Run（运行）**：一个 Task 的一次具体执行尝试。Run 在独立目录中保存实际输入、输出和日志。每次验证与评审固定当时的输入快照；新的尝试使用新的 Run 编号，符合条件的当前 Run 可原地纠正。
 
-通常先用 `calc-setup` 建立项目根目录、数据根、RQ Tracker 和集群配置，然后推进 RQ、Spec 和 Run：
+通常先用 `calc-setup` 建立项目根目录、数据根、RQ 存储配置和集群配置，然后推进 RQ、Spec 和 Run：
 
 1. 用 `calc-rq` 建立或推进 RQ，并把用户在访谈中确认的答案写入 RQ 的 `## Decisions`。
 2. 用 `calc-to-spec` 为 RQ 当前有依据的主要判断设计并发布一份完整 Spec。后续判断可根据结果逐份发布。证据档位优先采用 Spec 的设置，其次继承 RQ；都未设置时采用轻量档。

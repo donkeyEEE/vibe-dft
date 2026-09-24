@@ -21,9 +21,14 @@ Skill 是否允许 Codex 隐式选择的运行时策略；默认允许隐式调�
 
 `plugins/calc-project` 是可安装计算工作流插件。运行时计算模板和确定性辅助脚本属于唯一消费者 `calc-execute`，不属于插件共享资源。
 
-**RQ Tracker**:
+**RQ 存储配置**:
 每个 RQ 用于存放 `RQ.md` 与已发布 Spec 的配置化存储约定；RQ 属于一条计算研究主线，本地 Markdown adapter 下对应 `<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，不是独立状态文档。
 _Avoid_: Tracker 数据库，进度缓存，session registry
+
+**进度跟踪表（Progress Tracker）**:
+由智能体随状态变化直接维护的 RQ、Spec、Task、Run 派生摘要，用于查询项目已记录进度。
+跟踪表可从权威记录重建；RQ.md 与 Spec 保持状态权威，RQ 存储配置定义这些记录的存储位置。
+_Avoid_: 进度索引，独立状态权威
 
 **计算工具脚本（Calculation Utility Script）**:
 计算项目中可复用的可执行工具资产，用于辅助计算工作，但不作为生成任务输入的来源。

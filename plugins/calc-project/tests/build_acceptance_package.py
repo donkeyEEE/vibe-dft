@@ -58,6 +58,7 @@ REQUIRED_DT005_ASSETS = (
 _PLUGIN_ENTRIES = {
     ".codex-plugin",
     "skills",
+    "resources",
     "tests",
     "conftest.py",
     "__pycache__",
@@ -222,7 +223,16 @@ def runtime_files(plugin_root: Path) -> list[Path]:
             "skills directory must contain exactly: " + ", ".join(SKILL_NAMES)
         )
 
-    files: list[Path] = [manifest]
+    resources_root = plugin_root / "resources"
+    required_resources = {"README.md", "progress-tracker.md"}
+    if not resources_root.is_dir():
+        raise ValueError("required shared resources directory is missing")
+    _validate_exact_entries(resources_root, required_resources, "shared resources")
+    resources = [resources_root / name for name in sorted(required_resources)]
+    if any(not path.is_file() for path in resources):
+        raise ValueError("required shared resource is missing")
+
+    files: list[Path] = [manifest, *resources]
     for name in SKILL_NAMES:
         skill_root = skills_root / name
         _validate_exact_entries(skill_root, _SKILL_ENTRIES, f"skill {name}")

@@ -9,7 +9,7 @@
 _Avoid_: 项目目录，计算仓库
 
 **计算项目结构（Calculation Project Structure）**:
-由稳定知识、RQ Tracker 配置和数据根组成的项目级管理结构。
+由稳定知识、RQ 存储配置和数据根组成的项目级管理结构。
 _Avoid_: 任务状态，Spec DAG
 
 **计算笔记（Calculation Notes）**:
@@ -35,15 +35,20 @@ _Avoid_: RQ 主线，固定三层路径
 Spec 的任务 DAG 表达，而不是由并行状态文档拥有。
 _Avoid_: 计算线，状态文件
 
-**RQ Tracker**:
+**RQ 存储配置**:
 一个 RQ 的配置化存储约定。`local-markdown` adapter 将其存储在
 `01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，其中包含 `RQ.md`、已明确发布的
-Specs。Tracker 不是独立状态文档，也不拥有执行进度。
+Specs。RQ 存储配置不是独立状态文档，也不拥有执行进度。
 _Avoid_: Tracker 数据库，进度缓存，会话注册表
 
 **研究问题（Research Question, RQ）**:
 在一条研究主线内定义问题、边界、成功标准、已接受决策及已明确发布 Spec 的记录。
 _Avoid_: 研究计划目录，任务列表
+
+**进度跟踪表（Progress Tracker）**:
+`.calc-project/tracker.json` 中由智能体直接维护的 RQ、Spec、Task、Run 派生摘要。
+任一对象状态变化后立即同步；COT 默认读取此索引，缺失或异常时从权威记录修复。
+维护契约写在项目 `AGENTS.md`。索引可重建，不拥有科学设计或执行状态的权威。
 
 **计算规范（Spec）**:
 一个主判断的当前已发布科学设计，也是其任务目的、DAG、状态、Runs、current Run、
