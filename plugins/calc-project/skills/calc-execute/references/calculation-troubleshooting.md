@@ -88,5 +88,7 @@ After success, report the effective solution, evidence, and applicability
 boundary. When the finding is reusable and verified, write an independent stable
 note under `02-计算规范/`, citing the temporary research evidence and its
 applicability boundary. This workflow does not create a
-task-specific record under `04-问题排查/`, and an unverified solution is never
-promoted as stable calculation knowledge.
+task-specific troubleshooting log under `04-问题排查/`, and an unverified solution
+is never promoted as stable calculation knowledge. A finding worth independent
+inquiry may be handed to `$calc-issue` through the execution workflow; that
+separate Issue record does not replace this diagnostic loop.

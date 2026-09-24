@@ -37,6 +37,10 @@ Project 文献工作流负责。
 仅在请求配置集群时创建 `software-profiles.md`。基础设置不创建具体 RQ 目录、Spec、
 任务、Run、计算输入或调度器脚本。已有 RQ 和 Spec 保持不变。
 
+研究主线的 `04-问题排查/` 同时承载 `calc-issue` 管理的待探究问题记录；
+Issue 使用项目内唯一编号，可跨主线关联 RQ、Spec、Task。首个 Issue 出现时按需创建，
+具体记录及状态契约由 `$calc-issue` 所有；项目配置流程不创建具体 Issue。
+
 ## ARCHITECTURE.md 契约
 
 记录目录职责、命名规则及 Git/集群数据边界。消费者读取下列精确章节和字段行，

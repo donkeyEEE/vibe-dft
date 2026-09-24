@@ -84,6 +84,11 @@ def test_runtime_package(plugin_root, tmp_path):
         for path in builder.runtime_files(plugin_root)
     }
     assert names == expected
+    assert {
+        "skills/calc-issue/SKILL.md",
+        "skills/calc-issue/agents/openai.yaml",
+        "skills/calc-issue/references/issue-record.md",
+    } <= names
     assert ".codex-plugin/plugin.json" in names
     assert "resources/progress-tracker.md" in names
     assert "resources/README.md" in names
@@ -104,7 +109,7 @@ def test_runtime_inventory_is_sorted_and_independently_contains_dt005_assets(
     names = _runtime_names(builder, plugin_root)
 
     assert names == sorted(names)
-    assert len(names) == 86
+    assert len(names) == 89
     assert REQUIRED_DT005_ASSETS <= set(names)
 
 
@@ -120,6 +125,8 @@ def test_package_builder_requires_calculation_monitor_runtime(plugin_root):
         ".codex-plugin/plugin.json",
         "skills/calc-review/SKILL.md",
         "skills/calc-review/agents/openai.yaml",
+        "skills/calc-issue/SKILL.md",
+        "skills/calc-issue/agents/openai.yaml",
     ),
 )
 def test_missing_required_metadata_is_rejected(plugin_root, tmp_path, relative):
@@ -164,7 +171,7 @@ def test_malformed_metadata_is_rejected(plugin_root, tmp_path, metadata):
         builder.runtime_files(copy)
 
 
-def test_ninth_skill_is_rejected(plugin_root, tmp_path):
+def test_unexpected_skill_is_rejected(plugin_root, tmp_path):
     builder = _load_builder()
     copy = _copy_plugin(plugin_root, tmp_path)
     shutil.copytree(copy / "skills/ask-lyz", copy / "skills/ninth")
@@ -402,6 +409,7 @@ def test_manifest_and_skill_metadata_describe_exact_explicit_roster(plugin_root)
         "calc-rq",
         "calc-to-spec",
         "calc-execute",
+        "calc-issue",
         "calc-report",
         "calc-review",
         "show-cot",

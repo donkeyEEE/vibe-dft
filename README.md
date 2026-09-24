@@ -76,6 +76,7 @@ codex plugin add calc-project@vibe-dft
 | [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），将获批答案记录为已接受决策。 |
 | [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 为已接受 RQ 渐进发布完整的单份 Spec，或安全替换当前设计。 |
 | [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 推进已就绪或活动中的 Spec，处理 Run 的准备、评审、提交、跟踪、同步与验收。 |
+| [calc-issue](plugins/calc-project/skills/calc-issue/SKILL.md) | 记录执行中值得独立探究的问题，跨 RQ、Spec、Task 关联证据，按编号推进调研。 |
 | [calc-report](plugins/calc-project/skills/calc-report/SKILL.md) | 根据 RQ、Spec、Run 与已有结果生成可追溯的阶段或结果汇报。 |
 | [calc-review](plugins/calc-project/skills/calc-review/SKILL.md) | 对指定 prepared Run 做瞬时、只读的提交前评审。 |
 | [show-cot](plugins/calc-project/skills/show-cot/SKILL.md) | 显式、只读地展示计算归属树（COT）；直接调用时可在确认后生成 HTML 进展报告，执行交接时可自主生成。 |
@@ -109,6 +110,11 @@ calc-rq          calc-to-spec        calc-execute        calc-execute
 用户委托执行选定 Spec 后，`calc-execute` 可以准备和评审 Run，提交、监控和排查作业问题，同步结果，调整资源或成本，取消过时作业，处理执行产物，并在证据充分时结束 Spec。若委托范围是推进整个 RQ，有依据的下一项判断可继续进入新 Spec。需要修改执行中的科学设计时，`calc-to-spec` 会安全替换当前设计，并保留旧 Run 证据。
 
 若已接受 RQ、项目证据和可靠文献仍不足以解决关键科学问题，agent 会请用户参与判断。修改或重开已结束（`concluded`）的 Spec 需要针对具体变更取得授权。改变 RQ 的已接受决策、超出用户明确边界的行动也需另行处理。执行过程继续保留安全检查、提交前快照评审和证据记录。
+
+Issue 是执行时达到较高门槛才记录的附加产物，存放于研究主线的 `04-问题排查/`，
+使用项目内唯一的 `ISSUE-NNN`；可直接说“推进 ISSUE-001”。状态只有待探究、探究中、
+已完成。记录后继续当前 Spec，后续按委托以调研为主；必要验证先形成补充 Spec/Task 的需求，
+有设计授权时才交接。问题回答充分且可复用经验已沉淀时完成。经验独立保存和插件知识更新留待后续设计。
 
 不确定该用哪个 skill 时，可以使用 `ask-lyz`；它也能解释项目术语和查询进度。`calc-review` 通常由 `calc-execute` 在提交 Run 前调用，对已准备的输入快照做一次只读评审。输入、资源或执行环境改变后，必须重新验证和评审。直接调用 `calc-review` 不会启动执行，也不会改变 Task、Run 或 Spec 的状态。
 

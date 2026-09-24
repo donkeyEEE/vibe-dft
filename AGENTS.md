@@ -4,7 +4,7 @@
 
 ## 插件导航
 
-- [calc-project](plugins/calc-project/)：管理科研计算项目配置、RQ、Spec、整份 Spec 执行、prepared Run 瞬时评审和计算汇报；`ask-lyz` 提供显式路由辅助，`show-cot` 提供从既有权威记录派生的显式只读执行总览。稳定术语见 [calc-setup 领域词汇](plugins/calc-project/skills/calc-setup/references/project-context.md)，Run 输入、执行模板和同步工具由 `calc-execute` 所有。
+- [calc-project](plugins/calc-project/)：管理科研计算项目配置、RQ、Spec、整份 Spec 执行、prepared Run 瞬时评审、Issue 调研和计算汇报；`ask-lyz` 提供显式路由辅助，`show-cot` 提供从既有权威记录派生的显式只读执行总览。稳定术语见 [calc-setup 领域词汇](plugins/calc-project/skills/calc-setup/references/project-context.md)，Run 输入、执行模板和同步工具由 `calc-execute` 所有。
 - [paper-project](plugins/paper-project/)：文献整理、论文与学位论文写作、引用核验和科学图件。研究证据与学术表达任务进入此插件。
 - [osm-project](plugins/osm-project/)：将当前对话中的项目进展整理为草稿，经确认后写入 Obsidian Daily Note。用户要求记录项目日志时进入此插件。
 - [skill-incubator](plugins/skill-incubator/)：维护尚未形成独立插件边界的可安装 skill，包括通用物理论文润色与演示文稿工作流。

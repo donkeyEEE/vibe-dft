@@ -17,6 +17,8 @@ description: 从 Calc Project 的 RQ、Spec、Run 和相关结果生成可追溯
 3. 读取选定的 RQ、Spec、Task、Run 记录及其指向的结果。默认使用 current Runs 和被 Task
    接受的 Runs；历史 Run 仅在说明进展、失败、替换或比较时纳入，其他 RQ 的证据仅在确认范围内
    纳入。补充结果保留来源限制，不能单独满足 RQ 或 Spec 的验收准则。
+   主题涉及 Issue 时，在确认范围内读取其结论与成果，追溯原始证据并说明未验证认识；
+   Issue 状态不替代 RQ 或 Spec 的验收结论。
 4. 在确认的 workspace 中准备本次实际消费的轻量汇报源数据或提取结果。大型输出保留在原 Run
    或数据根。生成 `provenance.json`，记录实际消费的数据、图件和核心结论所对应的 RQ、Spec、
    Task、Run、具体来源及提取或推导，并记录可能影响理解的反证、缺口和排除项。只创建实际使用的

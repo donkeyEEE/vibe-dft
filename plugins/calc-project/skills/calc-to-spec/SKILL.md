@@ -20,6 +20,10 @@ Spec 的当前科学设计。新建与安全替换不另设发布批准；用户
    新建时确认当前主要判断直接服务于该 RQ 的问题、`Boundary:` 和成功判据；替换时通过
    RQ 解析唯一目标 Spec。权威含糊、所有权冲突或既有设计已 `concluded` 而缺少具体
    重开授权时停止，不猜测或覆盖。
+   来自 Issue 的验证需求先核实已获设计交接授权；仅有“推进 Issue”的委托不足以
+   发布或替换设计。授权后按目标 RQ 设计补充 Spec，或通过本流程安全替换为已有 Spec
+   补充 Task；遵守 concluded 边界。设计中保留来源 Issue 编号与路径，完成后回传
+   实际 Spec/Task 引用供 `$calc-issue` 更新关联。
 2. 解析本次 Spec 的证据档位。Spec 的明确设置优先，其次继承 RQ 的 `Evidence level:`，
    两者都未设置时为 `light`。`strict` 只来自用户明确要求或已接受的 RQ 设置；
    不自行降低已接受的严格要求。发布时将生效的 `Evidence level: light | strict`

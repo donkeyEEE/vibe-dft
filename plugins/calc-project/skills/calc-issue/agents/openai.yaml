@@ -1,0 +1,4 @@
+interface:
+  display_name: "Calc Issue"
+  short_description: "记录待探究问题，关联证据并推进调研"
+  default_prompt: "$calc-issue 按编号查询或推进指定 Issue，或记录执行中的重要发现。"

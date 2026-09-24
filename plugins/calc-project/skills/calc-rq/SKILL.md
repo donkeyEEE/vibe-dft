@@ -13,13 +13,14 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
    缺失或无效配置会停止本动作，并应交由 `$calc-setup`。
 2. 创建时读取已解析主线下的 sibling RQ 目录以避免 ID 冲突。既有 RQ 工作时读取所选 `RQ.md`；
    意图涉及 concluded Spec 影响时还读取相关已发布 Spec。将这些文件视为权威，而非对话摘要。
-   问题与已接受决策只保存在 `RQ.md`；进度跟踪表按项目 `AGENTS.md` 的进度跟踪表约定维护。
+   RQ 问题与已接受决策只保存在 `RQ.md`；进度跟踪表按项目 `AGENTS.md` 的进度跟踪表约定维护。
 3. 创建或推导 RQ，或变更其 Question、Question 下的 `Boundary:` 或 Success Criterion 时，
    调用 `$dev-engineering:grill-with-docs`。若此依赖不可用，只停止该工作流并报告；不需要
    此工作流的检查和已决定 RQ 更新仍可进行。将访谈产生的 RQ 范围术语和框架记录于
    `RQ.md` 的 `## Context`；仓库根 `CONTEXT.md` 仅保留稳定的项目级领域术语。在当前对话中
    解决未回答问题。用户回答后，在 `RQ.md` `## Decisions` 下提出准确新增或替换；不得单独
-   持久化未回答问题。
+   持久化 RQ 访谈待答问题。执行发现的 Issue 由 `$calc-issue` 独立维护。
+   来自 Issue 的新 RQ 提案读取其证据，沿用本流程批准；获批后回传实际 RQ 路径供 Issue 关联。
 4. 创建时用[RQ 模板](references/rq-template.md)起草 RQ。`RQ-NNN` ID 在其父主线内稳定且未使用。
    用户可在 RQ 上明确设置 `Evidence level: light | strict`；未设置时省略该字段并默认 `light`。
    已发布 Spec 的生效档位在其发布时固定，不因后续 RQ 更新而自动变化。

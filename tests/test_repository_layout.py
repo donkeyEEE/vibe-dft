@@ -19,6 +19,7 @@ EXPECTED_CALC_SKILLS = (
     "calc-rq",
     "calc-to-spec",
     "calc-execute",
+    "calc-issue",
     "calc-report",
     "calc-review",
     "show-cot",

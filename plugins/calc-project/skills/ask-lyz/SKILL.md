@@ -18,6 +18,7 @@ description: 显式辅助 Calc Project 用户选择工作接口、解释项目�
 | RQ 生命周期、已接受决策、未回答的 RQ 问题，或 concluded Spec 对 RQ 的影响 | `$calc-rq` |
 | RQ 当前下一主要判断的 Spec、科学承诺、Task DAG、条件、验收、停止规则或替换一份 Spec | `$calc-to-spec` |
 | 推进 ready/active Spec；准备、提交、跟踪、同步、接受、纠正或闭合其 Run 与 Task | `$calc-execute` |
+| 按编号查询、记录、关联或合并 Issue，或委托推进其调研 | `$calc-issue` |
 | 围绕主题或选定 RQ/Spec 汇总已有证据，生成阶段汇报或结果汇报 | `$calc-report` |
 
 ## 术语解释
