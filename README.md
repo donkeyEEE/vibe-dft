@@ -71,7 +71,7 @@ codex plugin add calc-project@vibe-dft
 
 | Skill | 用途 |
 | --- | --- |
-| [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 显式辅助入口，用于推荐工作接口、解释项目术语或查询进度。 |
+| [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 显式辅助入口，解释插件术语、核心流程和 Tracker 等用法，推荐工作接口或查询进度。 |
 | [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、RQ 存储配置、数据边界和集群配置。 |
 | [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），将获批答案记录为已接受决策。 |
 | [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 为已接受 RQ 渐进发布完整的单份 Spec，或安全替换当前设计。 |
@@ -116,7 +116,7 @@ Issue 是执行时达到较高门槛才记录的附加产物，存放于研究�
 已完成。记录后继续当前 Spec，后续按委托以调研为主；必要验证先形成补充 Spec/Task 的需求，
 有设计授权时才交接。问题回答充分且可复用经验已沉淀时完成。经验独立保存和插件知识更新留待后续设计。
 
-不确定该用哪个 skill 时，可以使用 `ask-lyz`；它也能解释项目术语和查询进度。`calc-review` 通常由 `calc-execute` 在提交 Run 前调用，对已准备的输入快照做一次只读评审。输入、资源或执行环境改变后，必须重新验证和评审。直接调用 `calc-review` 不会启动执行，也不会改变 Task、Run 或 Spec 的状态。
+想了解插件术语、核心流程或 Tracker 的位置，或不确定该用哪个 skill 时，可以使用 `ask-lyz`；它也能查询进度。`calc-review` 通常由 `calc-execute` 在提交 Run 前调用，对已准备的输入快照做一次只读评审。输入、资源或执行环境改变后，必须重新验证和评审。直接调用 `calc-review` 不会启动执行，也不会改变 Task、Run 或 Spec 的状态。
 
 ```text
 $calc-project:calc-setup 为当前目录建立计算项目配置。

@@ -91,6 +91,7 @@ def test_runtime_package(plugin_root, tmp_path):
     } <= names
     assert ".codex-plugin/plugin.json" in names
     assert "resources/progress-tracker.md" in names
+    assert "resources/project-context.md" in names
     assert "resources/README.md" in names
     assert "skills/calc-execute/assets/templates/common/run.sh.template" in names
     assert REQUIRED_DT005_ASSETS <= set(names)

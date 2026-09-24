@@ -8,6 +8,7 @@ description: 将一个精确的 prepared Calc Project Run 作为瞬时、只读�
 判定一个精确的 prepared Run。输入必须唯一解析到其 task、当前 Spec、完整 `inputs/` 快照、
 指定的上游 handoff、预期提交环境和资源配置。直接读取这些权威资料，并在决定是否需要用户前，
 通过安全的只读检查补足缺失的操作细节。
+涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
 
 ## 评审
 

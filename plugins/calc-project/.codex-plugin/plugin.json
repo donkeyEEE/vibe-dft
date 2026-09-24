@@ -1,7 +1,7 @@
 {
   "name": "calc-project",
   "version": "0.1.0+codex.20260916141145",
-  "description": "以七个可自动选择的接口管理计算项目配置、RQ、Spec、执行、Issue 调研、评审与汇报，并提供显式路由辅助和只读 COT 总览。",
+  "description": "以七个可自动选择的接口管理计算项目配置、RQ、Spec、执行、Issue 调研、评审与汇报，并提供显式使用说明、路由辅助和只读 COT 总览。",
   "author": {
     "name": "donk"
   },
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Calc Project",
     "shortDescription": "配置、RQ、Spec、执行、Issue 调研与汇报",
-    "longDescription": "calc-project 提供七个可自动选择的核心接口：calc-setup 管理稳定项目结构与配置；calc-rq 管理研究问题及其已接受决策；calc-to-spec 为一个 RQ 设计并发布完整科学 Spec 集或替换一份 Spec；calc-execute 推进整份 ready 或 active Spec 的任务与 Run；calc-issue 记录值得独立探究的问题并按委托推进调研；calc-review 对一个准确的 prepared Run 快照执行瞬时只读评审；calc-report 从已有计算证据生成阶段汇报或结果汇报。显式的 ask-lyz 只负责路由辅助，show-cot 从既有权威记录展示完整计算归属树并可按用户确认生成派生进展报告。Spec 是任务 DAG、Run 记录、current Run、执行状态与闭合的唯一权威。",
+    "longDescription": "calc-project 提供七个可自动选择的核心接口：calc-setup 管理稳定项目结构与配置；calc-rq 管理研究问题及其已接受决策；calc-to-spec 为一个 RQ 设计并发布完整科学 Spec 集或替换一份 Spec；calc-execute 推进整份 ready 或 active Spec 的任务与 Run；calc-issue 记录值得独立探究的问题并按委托推进调研；calc-review 对一个准确的 prepared Run 快照执行瞬时只读评审；calc-report 从已有计算证据生成阶段汇报或结果汇报。显式的 ask-lyz 解释插件术语、核心流程与 Tracker 等用法并推荐工作接口，show-cot 从既有权威记录展示完整计算归属树并可按用户确认生成派生进展报告。Spec 是任务 DAG、Run 记录、current Run、执行状态与闭合的唯一权威。",
     "developerName": "donk",
     "category": "Productivity",
     "capabilities": [
@@ -17,7 +17,7 @@
       "Write"
     ],
     "defaultPrompt": [
-      "$ask-lyz 判断这项计算项目工作应进入哪个显式接口。",
+      "$ask-lyz 解释 Calc Project 的核心流程与 Tracker，或推荐工作接口。",
       "$calc-setup 初始化或维护指定计算项目的稳定配置。",
       "$calc-rq 创建、检查或推进指定 RQ 及其决策。",
       "$calc-to-spec 为指定 RQ 设计并发布完整 Spec 集，或替换一份现有 Spec。",

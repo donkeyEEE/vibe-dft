@@ -43,12 +43,15 @@ def test_user_invoked_entries_are_explicit_only(plugin_root):
         assert f"${name}" in data["interface"]["default_prompt"]
 
 
-def test_ask_lyz_has_three_user_scenarios(plugin_root):
+def test_ask_lyz_explains_plugin_usage_and_routes_other_requests(plugin_root):
     router = (plugin_root / "skills/ask-lyz/SKILL.md").read_text(encoding="utf-8")
 
     assert all(
         f"## {scenario}" in router
-        for scenario in ("推荐 sibling", "术语解释", "进度查询")
+        for scenario in ("插件使用说明", "推荐 sibling", "进度查询")
     )
+    assert "[领域术语](../../resources/project-context.md)" in router
+    assert "[进度跟踪表契约](../../resources/progress-tracker.md)" in router
+    assert "直接解释" in router
     assert "调用 `$dev-engineering:domain-modeling`" in router
     assert "调用 `$show-cot`" in router

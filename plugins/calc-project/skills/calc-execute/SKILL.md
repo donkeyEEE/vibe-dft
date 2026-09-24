@@ -7,6 +7,7 @@ description: 执行一个选定的 ready 或 active Calc Project Spec，完成�
 
 将一个选定的 ready 或 active Calc Project Spec 推进完成整条执行生命周期，涵盖任务推进、
 Run 执行、任务验收和 Spec 闭包。
+涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
 
 ## 工作流
 

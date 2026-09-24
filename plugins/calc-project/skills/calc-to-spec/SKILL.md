@@ -10,6 +10,7 @@ description: 为已接受 RQ 渐进设计并自主发布完整的单份 Spec，�
 Spec 的当前科学设计。新建与安全替换不另设发布批准；用户明确给出的范围和约束始终有效。
 `concluded` Spec 可只读引用，通常以新 Spec 承载后续判断；修改或重开它需要针对具体
 变更的人工授权。
+涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
 
 ## 流程
 

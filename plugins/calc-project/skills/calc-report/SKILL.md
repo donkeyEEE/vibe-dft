@@ -7,6 +7,7 @@ description: 从 Calc Project 的 RQ、Spec、Run 和相关结果生成可追溯
 
 围绕一个汇报主题组织已有计算证据，并在
 `<project-root>/.calc-project/results-<tag>/` 生成一份 HTML 计算汇报。
+涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
 
 1. 解析唯一计算项目。入口可以是一个或多个 RQ、可选的 Spec 限定，或自然语言汇报主题。
    主题入口只做轻量发现。根据明确措辞选择阶段汇报或结果汇报；意图实质含糊时询问。默认受众是

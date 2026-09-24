@@ -10,7 +10,7 @@ description: 初始化、重组或维护一个计算项目的稳定结构、RQ �
 1. 解析唯一项目路径，并在存在时读取其 `AGENTS.md`、`CONTEXT.md` 和 `ARCHITECTURE.md`。
    若目标有歧义，询问用户。
 2. 初始化、重组或维护时，读取[项目结构](references/project-structure.md)和
-   [项目上下文](references/project-context.md)。提出准确路径与文档变更，包括
+   [项目上下文](../../resources/project-context.md)。提出准确路径与文档变更，包括
    `ARCHITECTURE.md` 的 `## Calculation Configuration` 字段。
 3. 独立初始化或维护项目时，写入前取得该具体提案的批准。由 `$calc-execute` 为选定 Spec 的
    执行所需配置调用时，在用户明确约束内自主完成变更；保留计算数据，并在变更前比较既有

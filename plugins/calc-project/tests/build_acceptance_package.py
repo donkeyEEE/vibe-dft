@@ -225,7 +225,7 @@ def runtime_files(plugin_root: Path) -> list[Path]:
         )
 
     resources_root = plugin_root / "resources"
-    required_resources = {"README.md", "progress-tracker.md"}
+    required_resources = {"README.md", "progress-tracker.md", "project-context.md"}
     if not resources_root.is_dir():
         raise ValueError("required shared resources directory is missing")
     _validate_exact_entries(resources_root, required_resources, "shared resources")

@@ -1,7 +1,7 @@
 interface:
   display_name: "Ask LYZ"
-  short_description: "推荐 Calc Project 接口、解释术语或查询进度"
-  default_prompt: "$ask-lyz 进度查看和查询工作接口。"
+  short_description: "解释 Calc Project 用法、推荐接口或查询进度"
+  default_prompt: "$ask-lyz 解释插件用法、查询工作接口或查看进度。"
 
 policy:
   allow_implicit_invocation: false

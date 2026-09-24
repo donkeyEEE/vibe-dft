@@ -78,6 +78,6 @@ RQ 存储配置沿用机器字段 `Tracker adapter:`，初始且唯一值为 `lo
 
 ## 项目文档
 
-生成简洁的项目专用文档。`CONTEXT.md` 以[项目上下文](project-context.md)和已确认的
+生成简洁的项目专用文档。`CONTEXT.md` 以[项目上下文](../../../resources/project-context.md)和已确认的
 项目定义为基础。除非用户逐项批准拟议变更，否则保留已有 `CONTEXT.md`。`.gitignore`
 排除编辑器/Python 缓存、HDF5、`CHGCAR`、`WAVECAR` 和其他已识别的大型计算输出。

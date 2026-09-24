@@ -174,7 +174,7 @@
   {
     "source": "skills/calc-project-structure/references/project-context.md",
     "targets": [
-      "skills/calc-setup/references/project-context.md"
+      "resources/project-context.md"
     ],
     "reason": ""
   },

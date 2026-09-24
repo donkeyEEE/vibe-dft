@@ -6,6 +6,7 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
 # Calc RQ
 
 负责 RQ 生命周期及其已接受决策。RQ 存储配置只定义存储约定；`RQ.md` 是 RQ 的唯一权威。
+涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
 
 1. 解析唯一计算项目。读取其 `ARCHITECTURE.md` 的 `## Calculation Configuration`，再解析配置的
    `Data root:`、`Tracker adapter:` 与 `RQ location:`。要求使用 `local-markdown` adapter。

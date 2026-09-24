@@ -56,11 +56,11 @@ _Avoid_: 通用 Run，任务级后端方案，搜索授权
 _Avoid_: 简单纠错，结果解释，Spec 修改
 
 **Ask LYZ (`ask-lyz`)**:
-Calc Project 面向用户的显式辅助入口，用于推荐工作接口、解释领域术语或查询进度；原名
+Calc Project 面向用户的显式辅助入口，用于解释插件术语、核心流程与 Tracker 等用法、推荐工作接口或查询进度；原名
 `ask-dnk`，自 2026-09-13 起使用现名。过去文档中的旧名称保留为历史记录。
 _Avoid_: ask-dnk（当前名称）
 
-关键索引词，完整定义以 [calc-setup 领域术语](plugins/calc-project/skills/calc-setup/references/project-context.md) 为准：计算项目、计算项目结构、数据根、计算线、RQ、Spec、计算任务、运行、计算归属树（COT）、进展报告、计算汇报、汇报源数据、Run-local inputs、计算模板、项目计算模板、插件计算模板。
+关键索引词，完整定义以[插件共享领域术语](plugins/calc-project/resources/project-context.md)为准：计算项目、计算项目结构、数据根、计算线、RQ、Spec、计算任务、运行、计算归属树（COT）、进展报告、计算汇报、汇报源数据、Run-local inputs、计算模板、项目计算模板、插件计算模板。
 证据档位（`light | strict`）的完整定义也在该领域术语文档中。
 
 ## Paper Project

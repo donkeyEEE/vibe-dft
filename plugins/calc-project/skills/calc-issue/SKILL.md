@@ -8,6 +8,7 @@ description: 记录计算执行中值得独立探究的 Issue，按编号查询�
 Issue 是执行的附加产物，以问题语义跨 RQ、Spec、Task 组织证据。本接口拥有问题记录、
 关联和三状态生命周期；Spec 保持计算设计、Task、Run 及验收权威。
 按用户意图选择记录、查询维护或推进入口；仅记录、查询、关联或重开不授权后续探究。
+涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
 
 ## 定位与记录
 
