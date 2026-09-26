@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: amended by ADR-0019
 ---
 
 # Let Calc To Spec publish scientific designs autonomously

@@ -1,13 +1,14 @@
 ---
 name: calc-to-spec
-description: 为已接受 RQ 渐进设计并自主发布完整的单份 Spec，或安全替换既有 Spec 的当前设计。
+description: 按 RQ 的自动或协作设计模式渐进发布完整的单份 Spec，或安全替换既有 Spec 的当前设计。
 ---
 
 # Calc to Spec
 
 围绕一个已接受 RQ 的当前下一项主要判断设计并发布 Spec；研究推进时可逐份发布，
 无需预先穷尽该 RQ 的全部 Spec。每份 Spec 自身必须完整。也可替换一个既有、尚未闭合
-Spec 的当前科学设计。新建与安全替换不另设发布批准；用户明确给出的范围和约束始终有效。
+Spec 的当前科学设计。自动设计可自主发布；协作设计须在具体方案获批后发布。
+用户明确给出的范围和约束始终有效。
 `concluded` Spec 可只读引用，通常以新 Spec 承载后续判断；修改或重开它需要针对具体
 变更的人工授权。
 涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
@@ -25,11 +26,17 @@ Spec 的当前科学设计。新建与安全替换不另设发布批准；用户
    发布或替换设计。授权后按目标 RQ 设计补充 Spec，或通过本流程安全替换为已有 Spec
    补充 Task；遵守 concluded 边界。设计中保留来源 Issue 编号与路径，完成后回传
    实际 Spec/Task 引用供 `$calc-issue` 更新关联。
-2. 解析本次 Spec 的证据档位。Spec 的明确设置优先，其次继承 RQ 的 `Evidence level:`，
+2. 解析所属 RQ 的 `Spec design mode: automatic | collaborative`。已有记录且用户未要求
+   切换时直接沿用；用户明确要求切换时先交 `$calc-rq` 展示并批准准确的 `RQ.md` 变更。
+   首次进入该 RQ 的 Spec 设计而字段缺失时，由 `$calc-rq` 让用户在“自动设计（默认）”与
+   “协作设计”之间选择并记录，等待答复和 RQ 更新批准；自动模式只是建议选项，沉默不
+   触发发布。直接调用、新建、替换，以及执行结束后续接下一份 Spec 都经过此入口；
+   不因上游已委托推进 RQ 而跳过模式选择。更新后重读 RQ，再开始科学设计。
+3. 解析本次 Spec 的证据档位。Spec 的明确设置优先，其次继承 RQ 的 `Evidence level:`，
    两者都未设置时为 `light`。`strict` 只来自用户明确要求或已接受的 RQ 设置；
    不自行降低已接受的严格要求。发布时将生效的 `Evidence level: light | strict`
    写入 Spec，之后 RQ 档位变化不自动改动既有 Spec。
-3. 仅加载当前判断需要的科学设计参考资料：VASP [设计](references/backends/vasp.md)、
+4. 仅加载当前判断需要的科学设计参考资料：VASP [设计](references/backends/vasp.md)、
    [MAE](references/backends/vasp-mae.md)、[DMFT](references/backends/dmft.md)、
    [NAMD](references/backends/namd.md)、[磁性链](references/backends/magnetic.md)、
    [能量映射](references/backends/energy-mapping.md)或[Wannier90](references/backends/wannier90.md)。
@@ -37,11 +44,13 @@ Spec 的当前科学设计。新建与安全替换不另设发布批准；用户
    `$dev-engineering:research` 或 `$paper-project:literature-review` 补证据；前者的定向
    Markdown 暂存于独立 `/tmp` 路径，后者使用当前研究主线 `06-文献笔记/` 下唯一的
    Markdown 路径。设计只采用可核对的原始证据，并在 Spec 中引用实际使用的来源。
-4. 根据已接受 RQ、结果和调研证据判断是否有关键科学缺口：只有影响主要判断、必要
+5. 自动设计时，根据已接受 RQ、结果和调研证据判断是否有关键科学缺口：只有影响主要判断、必要
    可比性或验收，且现有证据仍无法决定的选择才调用 `$dev-engineering:grill-with-docs`。
+   没有关键缺口时自主完成设计。协作设计时，起草前调用同一访谈，讨论当前主要判断、
+   Task、依赖、验收与停止规则；已由 RQ 决策或可靠证据确定的事项不重复发问。
    访谈形成的 Spec 范围术语和框架写入该 Spec 的 `## 上下文`；真正需要改动 RQ 问题、
-   边界或成功判据的事项交回 `$calc-rq`。没有关键缺口时自主完成设计。
-5. 用 [Spec 模板](references/spec-template.md)起草当前 Spec。它围绕一个主要判断，
+   边界或成功判据的事项交回 `$calc-rq`。
+6. 用 [Spec 模板](references/spec-template.md)起草当前 Spec。它围绕一个主要判断，
    完整声明 Task、无环依赖、条件、以最低充分证据表述的验收和停止规则。`SPEC-NNN`
    只在所属 RQ 内编号，`TASK-NNN` 只在所属 Spec 内编号，`RUN-NNN` 只在所属 Task
    内编号；依赖仅引用同一 Spec 中的 Task，条件只依据已记录的上游结果。
@@ -51,22 +60,32 @@ Spec 的当前科学设计。新建与安全替换不另设发布批准；用户
    相关的收敛、敏感性或对照检查，并满足用户或已接受 RQ 的明确要求，不套固定清单。
    把不改变科学含义且有确定依据的实现值留给
    `$calc-execute`；Spec 中的明确值具有约束力。缺少必要科学证据时保持未发布。
-6. 替换时读取目标 Spec、全部 Task 和 Run 记录、物理 Run 目录及调度器事实。
-   如仍有写入者，先经 `$calc-execute` 核实并按情况取消或等待，直至无写入风险。
+7. 替换时读取目标 Spec、全部 Task 和 Run 记录、物理 Run 目录及调度器事实。
+   识别仍在写入的作业及拟采取的处置；协作模式在具体方案获批前不得取消作业或
+   改动旧设计，自动模式可按执行委托处置。
    保留每个旧 Run 及其状态和产物；已有 Run 的 Task 身份须保持可追溯，若新设计
    无法容纳旧任务与 Run 记录，就另建后续 Spec。新设计使已接受证据失效时，清除相应
    `Current` 选择，将受影响 Task 恢复为 `pending`；已接受的下游 Task 按依赖变化
    置为 `needs-review`，未提交的 prepared 快照重建并重评。变更科学含义的
    下一次执行使用新 Run。替换只修改当前 Spec 设计及必要状态，不覆盖物理 Run。
-7. 写入前重读 RQ、目标 Spec、现有索引和替换所需的权威证据，检查 RQ 归属、
+8. 协作设计在写入前展示具体发布方案：目标路径、主要判断、Task 与依赖、验收及停止
+   规则、准确的 RQ 索引变更；替换时还展示对旧 Run、current 选择及活动作业的影响。
+   仅在用户明确批准该方案后写入。目标、科学设计、索引或替换效果等方案变化使批准
+   失效，须修订并重新展示；未获批准时保留权威文件及物理 Run。自动设计无需此发布
+   批准，但仍遵守用户明确约束及以下写入预检。
+9. 写入前重读 RQ、目标 Spec、现有索引和替换所需的权威证据，检查 RQ 归属、
    ID 和路径唯一、设计完整、现有目标未被其他所有者占用、替换安全。冲突先调和；
-   不能安全调和则停止。新建时写入一份完整 Spec 及一条准确的 `RQ.md` Spec 索引；
+   不能安全调和则停止。协作模式下方案变化或预检发现需要改变已批准内容时回到第 8 步，
+   不能沿用旧批准。替换时如仍有写入者，经 `$calc-execute` 核实；协作模式按已批准的
+   处置、自动模式按已有执行授权取消或等待，直至无写入风险；实际处置超出协作方案时
+   回到第 8 步。新建时写入一份完整 Spec
+   及一条准确的 `RQ.md` Spec 索引；
    替换时更新同一 Spec。重新读取并核实写入结果；每次 Spec、Task 或 Run 状态或其他索引
    字段变化、新增对象时，立即按项目 `AGENTS.md` 直接维护所属 RQ 目录下的 `tracker.json`
    并核对一致性；遵循[进度跟踪表契约](../../resources/progress-tracker.md)。
    缺少项目约定时，规则补齐交由 `$calc-setup`。相同内容重试保持幂等，差异由
    当前权威资料重新评估，不依赖旧会话提案或批准缓存。
-8. 报告发布或替换的 Spec、证据档位和本次研究前沿。若用户只要求设计或发布，
+10. 报告发布或替换的 Spec、证据档位和本次研究前沿。若用户只要求设计或发布，
    到此结束。若用户已委托推进该 RQ 的计算，直接进入 `$calc-execute` 继续当前 Spec；
    每份 Spec 完成后，仅在已接受 RQ 和结果直接支持下一主要判断时继续发布下一份。
    达到 RQ 成功判据、无证据支持下一判断、关键科学缺口未解决或触及用户边界时停止。

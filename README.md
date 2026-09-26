@@ -73,8 +73,8 @@ codex plugin add calc-project@vibe-dft
 | --- | --- |
 | [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 显式辅助入口，解释插件术语、核心流程和 Tracker 等用法，推荐工作接口或查询进度。 |
 | [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、RQ 存储配置、数据边界和集群配置。 |
-| [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），将获批答案记录为已接受决策。 |
-| [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 为已接受 RQ 渐进发布完整的单份 Spec，或安全替换当前设计。 |
+| [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），记录已接受决策与 Spec 设计模式。 |
+| [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 按 RQ 的设计模式渐进发布完整的单份 Spec，或安全替换当前设计。 |
 | [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 推进已就绪或活动中的 Spec，处理 Run 的准备、评审、提交、跟踪、同步与验收。 |
 | [calc-issue](plugins/calc-project/skills/calc-issue/SKILL.md) | 记录执行中值得独立探究的问题，跨 RQ、Spec、Task 关联证据，按编号推进调研。 |
 | [calc-report](plugins/calc-project/skills/calc-report/SKILL.md) | 根据 RQ、Spec、Run 与已有结果生成可追溯的阶段或结果汇报。 |
@@ -90,7 +90,7 @@ RQ ─────────────▶ Spec ─────────�
 calc-rq          calc-to-spec        calc-execute        calc-execute
 ```
 
-- **RQ（研究问题）**：记录一条研究主线中的问题、边界、成功标准和已接受决策。一个 RQ 可以有多份 Spec，各自回答不同的主要判断。
+- **RQ（研究问题）**：记录一条研究主线中的问题、边界、成功标准、已接受决策及 Spec 设计模式。一个 RQ 可以有多份 Spec，各自回答不同的主要判断。
 - **Spec（计算规范）**：针对一个主要判断制定科学设计，定义任务依赖，并记录任务目的、条件、验收规则、状态、Run 和闭合结论。
 - **Task（计算任务）**：Spec 中支持主要判断的可执行工作单元。父 Spec 管理它的身份、目的、依赖、条件和验收标准。
 - **Run（运行）**：一个 Task 的一次具体执行尝试。Run 在独立目录中保存实际输入、输出和日志。每次验证与评审固定当时的输入快照；新的尝试使用新的 Run 编号，符合条件的当前 Run 可原地纠正。
@@ -99,17 +99,17 @@ calc-rq          calc-to-spec        calc-execute        calc-execute
 通常先用 `calc-setup` 建立项目根目录、数据根、RQ 存储配置和集群配置，然后推进 RQ、Spec 和 Run：
 
 1. 用 `calc-rq` 建立或推进 RQ，并把用户在访谈中确认的答案写入 RQ 的 `## Decisions`。
-2. 用 `calc-to-spec` 为 RQ 当前有依据的主要判断设计并发布一份完整 Spec。后续判断可根据结果逐份发布。证据档位优先采用 Spec 的设置，其次继承 RQ；都未设置时采用轻量档。
+2. 首次进入某个 RQ 的 Spec 设计时选择自动或协作模式；`calc-rq` 将选择记入 RQ。`calc-to-spec` 按该模式为当前有依据的主要判断设计并发布一份完整 Spec。后续判断可根据结果逐份发布。证据档位优先采用 Spec 的设置，其次继承 RQ；都未设置时采用轻量档。
 3. 用 `calc-execute` 推进已发布的 Spec：选择可执行的 Task，创建或继续 Run，准备并验证输入。评审通过后自主提交作业，接收结果并处理后续 Task。需要改变科学设计时，交由 `calc-to-spec`。
 4. 全部 Task 都已处理且闭合证据充分时，`calc-execute` 自主结束 Spec。需要调整 RQ 时，交由后续 `calc-rq` 流程。
 
 ### Calc Project 的自主执行与人工参与
 
-在已接受 RQ 和用户明确约束内，`calc-to-spec` 可自主发布新 Spec，也可替换未结束 Spec 的当前设计。Spec 可以随研究进展逐份发布，无需事先列齐。设计证据不足时，agent 可自行调研。默认的轻量档只要求当前判断和必要交接所需的检查；用户可在 RQ 或 Spec 中明确要求严格档。
+首次进入已接受 RQ 的 Spec 设计前，用户选择设计模式，自动设计为建议的默认选项。选择记录在该 RQ 中，后续新建与替换沿用，用户可要求切换。自动模式下，`calc-to-spec` 可依据证据自主发布或安全替换未结束的 Spec，只在关键科学缺口仍未解决时访谈。协作模式下，先讨论科学设计，再展示当前 Spec 的主要判断、任务、验收、停止规则和替换影响；具体方案获批后才写入。没有答复或批准时不发布。两种模式都逐份发布，无需事先列齐，也都可自行调研设计证据。默认的轻量证据档位只要求当前判断和必要交接所需的检查；用户可在 RQ 或 Spec 中明确要求严格档。
 
 用户委托执行选定 Spec 后，`calc-execute` 可以准备和评审 Run，提交、监控和排查作业问题，同步结果，调整资源或成本，取消过时作业，处理执行产物，并在证据充分时结束 Spec。若委托范围是推进整个 RQ，有依据的下一项判断可继续进入新 Spec。需要修改执行中的科学设计时，`calc-to-spec` 会安全替换当前设计，并保留旧 Run 证据。
 
-若已接受 RQ、项目证据和可靠文献仍不足以解决关键科学问题，agent 会请用户参与判断。修改或重开已结束（`concluded`）的 Spec 需要针对具体变更取得授权。改变 RQ 的已接受决策、超出用户明确边界的行动也需另行处理。执行过程继续保留安全检查、提交前快照评审和证据记录。
+若已接受 RQ、项目证据和可靠文献仍不足以解决关键科学问题，agent 会请用户参与判断。修改或重开已结束（`concluded`）的 Spec 需要针对具体变更取得授权。改变 RQ 的已接受决策、超出用户明确边界的行动也需另行处理。设计模式选择本身不授权计算执行。执行过程继续保留安全检查、提交前快照评审和证据记录。
 
 Issue 是执行时达到较高门槛才记录的附加产物，存放于研究主线的 `04-问题排查/`，
 使用项目内唯一的 `ISSUE-NNN`；可直接说“推进 ISSUE-001”。状态只有待探究、探究中、

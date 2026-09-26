@@ -25,6 +25,12 @@ Skill 是否允许 Codex 隐式选择的运行时策略；默认允许隐式调�
 每个 RQ 用于存放 `RQ.md` 与已发布 Spec 的配置化存储约定；RQ 属于一条计算研究主线，本地 Markdown adapter 下对应 `<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，不是独立状态文档。
 _Avoid_: Tracker 数据库，进度缓存，session registry
 
+**Spec 设计模式（Spec Design Mode）**:
+RQ 中可选的 `automatic | collaborative` 工作流偏好。首次进入该 RQ 的 Spec 设计时
+明确选择并由 `calc-rq` 记录；自动模式按证据自主发布，协作模式先访谈并在具体方案获批后
+发布。模式不改变证据档位或既有 Spec、Run。
+_Avoid_: 证据档位，Spec 状态，执行授权
+
 **进度跟踪表（Progress Tracker）**:
 由智能体随状态变化直接维护的单个 RQ 及其 Spec、Task、Run 派生摘要；每个 RQ 一份，项目总览按需汇总。
 跟踪表可从权威记录重建；RQ.md 与 Spec 保持状态权威，RQ 存储配置定义这些记录的存储位置。

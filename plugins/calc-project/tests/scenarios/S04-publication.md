@@ -1,6 +1,8 @@
-# S04 — Incremental autonomous Spec publication
+# S04 — Incremental Spec publication in automatic mode
 
-Each probe natively invokes `calc-project:calc-to-spec` in a fresh fixture.
+Each probe natively invokes `calc-project:calc-to-spec` in a fresh fixture whose
+RQ.md records `Spec design mode: automatic`. First-entry choice and collaborative
+approval are covered by S15.
 
 ## Exact prompts
 
@@ -34,7 +36,7 @@ Each probe natively invokes `calc-project:calc-to-spec` in a fresh fixture.
 
 ## Expected observations
 
-- The next complete Spec publishes without a separate approval or mandatory interview, uses `light` by default, updates one accurate RQ index entry, and stops when execution was not requested.
+- In recorded automatic mode, the next complete Spec publishes without a separate approval or mandatory interview, uses `light` by default, updates one accurate RQ index entry, and stops when execution was not requested.
 - Incremental publication does not invent or require a complete future Spec set. When RQ advancement includes execution intent, it hands the published Spec to `calc-execute`.
 - An RQ strict setting is resolved and written into the Spec at publication. Later RQ changes do not silently modify it.
 - Missing scientific evidence triggers targeted research or literature review; only an unresolved critical scientific gap triggers `grill-with-docs`.

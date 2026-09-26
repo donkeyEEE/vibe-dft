@@ -45,7 +45,7 @@ def test_run_result_is_a_compact_advancement_summary(plugin_root):
     assert "不粘贴原始日志、排障过程或 详细诊断" in flat
 
 
-def test_design_flow_is_incremental_and_only_interviews_for_critical_gaps(plugin_root):
+def test_design_flow_is_incremental_and_mode_dependent(plugin_root):
     text = " ".join(
         (plugin_root / "skills/calc-to-spec/SKILL.md")
         .read_text(encoding="utf-8")
@@ -55,10 +55,26 @@ def test_design_flow_is_incremental_and_only_interviews_for_critical_gaps(plugin
     assert "$dev-engineering:grill-with-docs" in text
     assert "无需预先穷尽该 RQ 的全部 Spec" in text
     assert "只有影响主要判断、必要 可比性或验收" in text
-    assert "没有关键缺口时自主完成设计" in text
-    assert "新建与安全替换不另设发布批准" in text
+    assert "自动设计" in text
+    assert "协作设计" in text
+    assert "明确批准" in text
     assert "`concluded` Spec 可只读引用" in text
     assert "直接进入 `$calc-execute`" in text
+
+
+def test_mode_gate_covers_direct_and_continued_design(plugin_root):
+    spec = " ".join(
+        (plugin_root / "skills/calc-to-spec/SKILL.md")
+        .read_text(encoding="utf-8")
+        .split()
+    )
+
+    assert "Spec design mode: automatic | collaborative" in spec
+    assert "首次" in spec
+    assert "等待" in spec
+    assert "新建" in spec and "替换" in spec
+    assert "下一份" in spec
+    assert "方案变化" in spec
 
 
 def test_evidence_level_inheritance_and_research_handoff(plugin_root):

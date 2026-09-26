@@ -1,6 +1,8 @@
-# S05 — Autonomous current-design replacement
+# S05 — Current-design replacement in automatic mode
 
-Each probe natively invokes `calc-project:calc-to-spec` in a fresh fixture.
+Each probe natively invokes `calc-project:calc-to-spec` in a fresh fixture whose
+RQ.md records `Spec design mode: automatic`. Collaborative replacement is covered
+by S15.
 
 ## Exact prompts
 
@@ -23,6 +25,6 @@ Each probe natively invokes `calc-project:calc-to-spec` in a fresh fixture.
 ## Expected observations
 
 - No replacement occurs while an old job may still write. The agent verifies its state, cancels or waits as appropriate, and retains scheduler and Run evidence.
-- Safe replacement needs no publication approval. It retains every physical Run and old result, clears any invalid current selection and completed Task judgment, and leaves the changed scientific design to a new Run.
+- In recorded automatic mode, safe replacement needs no publication approval. It retains every physical Run and old result, clears any invalid current selection and completed Task judgment, and leaves the changed scientific design to a new Run.
 - A concluded Spec remains unchanged without specific human authorization. Later judgments normally become a new Spec.
 - An incomplete design leaves the current Spec and physical Runs unchanged.

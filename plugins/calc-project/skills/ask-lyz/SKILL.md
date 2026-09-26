@@ -20,7 +20,8 @@ description: 显式辅助 Calc Project 用户了解插件术语与流程、选�
 回答应交代用户所问概念的作用及其与相邻记录或流程的关系。例如解释 Tracker 时，说明每个
 RQ 的 `tracker.json` 是 RQ、Spec、Task、Run 状态的派生摘要，由状态写入者同步维护，
 `show-cot` 汇总查询；RQ.md 和 Spec 保持权威。解释核心流程时，串起项目配置、RQ 决策、
-Spec 设计、Task/Run 执行与汇报或进度查询，并指出各阶段的 owning skill。仅在用户要
+Spec 设计、Task/Run 执行与汇报或进度查询，并指出各阶段的 owning skill。说明首次
+进入某 RQ 的 Spec 设计需选择自动或协作模式，后者在具体方案获批后发布。仅在用户要
 解决术语冲突、重新定义概念或修改领域词汇时调用 `$dev-engineering:domain-modeling`。
 
 ## 推荐 sibling
@@ -30,7 +31,7 @@ Spec 设计、Task/Run 执行与汇报或进度查询，并指出各阶段的 ow
 | 用户目标 | 推荐 |
 |---|---|
 | 缺失或变更了稳定项目、RQ 存储配置、数据边界或集群配置 | `$calc-setup` |
-| RQ 生命周期、已接受决策、未回答的 RQ 问题，或 concluded Spec 对 RQ 的影响 | `$calc-rq` |
+| RQ 生命周期、已接受决策、Spec 设计模式选择或切换、未回答的 RQ 问题，或 concluded Spec 对 RQ 的影响 | `$calc-rq` |
 | RQ 当前下一主要判断的 Spec、科学承诺、Task DAG、条件、验收、停止规则或替换一份 Spec | `$calc-to-spec` |
 | 推进 ready/active Spec；准备、提交、跟踪、同步、接受、纠正或闭合其 Run 与 Task | `$calc-execute` |
 | 按编号查询、记录、关联或合并 Issue，或委托推进其调研 | `$calc-issue` |

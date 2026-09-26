@@ -45,6 +45,12 @@ _Avoid_: Tracker 数据库，进度缓存，会话注册表
 在一条研究主线内定义问题、边界、成功标准、已接受决策及已明确发布 Spec 的记录。
 _Avoid_: 研究计划目录，任务列表
 
+**Spec 设计模式（Spec Design Mode）**:
+RQ.md 中可选的 `automatic | collaborative` 工作流偏好，控制该 RQ 后续新建与替换
+Spec 时是否先访谈并取得具体方案的发布批准。首次进入设计时由研究者选择，`calc-rq`
+记录；缺失字段的默认建议是 `automatic`。它不改变科学证据档位、已发布 Spec 或 Run。
+_Avoid_: 证据档位，Spec 状态，执行授权
+
 **进度跟踪表（Progress Tracker）**:
 每个 RQ 目录下 `tracker.json` 中由智能体直接维护的该 RQ、Spec、Task、Run 派生摘要。
 任一对象状态变化后立即同步所属 RQ 的表；项目 COT 汇总各表，缺失或异常时按 RQ 修复。
