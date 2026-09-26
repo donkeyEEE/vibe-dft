@@ -35,6 +35,7 @@ def test_release_contains_all_incubating_skills(tmp_path: Path) -> None:
     assert prefix + "skills/cangjie-skill/SKILL.md" in names
     assert prefix + "skills/domain-research/SKILL.md" in names
     assert prefix + "skills/domain-research/agents/openai.yaml" in names
+    assert prefix + "skills/domain-research/references/research-context.md" in names
     assert prefix + "skills/nature-response/SKILL.md" in names
     assert prefix + "skills/scholar-evaluation/SKILL.md" in names
     assert prefix + "skills/prl-polishing/SKILL.md" in names

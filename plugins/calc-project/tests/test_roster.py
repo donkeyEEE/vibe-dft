@@ -48,7 +48,7 @@ def test_ask_lyz_explains_plugin_usage_and_routes_other_requests(plugin_root):
 
     assert all(
         f"## {scenario}" in router
-        for scenario in ("插件使用说明", "推荐 sibling", "进度查询")
+        for scenario in ("插件使用说明", "推荐工作接口", "进度查询")
     )
     assert "[领域术语](../../resources/project-context.md)" in router
     assert "[进度跟踪表契约](../../resources/progress-tracker.md)" in router

@@ -445,7 +445,7 @@ def test_business_skills_handoff_automatically_but_router_only_recommends(plugin
     router_flat = " ".join(router.split())
     execute_flat = " ".join(execute.split())
 
-    assert "推荐 sibling，不自动调用它" in router_flat
+    assert "推荐相应技能，不自动调用它" in router_flat
     assert "直接进入 `$calc-to-spec`" in rq
     assert "直接进入 `$calc-execute`" in spec
     assert "先加载 `$calc-setup`" in execute_flat
