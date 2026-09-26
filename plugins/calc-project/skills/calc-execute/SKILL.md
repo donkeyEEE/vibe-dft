@@ -38,7 +38,7 @@ Run 执行、任务验收和 Spec 闭包。
 6. 验收 Task、变更其 current Run、传播失效或关闭 Spec 时，阅读[任务推进]
    (references/task-advancement.md)。应用当前 Spec 中该 Task 的 Acceptance，再继续下一个可用任务。
    Spec 完成时核实闭包证据并自主结束它。若用户委托推进 RQ，且结果支持其边界内的
-   下一主要判断，调用 `$calc-to-spec` 按该 RQ 的 Spec 设计模式渐进发布并继续；
+   下一主要判断，调用 `$calc-to-spec` 为下一份 Spec 选择本次设计模式并渐进发布；
    协作模式的访谈和方案批准不得因执行委托而跳过。达到 RQ 成功判据、没有有依据的
    下一判断、关键科学缺口未解决或触及用户边界时停止。RQ 本身需要变更时调用 `$calc-rq`。
    交还控制前，以已解析的项目根和本执行步骤处理的 Task、Run 调用 `$show-cot`。展示完整项目总览，
@@ -59,5 +59,5 @@ Run 执行、任务验收和 Spec 闭包。
 - Run 正常结束且产生可供任务验收的结果时为 `finished`；未成功结束且没有完整可验收结果时为
   `failed`；执行已实际取消且不会继续运行或写入结果时为 `cancelled`。
 - 科学定义或 provenance 的变更使用新 Run。若同时需要变更当前 Spec，调用
-  `$calc-to-spec` 按所属 RQ 的设计模式安全替换后继续；`concluded` Spec 的修改或重开
+  `$calc-to-spec` 在本次设计模式下安全替换后继续；`concluded` Spec 的修改或重开
   仍需具体人工授权。

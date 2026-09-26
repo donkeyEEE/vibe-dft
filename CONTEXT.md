@@ -26,10 +26,10 @@ Skill 是否允许 Codex 隐式选择的运行时策略；默认允许隐式调�
 _Avoid_: Tracker 数据库，进度缓存，session registry
 
 **Spec 设计模式（Spec Design Mode）**:
-RQ 中可选的 `automatic | collaborative` 工作流偏好。首次进入该 RQ 的 Spec 设计时
-明确选择并由 `calc-rq` 记录；自动模式按证据自主发布，协作模式先访谈并在具体方案获批后
-发布。模式不改变证据档位或既有 Spec、Run。
-_Avoid_: 证据档位，Spec 状态，执行授权
+本次 Spec 新建或替换使用的 `automatic | collaborative` 交互选择，不写入项目记录。
+自动模式按证据自主发布，协作模式先访谈并在具体方案获批后发布。
+模式不改变证据档位或既有 Spec、Run。
+_Avoid_: RQ 属性，证据档位，Spec 状态，执行授权
 
 **进度跟踪表（Progress Tracker）**:
 由智能体随状态变化直接维护的单个 RQ 及其 Spec、Task、Run 派生摘要；每个 RQ 一份，项目总览按需汇总。

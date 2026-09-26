@@ -40,12 +40,12 @@ def test_rq_skill_has_only_its_rq_template(plugin_root):
     assert {path.name for path in references.iterdir()} == {"rq-template.md"}
 
 
-def test_rq_design_mode_is_optional_and_persisted_by_rq_owner(plugin_root):
+def test_rq_handoff_leaves_design_mode_to_spec_entry(plugin_root):
     template = (plugin_root / "skills/calc-rq/references/rq-template.md").read_text()
     skill = (plugin_root / "skills/calc-rq/SKILL.md").read_text()
 
-    assert "Spec design mode: <automatic|collaborative> (optional)" in template
-    assert "未设置时默认 `automatic`" in template
+    assert "Spec design mode:" not in template
+    assert "设计模式" not in template
     assert "展示准确的拟议文件路径和完整 Markdown 变更" in skill
-    assert "模式选择" in skill
+    assert "不在 `RQ.md` 记录设计模式" in skill
     assert "直接进入 `$calc-to-spec`" in skill

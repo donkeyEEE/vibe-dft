@@ -69,8 +69,8 @@ def test_mode_gate_covers_direct_and_continued_design(plugin_root):
         .split()
     )
 
-    assert "Spec design mode: automatic | collaborative" in spec
-    assert "首次" in spec
+    assert "本次设计" in spec
+    assert "不写入 `RQ.md`" in spec
     assert "等待" in spec
     assert "新建" in spec and "替换" in spec
     assert "下一份" in spec
