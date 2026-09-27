@@ -26,7 +26,9 @@ Spec 的当前科学设计。自动设计可自主发布；协作设计须在具
    发布或替换设计。授权后按目标 RQ 设计补充 Spec，或通过本流程安全替换为已有 Spec
    补充 Task；遵守 concluded 边界。设计中保留来源 Issue 编号与路径，完成后回传
    实际 Spec/Task 引用供 `$calc-issue` 更新关联。
-   加载 `$skill-incubator:domain-research`，在设计中沿用项目研究术语并核对概念；
+   读取项目根 `CONTEXT.md` 与所属 RQ 目录下已有的 `RQ-CONTEXT.md`；加载
+   `$domain-research`，提供这两个目录并由它维护设计中澄清的 RQ 术语。
+   已有 `RQ-CONTEXT.md` 直接沿用；首次创建时由它读取共享领域术语作为基础。
    重点核对研究策略、研究手段与证据的表述，科学设计和验收标准仍由本技能决定。
    本次设计的局部含义、假设与限定条件仍由本技能记录于 Spec 上下文。
 2. 进入本次设计时，若用户已明确选择自动或协作模式，直接采用；否则询问其是否要参与
@@ -52,7 +54,9 @@ Spec 的当前科学设计。自动设计可自主发布；协作设计须在具
    可比性或验收，且现有证据仍无法决定的选择才调用 `$dev-engineering:grill-with-docs`。
    没有关键缺口时自主完成设计。协作设计时，起草前调用同一访谈，讨论当前主要判断、
    Task、依赖、验收与停止规则；已由 RQ 决策或可靠证据确定的事项不重复发问。
-   访谈形成的 Spec 范围术语和框架写入该 Spec 的 `## 上下文`；真正需要改动 RQ 问题、
+   访谈形成的 RQ 术语由 `domain-research` 写入 `RQ-CONTEXT.md`，项目共用概念交给
+   `$dev-engineering:domain-modeling`；本次设计的假设与框架写入 Spec 的 `## 上下文`。
+   真正需要改动 RQ 问题、
    边界或成功判据的事项交回 `$calc-rq`。
 6. 用 [Spec 模板](references/spec-template.md)起草当前 Spec。它围绕一个主要判断，
    完整声明 Task、无环依赖、条件、以最低充分证据表述的验收和停止规则。`SPEC-NNN`

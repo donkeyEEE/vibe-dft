@@ -1,6 +1,8 @@
 # 计算项目管理
 
-本上下文定义 Calc Project 组织科研计算的稳定语言。新项目以此为基线，项目可用已确认的项目语义调整定义。
+本上下文定义 Calc Project 组织科研计算的稳定语言，也是各 RQ 上下文的初始化基础。
+`domain-research` 在首次创建 RQ 目录的 `RQ-CONTEXT.md` 时读取本资源，
+与已确认的 RQ 专用概念合并；后续使用已建立的 RQ 上下文。
 
 ## Language
 
@@ -11,6 +13,15 @@ _Avoid_: 项目目录，计算仓库
 **计算项目结构（Calculation Project Structure）**:
 由稳定知识、RQ 存储配置和数据根组成的项目级管理结构。
 _Avoid_: 任务状态，Spec DAG
+
+**项目上下文（Project Context）**:
+项目根目录 `CONTEXT.md` 中的项目级领域词汇与共用概念，由 `dev-engineering:domain-modeling` 维护。
+_Avoid_: RQ 上下文，项目独立术语文件
+
+**RQ 上下文（RQ Context）**:
+RQ 目录下 `RQ-CONTEXT.md` 中服务于该研究问题的术语、含义及适用范围，由 `calc-project:domain-research` 维护。
+它独立于 `RQ.md`；问题、已接受决策及状态仍以 `RQ.md` 为准。
+_Avoid_: RQ.md 的 Context 章节，项目上下文
 
 **计算笔记（Calculation Notes）**:
 按研究主线沉淀计算规范、结果解释、问题排查和理论知识的稳定记录。
@@ -37,8 +48,8 @@ _Avoid_: 计算线，状态文件
 
 **RQ 存储配置**:
 一个 RQ 的配置化存储约定。`local-markdown` adapter 将其存储在
-`01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，其中包含 `RQ.md`、已明确发布的
-Specs。RQ 存储配置不是独立状态文档，也不拥有执行进度。
+`01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，其中包含 `RQ.md`、按需维护的
+`RQ-CONTEXT.md` 和已明确发布的 Specs。RQ 存储配置不是独立状态文档，也不拥有执行进度。
 _Avoid_: Tracker 数据库，进度缓存，会话注册表
 
 **研究问题（Research Question, RQ）**:

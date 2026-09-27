@@ -34,6 +34,10 @@ Project 文献工作流负责。
 仅记录该 RQ 的进度；根忽略规则按共享契约排除各跟踪表。空项目初始化时不建表；
 维护已有项目时，分别从各 RQ 与其已发布 Spec 建立或修复跟踪表，保留权威记录。
 
+项目根 `CONTEXT.md` 是项目上下文，由 `$dev-engineering:domain-modeling` 维护。
+每个 RQ 目录下的 `RQ-CONTEXT.md` 是 RQ 上下文，由 `$domain-research`
+在首次有已确认术语时创建；它与 `RQ.md` 同级，`RQ.md` 不再维护上下文章节。
+
 仅在请求配置集群时创建 `software-profiles.md`。基础设置不创建具体 RQ 目录、Spec、
 任务、Run、计算输入或调度器脚本。已有 RQ 和 Spec 保持不变。
 
@@ -66,7 +70,8 @@ RQ 存储配置沿用机器字段 `Tracker adapter:`，初始且唯一值为 `lo
 - 项目 `CONTEXT.md`，以了解术语和数据边界；
 - 在定位 RQ、Spec、任务或 Run 前查阅 `ARCHITECTURE.md` 及其
   `## Calculation Configuration`；
-- 在科学设计或执行工作前查阅选定的 `RQ.md`、选定 Spec，以及仅由该 Spec 引用的 Runs；
+- 在科学设计或执行工作前查阅选定的 `RQ.md`、同目录已有的 `RQ-CONTEXT.md`、选定 Spec，
+  以及仅由该 Spec 引用的 Runs；
 - Git/集群边界：文档、模板、结构、脚本和轻量结果可在本地追踪，而 HDF5、`CHGCAR`、
   `WAVECAR` 和大型计算输出保留在服务端。
 
@@ -78,6 +83,7 @@ RQ 存储配置沿用机器字段 `Tracker adapter:`，初始且唯一值为 `lo
 
 ## 项目文档
 
-生成简洁的项目专用文档。`CONTEXT.md` 以[项目上下文](../../../resources/project-context.md)和已确认的
-项目定义为基础。除非用户逐项批准拟议变更，否则保留已有 `CONTEXT.md`。`.gitignore`
+生成简洁的项目专用文档。`CONTEXT.md` 由 `$dev-engineering:domain-modeling` 依据
+[共享领域术语](../../../resources/project-context.md)和已确认的项目定义维护。
+在本项目配置流程中，除非用户逐项批准拟议变更，否则保留已有 `CONTEXT.md`。`.gitignore`
 排除编辑器/Python 缓存、HDF5、`CHGCAR`、`WAVECAR` 和其他已识别的大型计算输出。

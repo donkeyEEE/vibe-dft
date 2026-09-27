@@ -12,6 +12,8 @@ description: 初始化、重组或维护一个计算项目的稳定结构、RQ �
 2. 初始化、重组或维护时，读取[项目结构](references/project-structure.md)和
    [项目上下文](../../resources/project-context.md)。提出准确路径与文档变更，包括
    `ARCHITECTURE.md` 的 `## Calculation Configuration` 字段。
+   项目根 `CONTEXT.md` 的创建与概念维护交由 `$dev-engineering:domain-modeling`，
+   纳入本次项目文档提案；本技能负责结构与配置。
 3. 独立初始化或维护项目时，写入前取得该具体提案的批准。由 `$calc-execute` 为选定 Spec 的
    执行所需配置调用时，在用户明确约束内自主完成变更；保留计算数据，并在变更前比较既有
    项目文档。科学设计变更交由 `$calc-to-spec` 自主处理；已闭合 Spec 的修改仍需具体授权。

@@ -22,7 +22,6 @@ def check_skill_incubator_owns_expected_skills() -> None:
     }
     assert skill_names == {
         "cangjie-skill",
-        "domain-research",
         "nature-response",
         "paper2ppt",
         "ppt-master",
@@ -37,7 +36,6 @@ def check_skill_incubator_owns_expected_skills() -> None:
 def check_paper_project_no_longer_owns_incubator_skills() -> None:
     for skill_name in (
         "cangjie-skill",
-        "domain-research",
         "nature-response",
         "paper2ppt",
         "ppt-master",
@@ -116,6 +114,8 @@ def check_repository_navigation_exposes_skill_incubator() -> None:
     assert "`paper2ppt`" not in paper_readme
     assert "`ppt-master`" not in paper_readme
     assert "- `prl-polishing`" not in paper_readme
+    assert "plugins/calc-project/skills/domain-research/SKILL.md" in readme
+    assert not (PLUGIN / "skills/domain-research").exists()
 
 
 def test_skill_incubator_boundary() -> None:

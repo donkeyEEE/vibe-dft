@@ -6,7 +6,7 @@
 
 | 插件 | 用途 | 常见工作 |
 | --- | --- | --- |
-| [calc-project](plugins/calc-project/) | 科研计算的 RQ、Spec、执行和作业监控 | 配置项目、设计 Spec、推进 Run、监控 PBS 作业、提交前评审 |
+| [calc-project](plugins/calc-project/) | 科研计算的 RQ、术语、Spec、执行和作业监控 | 配置项目、维护 RQ 上下文、设计 Spec、推进 Run、监控 PBS 作业、提交前评审 |
 | [paper-project](plugins/paper-project/) | 文献证据和学术写作 | 整理文献、核查引用、写作与制作科学图件 |
 | [osm-project](plugins/osm-project/) | Obsidian 项目日志 | 将当前会话的进展整理为项目日志 |
 | [skill-incubator](plugins/skill-incubator/) | 尚未形成独立插件边界的通用 skill | 论文润色、演示文稿、学术评价与修回材料 |
@@ -74,6 +74,7 @@ codex plugin add calc-project@vibe-dft
 | [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 显式辅助入口，解释插件术语、核心流程和 Tracker 等用法，推荐工作接口或查询进度。 |
 | [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、RQ 存储配置、数据边界和集群配置。 |
 | [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），记录已接受决策。 |
+| [domain-research](plugins/calc-project/skills/domain-research/SKILL.md) | 在研究讨论和汇报中对齐术语，维护 RQ 目录下的 `RQ-CONTEXT.md`，防止自造概括词与概念偏移。 |
 | [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 在本次自动或协作模式下渐进发布完整的单份 Spec，或安全替换当前设计。 |
 | [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 推进已就绪或活动中的 Spec，处理 Run 的准备、评审、提交、跟踪、同步与验收。 |
 | [calc-issue](plugins/calc-project/skills/calc-issue/SKILL.md) | 记录执行中值得独立探究的问题，跨 RQ、Spec、Task 关联证据，按编号推进调研。 |
@@ -150,7 +151,6 @@ $calc-project:calc-execute 推进 SPEC-001 中当前可执行的 Task 和 Run。
 | Skill | 用途 |
 | --- | --- |
 | [cangjie-skill](plugins/skill-incubator/skills/cangjie-skill/SKILL.md) | Cangjie 资源蒸馏工作流正在重新设计期间的显式入口。 |
-| [domain-research](plugins/skill-incubator/skills/domain-research/SKILL.md) | 在研究讨论和汇报写作中沿用项目术语，防止自造概括词与概念偏移。 |
 | [nature-response](plugins/skill-incubator/skills/nature-response/SKILL.md) | 起草、审查或修订 Nature 风格的审稿回复、rebuttal、修回信和 LaTeX 模板。 |
 | [paper2ppt](plugins/skill-incubator/skills/paper2ppt/SKILL.md) | 将论文、预印本、文章或阅读笔记整理为以证据为主线的中文演示文稿。 |
 | [ppt-master](plugins/skill-incubator/skills/ppt-master/SKILL.md) | 创建、填充、重建或增强可编辑的 PPTX 演示文稿。 |

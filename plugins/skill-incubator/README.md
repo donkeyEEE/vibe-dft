@@ -10,7 +10,6 @@ Skill Incubator 是可独立安装和发布的通用 skill 试验场。它允许
 - `scholar-evaluation`：按结构化框架评价学术成果。
 - `cangjie-skill`：仅限显式调用的待重设计知识蒸馏入口。
 - `prl-polishing`：按 claim、evidence、boundary 和 consequence 逻辑逐段审阅、重构或翻译物理论文。
-- `domain-research`：在研究讨论和汇报写作中沿用项目术语，处理陌生词并防止自造概括词与概念偏移。
 
 `paper2ppt` 使用同插件内置的 `$ppt-master` 完成渲染。处理 PDF、Office
 文档或图片时还需要单独安装 `paper-project`，以调用

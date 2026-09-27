@@ -18,6 +18,7 @@ SKILL_NAMES = (
     "ask-lyz",
     "calc-setup",
     "calc-rq",
+    "domain-research",
     "calc-to-spec",
     "calc-execute",
     "calc-issue",

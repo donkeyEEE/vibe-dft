@@ -5,7 +5,7 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
 
 # Calc RQ
 
-负责 RQ 生命周期及其已接受决策。RQ 存储配置只定义存储约定；`RQ.md` 是 RQ 的唯一权威。
+负责 RQ 生命周期及其已接受决策。RQ 存储配置只定义存储约定；`RQ.md` 是 RQ 问题、决策及状态的唯一权威。
 涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
 
 1. 解析唯一计算项目。读取其 `ARCHITECTURE.md` 的 `## Calculation Configuration`，再解析配置的
@@ -15,13 +15,17 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
 2. 创建时读取已解析主线下的 sibling RQ 目录以避免 ID 冲突。既有 RQ 工作时读取所选 `RQ.md`；
    意图涉及 concluded Spec 影响时还读取相关已发布 Spec。将这些文件视为权威，而非对话摘要。
    RQ 问题与已接受决策只保存在 `RQ.md`；进度跟踪表按项目 `AGENTS.md` 的进度跟踪表约定维护。
-   创建或修改 RQ 时加载 `$skill-incubator:domain-research`，沿用项目研究术语并核对概念。
+   读取项目根 `CONTEXT.md` 和当前 RQ 目录下已有的 `RQ-CONTEXT.md`。
+   创建或修改 RQ 时加载 `$domain-research`，提供项目根与目标 RQ 目录，由它维护 RQ 上下文；
+   首次创建 `RQ-CONTEXT.md` 时由它自行读取共享领域术语作为基础。
    重点核对研究问题及假说／假设的表述；本技能继续负责问题推敲、已接受决策及 RQ 写入。
 3. 创建或推导 RQ，或变更其 Question、Question 下的 `Boundary:` 或 Success Criterion 时，
    调用 `$dev-engineering:grill-with-docs`。若此依赖不可用，只停止该工作流并报告；不需要
-   此工作流的检查和已决定 RQ 更新仍可进行。将访谈产生的 RQ 范围术语和框架记录于
-   `RQ.md` 的 `## Context`；跨问题复用的科学概念由 `domain-research` 维护于项目独立研究术语文件，
-   仓库根 `CONTEXT.md` 保留稳定的项目组织与工作流术语。在当前对话中
+   此工作流的检查和已决定 RQ 更新仍可进行。访谈形成的项目共用概念交给
+   `$dev-engineering:domain-modeling` 维护于项目根 `CONTEXT.md`；RQ 范围术语交给
+   `$domain-research` 维护于同目录的 `RQ-CONTEXT.md`，不写入 `RQ.md`。
+   旧 RQ 内嵌上下文按需迁移：由 `domain-research` 整理至 `RQ-CONTEXT.md`，本技能在
+   展示并获批的 RQ 更新中移除旧 Context／上下文章节，保持问题、决策和状态不变。在当前对话中
    解决未回答问题。用户回答后，在 `RQ.md` `## Decisions` 下提出准确新增或替换；不得单独
    持久化 RQ 访谈待答问题。执行发现的 Issue 由 `$calc-issue` 独立维护。
    来自 Issue 的新 RQ 提案读取其证据，沿用本流程批准；获批后回传实际 RQ 路径供 Issue 关联。
@@ -31,7 +35,8 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
 5. 展示准确的拟议文件路径和完整 Markdown 变更。等待调用约定要求的所有批准：创建或推导 RQ，
    以及每次正式 RQ 更新，都需要明确批准。批准只约束已展示提案；任何变更后都要修订并重新展示。
    concluded Spec 的 Closure 影响在批准前仍是提案；报告其为已接受、已拒绝或待定。批准创建后，
-   创建配置的 RQ 目录及其中的 `RQ.md` 与 `specs/`。
+   创建配置的 RQ 目录及其中的 `RQ.md` 与 `specs/`，再将已确认的 RQ 术语交给
+   `$domain-research` 按需创建 `RQ-CONTEXT.md`；RQ 未获批创建前只保留术语提案。
 6. 每次写入后重读 `RQ.md`；RQ 状态或其他索引字段变化、新增 RQ 时，立即直接维护
    所属 RQ 目录下的 `tracker.json` 并核对一致性。遵循项目 `AGENTS.md` 和
    [进度跟踪表契约](../../resources/progress-tracker.md)；缺少项目约定时，规则补齐交由 `$calc-setup`。

@@ -92,6 +92,9 @@ def test_runtime_package(plugin_root, tmp_path):
     assert ".codex-plugin/plugin.json" in names
     assert "resources/progress-tracker.md" in names
     assert "resources/project-context.md" in names
+    assert "skills/domain-research/SKILL.md" in names
+    assert "skills/domain-research/agents/openai.yaml" in names
+    assert "skills/domain-research/references/research-context.md" in names
     assert "resources/README.md" in names
     assert "skills/calc-execute/assets/templates/common/run.sh.template" in names
     assert REQUIRED_DT005_ASSETS <= set(names)
@@ -110,7 +113,7 @@ def test_runtime_inventory_is_sorted_and_independently_contains_dt005_assets(
     names = _runtime_names(builder, plugin_root)
 
     assert names == sorted(names)
-    assert len(names) == 89
+    assert len(names) == 92
     assert REQUIRED_DT005_ASSETS <= set(names)
 
 
@@ -408,6 +411,7 @@ def test_manifest_and_skill_metadata_describe_exact_explicit_roster(plugin_root)
         "ask-lyz",
         "calc-setup",
         "calc-rq",
+        "domain-research",
         "calc-to-spec",
         "calc-execute",
         "calc-issue",

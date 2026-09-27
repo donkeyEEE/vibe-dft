@@ -8,7 +8,9 @@ description: 执行一个选定的 ready 或 active Calc Project Spec，完成�
 将一个选定的 ready 或 active Calc Project Spec 推进完成整条执行生命周期，涵盖任务推进、
 Run 执行、任务验收和 Spec 闭包。
 涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
-解释执行结果时加载 `$skill-incubator:domain-research`，沿用项目研究术语并核对概念；
+解释执行结果时读取项目根 `CONTEXT.md` 与所属 RQ 目录下已有的 `RQ-CONTEXT.md`，
+加载 `$domain-research`，提供项目根与 RQ 目录，由它核对概念并维护 RQ 上下文。
+已有 `RQ-CONTEXT.md` 直接沿用；首次创建时由它读取共享领域术语作为基础。
 重点区分研究手段产生的结果、用于判断的证据和回答研究问题的结论。
 普通提交或状态查询无需重复检查。术语澄清若涉及科学决策或验收标准变更，按下述流程
 交回 `$calc-rq` 或 `$calc-to-spec`，继续以当前生效的 Spec 为验收依据。

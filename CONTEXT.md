@@ -21,6 +21,15 @@ Skill 是否允许 Codex 隐式选择的运行时策略；默认允许隐式调�
 
 `plugins/calc-project` 是可安装计算工作流插件。运行时计算模板和确定性辅助脚本属于唯一消费者 `calc-execute`，不属于插件共享资源。
 
+**项目上下文（Project Context）**：
+项目根目录 `CONTEXT.md` 中的项目级领域词汇与共用概念，由 `dev-engineering:domain-modeling` 维护。
+_Avoid_: 项目独立术语文件，RQ 上下文
+
+**RQ 上下文（RQ Context）**：
+RQ 目录下 `RQ-CONTEXT.md` 中服务于该研究问题的术语、含义及适用范围，由 `calc-project:domain-research` 维护。`RQ.md` 不再维护上下文；问题、决策和验收要求仍属于原有科学记录。
+Calc Project 的共享领域术语用于初始化 RQ 上下文，具体研究在此基础上补充专用概念。
+_Avoid_: RQ.md 的 Context 章节，项目上下文
+
 **RQ 存储配置**:
 每个 RQ 用于存放 `RQ.md` 与已发布 Spec 的配置化存储约定；RQ 属于一条计算研究主线，本地 Markdown adapter 下对应 `<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，不是独立状态文档。
 _Avoid_: Tracker 数据库，进度缓存，session registry
@@ -121,8 +130,3 @@ _Avoid_: sibling 共享脚本、插件共享资源、跨 skill Python 导入
 ## Skill Incubator
 
 `plugins/skill-incubator` 是可安装的通用 skill 试验场，收纳尚未形成独立插件边界的工作流。`prl-polishing` 在此继续提供通用物理论文逐段润色；Physical Review Introduction 的专用写作与重构由 Paper Project 的 `pr-intro` 负责。
-
-**研究术语文件（Research Term List）**：
-研究项目独立维护的可复用专有术语清单，每项只记录名称、简短解释和适用范围。`domain-research` 在研究交互与汇报写作中用它对齐物理概念和用语；一次性描述不进入清单。
-它保存跨研究问题复用的科学概念；RQ、Spec 的上下文保存局部含义、假设与限定条件，科学决策仍属于对应记录。
-`domain-research` 内置科研通用定义；项目术语文件补充专有术语与语境限定，无需重复内置条目。

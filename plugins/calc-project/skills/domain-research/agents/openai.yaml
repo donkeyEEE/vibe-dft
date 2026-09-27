@@ -1,4 +1,4 @@
 interface:
   display_name: "domain-research"
-  short_description: "在研究讨论和汇报中防止术语自造与概念偏移"
+  short_description: "对齐科研术语并维护 RQ 上下文，防止概念偏移"
   default_prompt: "使用 $domain-research 对齐这项研究的术语，并检查汇报中的概念偏移。"
