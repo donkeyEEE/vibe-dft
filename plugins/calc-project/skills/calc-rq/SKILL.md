@@ -17,7 +17,7 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
    RQ 问题与已接受决策只保存在 `RQ.md`；进度跟踪表按项目 `AGENTS.md` 的进度跟踪表约定维护。
    读取项目根 `CONTEXT.md` 和当前 RQ 目录下已有的 `RQ-CONTEXT.md`。
    创建或修改 RQ 时加载 `$domain-research`，提供项目根与目标 RQ 目录，由它维护 RQ 上下文；
-   首次创建 `RQ-CONTEXT.md` 时由它自行读取共享领域术语作为基础。
+   术语的收录、确认和更新遵循 `$domain-research`。
    重点核对研究问题及假说／假设的表述；本技能继续负责问题推敲、已接受决策及 RQ 写入。
 3. 创建或推导 RQ，或变更其 Question、Question 下的 `Boundary:` 或 Success Criterion 时，
    调用 `$dev-engineering:grill-with-docs`。若此依赖不可用，只停止该工作流并报告；不需要

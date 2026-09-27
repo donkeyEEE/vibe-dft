@@ -1,8 +1,8 @@
 # 计算项目管理
 
-本上下文定义 Calc Project 组织科研计算的稳定语言，也是各 RQ 上下文的初始化基础。
-`domain-research` 在首次创建 RQ 目录的 `RQ-CONTEXT.md` 时读取本资源，
-与已确认的 RQ 专用概念合并；后续使用已建立的 RQ 上下文。
+本上下文定义 Calc Project 组织科研计算的稳定语言。
+`domain-research` 在涉及插件流程概念时按需读取；RQ 术语清单只记录本研究已确认的关键术语，
+不复制本资源的定义。
 
 ## Language
 

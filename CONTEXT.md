@@ -27,7 +27,7 @@ _Avoid_: 项目独立术语文件，RQ 上下文
 
 **RQ 上下文（RQ Context）**：
 RQ 目录下 `RQ-CONTEXT.md` 中服务于该研究问题的术语、含义及适用范围，由 `calc-project:domain-research` 维护。`RQ.md` 不再维护上下文；问题、决策和验收要求仍属于原有科学记录。
-Calc Project 的共享领域术语用于初始化 RQ 上下文，具体研究在此基础上补充专用概念。
+RQ 上下文收录本研究已确认的关键术语；项目与插件已有定义按需读取，不复制到 RQ 术语清单。
 _Avoid_: RQ.md 的 Context 章节，项目上下文
 
 **RQ 存储配置**:

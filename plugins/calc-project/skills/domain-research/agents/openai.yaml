@@ -1,4 +1,4 @@
 interface:
   display_name: "domain-research"
-  short_description: "说明术语、模型、对称性和适用范围"
-  default_prompt: "使用 $domain-research 说明这项研究的术语、模型、对称性及适用范围，并维护已确认的 RQ 定义。"
+  short_description: "对齐研究术语并维护 RQ 上下文"
+  default_prompt: "使用 $domain-research 对齐这项研究的术语及其含义、适用范围，并维护已确认的 RQ 定义。"

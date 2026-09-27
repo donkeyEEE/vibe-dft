@@ -36,15 +36,14 @@ def test_context_ownership_and_consumers(plugin_root):
     assert "`RQ-CONTEXT.md`（RQ 上下文）由本技能维护" in domain
     assert "首次创建 `RQ-CONTEXT.md` 时" in domain
     assert "[共享领域术语](../../resources/project-context.md)" in domain
-    assert "后续术语维护不再读取或同步共享领域术语" in domain
+    assert "项目与插件已有的定义按需读取，不复制到 RQ 术语清单" in domain
     assert (plugin_root / "resources/project-context.md").is_file()
     for name in ("calc-rq", "calc-to-spec", "calc-execute"):
         skill = (plugin_root / "skills" / name / "SKILL.md").read_text()
         assert "RQ-CONTEXT.md" in skill
         assert "$domain-research" in skill
         assert "`RQ.md` 的 `## Context`" not in skill
-        assert "首次创建" in skill
-        assert "读取共享领域术语作为基础" in skill
+        assert "术语的收录、确认和更新遵循 `$domain-research`" in skill
         assert "实际文件路径" not in skill
         assert "将内容和来源交给它" not in skill
 
