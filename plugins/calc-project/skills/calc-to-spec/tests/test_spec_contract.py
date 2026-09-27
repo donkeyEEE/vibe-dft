@@ -54,7 +54,7 @@ def test_design_flow_is_incremental_and_mode_dependent(plugin_root):
 
     assert "$dev-engineering:grill-with-docs" in text
     assert "无需预先穷尽该 RQ 的全部 Spec" in text
-    assert "只有影响主要判断、必要 可比性或验收" in text
+    assert "自动设计只在影响主要判断、必要可比性或验收" in text
     assert "自动设计" in text
     assert "协作设计" in text
     assert "明确批准" in text
@@ -72,10 +72,10 @@ def test_domain_research_is_called_during_spec_design(plugin_root):
     assert text.index("仅加载当前判断需要的科学设计参考资料") < text.index(
         "调用 `$domain-research`"
     ) < text.index("用 [Spec 模板]")
-    assert "启动上述访谈时同时调用 `$domain-research`" in text
-    assert "随访谈说明关键术语、所用模型、相关对称性与适用范围" in text
-    assert "自动设计未进入访谈时" in text
-    assert "草稿或修订若引入影响含义的新术语" in text
+    assert "起草前调用 `$domain-research`" in text
+    assert "有访谈时随问答进行，无访谈时随证据整理进行" in text
+    assert "术语的收录、确认和更新遵循 `$domain-research`" in text
+    assert "草稿或修订引入影响含义的新术语" in text
 
 
 def test_mode_gate_covers_direct_and_continued_design(plugin_root):
