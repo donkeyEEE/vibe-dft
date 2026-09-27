@@ -33,7 +33,7 @@ def test_context_ownership_and_consumers(plugin_root):
     assert "`CONTEXT.md`（项目上下文）" in domain
     assert "`RQ-CONTEXT.md`（RQ 上下文）" in domain
     assert "$dev-engineering:domain-modeling" in domain
-    assert "本技能维护 RQ 上下文" in domain
+    assert "`RQ-CONTEXT.md`（RQ 上下文）由本技能维护" in domain
     assert "首次创建 `RQ-CONTEXT.md` 时" in domain
     assert "[共享领域术语](../../resources/project-context.md)" in domain
     assert "后续术语维护不再读取或同步共享领域术语" in domain
