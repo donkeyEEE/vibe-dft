@@ -95,6 +95,7 @@ def test_runtime_package(plugin_root, tmp_path):
     assert "skills/domain-research/SKILL.md" in names
     assert "skills/domain-research/agents/openai.yaml" in names
     assert "skills/domain-research/references/research-context.md" in names
+    assert "skills/domain-research/references/research-writing.md" in names
     assert "resources/README.md" in names
     assert "skills/calc-execute/assets/templates/common/run.sh.template" in names
     assert REQUIRED_DT005_ASSETS <= set(names)
@@ -113,7 +114,7 @@ def test_runtime_inventory_is_sorted_and_independently_contains_dt005_assets(
     names = _runtime_names(builder, plugin_root)
 
     assert names == sorted(names)
-    assert len(names) == 92
+    assert len(names) == 93
     assert REQUIRED_DT005_ASSETS <= set(names)
 
 
