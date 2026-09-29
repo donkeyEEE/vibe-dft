@@ -1,5 +1,4 @@
 from pathlib import Path, PureWindowsPath
-import subprocess
 import sys
 
 import pytest
@@ -15,11 +14,8 @@ from runtime_config import (  # noqa: E402
     RuntimeConfig,
     candidate_endpoints,
     config_path,
-    default_gateway,
     is_wsl,
     load_runtime_config,
-    powershell_wsl_host,
-    wsl_default_gateway,
 )
 
 
@@ -137,75 +133,19 @@ def runtime(*, mode: str, host: str | None, port: int = 23119) -> RuntimeConfig:
     )
 
 
-def test_wsl_candidates_try_loopback_then_gateway() -> None:
-    endpoints = candidate_endpoints(runtime(mode="wsl", host=None), "172.20.0.1")
-    assert [endpoint.url for endpoint in endpoints] == [
-        "http://127.0.0.1:23119",
-        "http://172.20.0.1:23119",
-    ]
-    assert [endpoint.source for endpoint in endpoints] == [
-        "automatic-loopback",
-        "automatic-wsl-gateway",
-    ]
+def test_wsl_and_native_modes_use_the_same_loopback_endpoint() -> None:
+    for mode in ("wsl", "native"):
+        endpoints = candidate_endpoints(runtime(mode=mode, host=None))
+        assert [endpoint.url for endpoint in endpoints] == [
+            "http://127.0.0.1:23119"
+        ]
+        assert [endpoint.source for endpoint in endpoints] == ["automatic-loopback"]
 
 
 def test_explicit_host_has_no_fallback_and_uses_configured_port() -> None:
     endpoints = candidate_endpoints(
-        runtime(mode="wsl", host="192.0.2.10", port=24000), "172.20.0.1"
+        runtime(mode="wsl", host="192.0.2.10", port=24000)
     )
     assert [endpoint.url for endpoint in endpoints] == ["http://192.0.2.10:24000"]
     assert endpoints[0].host_header == "127.0.0.1:24000"
     assert endpoints[0].source == "explicit-host"
-
-
-def test_native_mode_has_only_loopback_default() -> None:
-    endpoints = candidate_endpoints(runtime(mode="native", host=None), "172.20.0.1")
-    assert [endpoint.url for endpoint in endpoints] == ["http://127.0.0.1:23119"]
-
-
-def test_default_gateway_rejects_unusable_routes() -> None:
-    unusable_routes = [
-        "",
-        "default via 127.0.0.1 dev eth0",
-        "default via 0.0.0.0 dev eth0",
-        "default via 224.0.0.1 dev eth0",
-        "default via not-an-ip dev eth0",
-    ]
-    for route_output in unusable_routes:
-        with pytest.raises(ConfigError, match="gateway"):
-            default_gateway(route_output)
-
-
-def test_wsl_default_gateway_invokes_ip_without_shell() -> None:
-    calls: list[tuple[object, object]] = []
-
-    def run(command, **kwargs):
-        calls.append((command, kwargs))
-        return subprocess.CompletedProcess(command, 0, "default via 172.19.0.1 dev eth0\n", "")
-
-    assert wsl_default_gateway(run) == "172.19.0.1"
-    assert calls == [
-        (
-            ["ip", "route"],
-            {"check": True, "capture_output": True, "text": True},
-        )
-    ]
-
-
-def test_powershell_wsl_host_reads_virtual_switch_without_shell() -> None:
-    calls: list[tuple[object, object]] = []
-
-    def run(command, **kwargs):
-        calls.append((command, kwargs))
-        return subprocess.CompletedProcess(command, 0, "172.28.64.1\n", "")
-
-    assert powershell_wsl_host(run, lambda name: "/mnt/c/powershell.exe") == "172.28.64.1"
-    command, kwargs = calls[0]
-    assert command[:4] == [
-        "/mnt/c/powershell.exe",
-        "-NoProfile",
-        "-NonInteractive",
-        "-Command",
-    ]
-    assert "vEthernet (WSL*" in command[4]
-    assert kwargs == {"check": True, "capture_output": True, "text": True}

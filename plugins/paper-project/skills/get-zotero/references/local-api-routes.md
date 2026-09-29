@@ -1,6 +1,6 @@
 # Zotero local API and connector routes for Get Zotero
 
-Base URL 由 `scripts/runtime_config.py` 解析。原生环境默认使用 `http://127.0.0.1:23119`；WSL 依次尝试 loopback 和动态发现的 Windows 主机地址。用户显式配置 host 时只使用该地址。
+Base URL 由 `scripts/runtime_config.py` 解析。所有支持的环境默认使用 `http://127.0.0.1:23119`；用户显式配置 host 时只使用该地址。
 
 Every request must include:
 

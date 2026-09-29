@@ -1,6 +1,6 @@
 {
   "name": "calc-project",
-  "version": "0.1.0+codex.20260916141145",
+  "version": "1.1.0+codex.20260929154451",
   "description": "以八个可自动选择的接口管理计算项目配置、RQ、研究术语、Spec、执行、Issue 调研、评审与汇报，并提供显式使用说明、路由辅助和只读 COT 总览。",
   "author": {
     "name": "donk"

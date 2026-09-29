@@ -24,8 +24,6 @@ from runtime_config import (
     candidate_endpoints,
     config_path,
     load_runtime_config,
-    powershell_wsl_host,
-    wsl_default_gateway,
 )
 
 
@@ -64,12 +62,10 @@ class ZoteroClient:
         config: RuntimeConfig,
         endpoints: Sequence[Endpoint],
         opener: Callable[..., Any] = urllib.request.urlopen,
-        gateway_error: str | None = None,
     ) -> None:
         self.config = config
         self.endpoints = tuple(endpoints)
         self.opener = opener
-        self.gateway_error = gateway_error
         self.selected_endpoint: Endpoint | None = None
 
     def _request_at(
@@ -181,38 +177,6 @@ def api_response(client: ZoteroClient, path: str) -> Response:
 
 def api_get(client: ZoteroClient, path: str) -> Any:
     return parse_body(api_response(client, path))
-
-
-def runtime_endpoints(
-    config: RuntimeConfig,
-    gateway_loader: Callable[[], str] = wsl_default_gateway,
-    windows_host_loader: Callable[[], str] = powershell_wsl_host,
-) -> tuple[tuple[Endpoint, ...], str | None]:
-    gateway = None
-    discovery_errors: list[str] = []
-    if config.mode == "wsl" and not config.host:
-        try:
-            gateway = gateway_loader()
-        except ConfigError as error:
-            discovery_errors.append(str(error))
-        endpoints = list(candidate_endpoints(config, gateway))
-        try:
-            windows_host = windows_host_loader()
-        except ConfigError as error:
-            discovery_errors.append(str(error))
-        else:
-            url = f"http://{windows_host}:{config.port}"
-            if all(endpoint.url != url for endpoint in endpoints):
-                endpoints.append(
-                    Endpoint(
-                        url=url,
-                        host_header=f"127.0.0.1:{config.port}",
-                        source="automatic-windows-wsl-interface",
-                    )
-                )
-        error = "; ".join(discovery_errors) if len(endpoints) == 1 else None
-        return tuple(endpoints), error
-    return candidate_endpoints(config, gateway), None
 
 
 def query(params: dict[str, str | int | bool | None]) -> str:
@@ -548,19 +512,14 @@ def doctor_payload(
         }
     except ZoteroConnectionError:
         explicit = config.host is not None
-        gateway_failed = client.gateway_error is not None
         api = {
             "running": False,
             "status": None,
             "error_code": "explicit-host-unreachable"
             if explicit
-            else "wsl-gateway-unavailable"
-            if gateway_failed
             else "zotero-unreachable",
             "next_step": "Check the configured host and port, then run doctor again."
             if explicit
-            else "Provide the current Windows host address, then run doctor again."
-            if gateway_failed
             else "Start Zotero and enable its local API in the Zotero interface.",
             "zotero_version": None,
             "api_version": None,
@@ -899,12 +858,9 @@ def main(argv: list[str] | None = None) -> int:
         config = load_runtime_config(
             cli, os.environ, system, release, proc_version, Path.home()
         )
-        endpoints, gateway_error = runtime_endpoints(config)
+        endpoints = candidate_endpoints(config)
         args.config_exists = config_path(system, os.environ, Path.home()).exists()
-        args.func(
-            args,
-            ZoteroClient(config, endpoints, gateway_error=gateway_error),
-        )
+        args.func(args, ZoteroClient(config, endpoints))
     except (ConfigError, ZoteroConnectionError) as error:
         exit_with(str(error))
     return 0

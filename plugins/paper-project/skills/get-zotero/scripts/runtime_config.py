@@ -3,11 +3,8 @@
 
 from __future__ import annotations
 
-import ipaddress
-import shutil
-import subprocess
 import tomllib
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -214,81 +211,10 @@ def load_runtime_config(
     )
 
 
-def default_gateway(route_output: str) -> str:
-    for line in route_output.splitlines():
-        fields = line.split()
-        if len(fields) < 3 or fields[:2] != ["default", "via"]:
-            continue
-        try:
-            gateway = ipaddress.IPv4Address(fields[2])
-        except ipaddress.AddressValueError:
-            continue
-        if gateway.is_loopback or gateway.is_unspecified or gateway.is_multicast:
-            continue
-        return str(gateway)
-    raise ConfigError("No usable WSL IPv4 default gateway was found")
-
-
-def wsl_default_gateway(
-    run: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
-) -> str:
-    try:
-        completed = run(
-            ["ip", "route"], check=True, capture_output=True, text=True
-        )
-    except (OSError, subprocess.SubprocessError) as error:
-        raise ConfigError(f"Could not inspect the WSL gateway: {error}") from error
-    return default_gateway(completed.stdout)
-
-
-def powershell_wsl_host(
-    run: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
-    which: Callable[[str], str | None] = shutil.which,
-) -> str:
-    """Read the Windows-side WSL virtual-switch address without changing networking."""
-    executable = which("powershell.exe")
-    if executable is None:
-        mounted = Path("/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
-        if mounted.exists():
-            executable = str(mounted)
-    if executable is None:
-        raise ConfigError("Windows PowerShell was not found from WSL")
-
-    command = (
-        "Get-NetIPAddress -AddressFamily IPv4 | "
-        "Where-Object { $_.InterfaceAlias -like 'vEthernet (WSL*' } | "
-        "Select-Object -ExpandProperty IPAddress"
-    )
-    try:
-        completed = run(
-            [executable, "-NoProfile", "-NonInteractive", "-Command", command],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-    except (OSError, subprocess.SubprocessError) as error:
-        raise ConfigError(f"Could not inspect the Windows WSL interface: {error}") from error
-
-    for line in completed.stdout.splitlines():
-        try:
-            address = ipaddress.IPv4Address(line.strip())
-        except ipaddress.AddressValueError:
-            continue
-        if not (address.is_loopback or address.is_unspecified or address.is_multicast):
-            return str(address)
-    raise ConfigError("No usable Windows WSL interface address was found")
-
-
-def candidate_endpoints(
-    config: RuntimeConfig, gateway: str | None
-) -> tuple[Endpoint, ...]:
+def candidate_endpoints(config: RuntimeConfig) -> tuple[Endpoint, ...]:
     host_header = f"127.0.0.1:{config.port}"
     if config.host:
         hosts = [(config.host, "explicit-host")]
-    elif config.mode == "wsl":
-        hosts = [("127.0.0.1", "automatic-loopback")]
-        if gateway and gateway != "127.0.0.1":
-            hosts.append((gateway, "automatic-wsl-gateway"))
     else:
         hosts = [("127.0.0.1", "automatic-loopback")]
     return tuple(

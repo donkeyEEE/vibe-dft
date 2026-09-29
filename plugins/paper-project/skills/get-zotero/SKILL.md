@@ -13,7 +13,7 @@ description: Use when retrieving bibliographic metadata, annotations, Zotero ind
 - Zotero 始终只读；不修改条目、批注、附件、设置或 profile。
 - metadata 可直接返回 JSON；正文与 PDF 作为文件 artifact 传递，不嵌入 JSON。
 - 本地附件路径只供内部工具调用，不写入普通回复或持久文档。
-- 连接失败时读取 [故障排查](references/troubleshooting.md)；正常流程使用自动探测，不要求或创建用户配置文件。
+- 连接失败时读取 [故障排查](references/troubleshooting.md)；正常流程使用本机默认端点，不要求或创建用户配置文件。
 
 ## 访问与诊断
 
@@ -23,7 +23,7 @@ Zotero Desktop 必须运行且启用本地 API。先运行：
 python3 <plugin-root>/skills/get-zotero/scripts/zotero.py doctor --json
 ```
 
-支持 Windows 原生、macOS/Linux 原生，以及 Windows Zotero + WSL Codex。具体只读路由见 [本地 API 路由](references/local-api-routes.md)。
+Windows、macOS、Linux 和 WSL 均默认访问 `127.0.0.1:23119`；WSL 的附件路径仍按运行环境解析。具体只读路由见 [本地 API 路由](references/local-api-routes.md)。
 
 ## 获取模式
 

@@ -8,9 +8,7 @@ python3 <plugin-root>/skills/get-zotero/scripts/zotero.py doctor --json
 
 ## Zotero 不可达
 
-确认 Zotero Desktop 正在目标机器运行。原生 Windows、macOS 和 Linux 默认连接 `127.0.0.1:23119`。WSL 先尝试 loopback，再动态读取 Linux 默认网关和 Windows `vEthernet (WSL…)` 接口地址。
-
-不要写死其他机器的 WSL 网关。动态发现失败时，检查 WSL 网络模式、Windows Local API 与防火墙边界；保持自动探测，不创建用户配置文件。
+确认 Zotero Desktop 正在本机运行，并检查 `127.0.0.1:23119` 是否可达。Windows Zotero 与 WSL 配合使用时，确认镜像网络允许 WSL 访问该端口。Get Zotero 不创建用户配置文件或修改网络设置。
 
 ## 本地 API 未启用
 

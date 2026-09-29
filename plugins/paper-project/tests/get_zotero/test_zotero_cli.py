@@ -12,7 +12,7 @@ SCRIPTS = (
 sys.path.insert(0, str(SCRIPTS))
 
 import zotero  # noqa: E402
-from runtime_config import ConfigError, Endpoint, RuntimeConfig  # noqa: E402
+from runtime_config import Endpoint, RuntimeConfig  # noqa: E402
 
 
 def subcommand_names(parser: argparse.ArgumentParser) -> set[str]:
@@ -99,32 +99,28 @@ class FakeHTTPResponse:
         return self.body
 
 
-def test_client_selects_first_healthy_endpoint_and_builds_required_headers() -> None:
+def test_client_uses_loopback_and_builds_required_headers() -> None:
     requests = []
 
     def opener(request, timeout):
         requests.append((request, timeout))
-        if request.full_url.startswith("http://127.0.0.1"):
-            raise OSError("loopback unavailable")
         return FakeHTTPResponse()
 
     endpoints = (
         Endpoint("http://127.0.0.1:24000", "127.0.0.1:24000", "automatic-loopback"),
-        Endpoint("http://172.20.0.1:24000", "127.0.0.1:24000", "automatic-wsl-gateway"),
     )
     client = zotero.ZoteroClient(runtime(), endpoints, opener=opener)
 
     selected = client.select_endpoint()
 
-    assert selected == endpoints[1]
+    assert selected == endpoints[0]
     assert [request.full_url for request, _ in requests] == [
         "http://127.0.0.1:24000/api/",
-        "http://172.20.0.1:24000/api/",
     ]
-    assert requests[1][0].get_header("Host") == "127.0.0.1:24000"
-    assert requests[1][0].get_header("Zotero-api-version") == "3"
-    assert requests[1][0].method == "GET"
-    assert requests[1][1] == 2.5
+    assert requests[0][0].get_header("Host") == "127.0.0.1:24000"
+    assert requests[0][0].get_header("Zotero-api-version") == "3"
+    assert requests[0][0].method == "GET"
+    assert requests[0][1] == 2.5
 
 
 def test_explicit_host_failure_has_one_attempt() -> None:
@@ -144,33 +140,21 @@ def test_explicit_host_failure_has_one_attempt() -> None:
     assert attempts == ["http://192.0.2.10:24000/api/"]
 
 
-def test_wsl_gateway_failure_keeps_loopback_candidate() -> None:
-    def unavailable_gateway():
-        raise ConfigError("no gateway")
+def test_default_loopback_failure_reports_unreachable_api() -> None:
+    attempts = []
 
-    endpoints, gateway_error = zotero.runtime_endpoints(
-        runtime(),
-        gateway_loader=unavailable_gateway,
-        windows_host_loader=lambda: "172.28.64.1",
+    def opener(request, timeout):
+        attempts.append(request.full_url)
+        raise OSError("offline")
+
+    endpoint = Endpoint(
+        "http://127.0.0.1:24000", "127.0.0.1:24000", "automatic-loopback"
     )
+    client = zotero.ZoteroClient(runtime(), (endpoint,), opener=opener)
+    payload = zotero.doctor_payload(runtime(), (endpoint,), client, config_exists=False)
 
-    assert [endpoint.url for endpoint in endpoints] == [
-        "http://127.0.0.1:24000",
-        "http://172.28.64.1:24000",
-    ]
-    assert gateway_error is None
-
-
-def test_wsl_discovery_reports_error_only_when_both_host_methods_fail() -> None:
-    def unavailable():
-        raise ConfigError("unavailable")
-
-    endpoints, discovery_error = zotero.runtime_endpoints(
-        runtime(), gateway_loader=unavailable, windows_host_loader=unavailable
-    )
-
-    assert [endpoint.url for endpoint in endpoints] == ["http://127.0.0.1:24000"]
-    assert discovery_error == "unavailable; unavailable"
+    assert attempts == ["http://127.0.0.1:24000/api/"]
+    assert payload["api"]["error_code"] == "zotero-unreachable"
 
 
 def test_doctor_reports_sources_without_local_paths() -> None:
