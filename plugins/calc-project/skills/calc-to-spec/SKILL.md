@@ -5,13 +5,15 @@ description: 在本次自动或协作设计模式下渐进发布完整的单份 
 
 # Calc to Spec
 
-围绕一个已接受 RQ 的当前下一项主要判断设计并发布 Spec；研究推进时可逐份发布，
+围绕一个已接受 RQ 接下来要回答的具体问题设计并发布 Spec；研究推进时可逐份发布，
 无需预先穷尽该 RQ 的全部 Spec。每份 Spec 自身必须完整。也可替换一个既有、尚未闭合
 Spec 的当前科学设计。自动设计可自主发布；协作设计须在具体方案获批后发布。
 用户明确给出的范围和约束始终有效。
 `concluded` Spec 可只读引用，通常以新 Spec 承载后续判断；修改或重开它需要针对具体
 变更的人工授权。
 涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
+开始工作时先加载 `$domain-research`，在讨论、起草和修订中遵循其术语与文档表达规则；
+定位目标后提供项目根、RQ 目录及相关记录。术语的收录、确认和更新遵循 `$domain-research`。
 
 ## 流程
 
@@ -30,31 +32,31 @@ Spec 的当前科学设计。自动设计可自主发布；协作设计须在具
 3. **确定证据档位。** Spec 的明确设置优先，其次继承 RQ 的 `Evidence level:`，
    两者都未设置时为 `light`。`strict` 只来自用户或已接受 RQ 的明确要求，保留已有严格要求。
    发布时记录生效的 `Evidence level: light | strict`，后续 RQ 档位变化不自动改动该 Spec。
-4. **补齐设计证据。** 仅加载当前判断需要的科学设计参考资料：VASP [设计](references/backends/vasp.md)、
+4. **查明设计依据并澄清问题。** 先核对 RQ、前序结果和用户约束能确定的设计内容；仅加载当前问题需要的科学设计参考资料：VASP [设计](references/backends/vasp.md)、
    [MAE](references/backends/vasp-mae.md)、[DMFT](references/backends/dmft.md)、
    [NAMD](references/backends/namd.md)、[磁性链](references/backends/magnetic.md)、
    [能量映射](references/backends/energy-mapping.md)或[Wannier90](references/backends/wannier90.md)。
    模板提供实现基线，不提供科学数值。证据不足时自主选择 `$dev-engineering:research`
    （定向 Markdown 暂存独立 `/tmp` 路径）或 `$paper-project:literature-review`
    （保存至当前研究主线 `06-文献笔记/` 下唯一 Markdown 路径）。Spec 引用实际采用的可核对原始来源。
-5. **澄清设计。** 自动设计只在影响主要判断、必要可比性或验收、且现有证据仍无法决定的
-   关键科学缺口上调用 `$dev-engineering:grill-with-docs`；协作设计在起草前调用它，讨论
-   主要判断、Task、依赖、验收和停止规则，跳过 RQ 或可靠证据已确定的事项。
-   起草前调用 `$domain-research`：提供项目根、RQ 目录、相关记录与证据，读取 `CONTEXT.md`
-   和已有 `RQ-CONTEXT.md`，对齐术语；有访谈时随问答进行，无访谈时随证据整理进行。
-   术语的收录、确认和更新遵循 `$domain-research`。项目共用概念交 `$dev-engineering:domain-modeling`；
+   协作设计在起草前调用 `$dev-engineering:grill-with-docs`，讨论仍需人工判断的问题，包括
+   Spec 要回答的问题、Task、依赖、验收和停止规则；
+   自动设计只在影响主要判断、必要可比性或验收，且现有证据仍无法决定的关键科学缺口上调用它。
+   已由 RQ 或可靠证据确定的事项不重复访谈。
+   项目共用概念交 `$dev-engineering:domain-modeling`；
    RQ 问题、边界或成功判据变更交 `$calc-rq`。
-6. **起草完整 Spec。** 用 [Spec 模板](references/spec-template.md)围绕一个主要判断，声明  
+5. **起草完整 Spec。** 用 [Spec 模板](references/spec-template.md)围绕一个主要判断，声明
    Task、无环依赖、条件、最低充分证据的验收和停止规则；按模板落实证据档位、字段及参数归属。  
    Spec、Task、Run 各自在父对象内编号，依赖限于同一 Spec，条件依据已记录的上游结果。  
    本次设计的假设与框架写入 `## 上下文`。有确定依据且不改变科学含义的实现值留给
-   `$calc-execute`，Spec 显式值具有约束力。草稿或修订引入影响含义的新术语时交
-   `$domain-research` 澄清；必要科学证据未齐时保持未发布。
-7. **取得发布批准。** 协作模式展示目标路径、主要判断、Task 与依赖、验收、停止规则和
+   `$calc-execute`，Spec 显式值具有约束力。必要科学证据未齐时保持未发布。
+   草稿完成后按 `$domain-research` 检查完整 Spec，清理冗余表达并核对原意，再展示批准或自动发布。
+   修订后重复此检查；主要判断、Task、依赖、条件、验收和停止规则仍由本技能负责。
+6. **取得发布批准。** 协作模式展示目标路径、主要判断、Task 与依赖、验收、停止规则和
    准确的 RQ 索引变更；替换还须展示旧 Run、current 选择和活动作业的影响及处置。
    用户明确批准后才可处置作业或写入设计；方案变化（包括预检发现的变更）须重新展示并获批。
    自动模式无需此批准，仍须遵守用户约束和已有执行授权。
-8. **预检并写入。** 重读 RQ、目标 Spec、索引及替换证据，核对归属、ID/路径唯一、
+7. **预检并写入。** 重读 RQ、目标 Spec、索引及替换证据，核对归属、ID/路径唯一、
    设计完整、目标无其他所有者占用和替换安全；冲突无法安全调和时停止。
    仍有写入者时由 `$calc-execute` 核实，协作模式按已批准方案、自动模式按已有执行授权
    取消或等待，直至无写入风险。新建写入完整 Spec 和准确的 RQ Spec 索引；替换更新同一 Spec
@@ -62,7 +64,7 @@ Spec 的当前科学设计。自动设计可自主发布；协作设计须在具
    立即按项目 `AGENTS.md` 和[进度跟踪表契约](../../resources/progress-tracker.md)维护
    所属 RQ 目录下的 `tracker.json` 并核对一致性；缺少项目约定时交 `$calc-setup` 补齐。
    同内容重试保持幂等，差异按当前权威资料重评，不依赖旧会话提案或批准缓存。
-9. **汇报与推进。** 报告 Spec、证据档位和研究前沿。仅设计或发布的委托到此结束；
+8. **汇报与推进。** 报告 Spec、证据档位和研究前沿。仅设计或发布的委托到此结束；
    已委托推进 RQ 计算时，直接进入 `$calc-execute`。每份 Spec 完成后，只有已接受 RQ
    和结果支持下一主要判断时才继续设计。达到 RQ 成功判据、无证据支持下一判断、
    关键科学缺口未解决或触及用户边界时停止；新 RQ 的发现与创建另行讨论。

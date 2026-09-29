@@ -14,6 +14,6 @@ skill stays there or becomes an independent plugin. Adding and removing skills
 uses ordinary code review without a lifecycle transition, baseline audit, or
 migration log.
 
-This decision supersedes lifecycle registry, state-transition, deletion-gate,
-and migration-log requirements in ADRs 0003–0006 while preserving their other
-architectural decisions and historical wording.
+This decision replaces earlier lifecycle registry, state-transition,
+deletion-gate, and migration-log requirements while preserving the resource
+ownership, plugin boundary, and upstream engineering-skill decisions.

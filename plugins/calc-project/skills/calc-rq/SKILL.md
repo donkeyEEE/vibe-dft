@@ -7,6 +7,8 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
 
 负责 RQ 生命周期及其已接受决策。RQ 存储配置只定义存储约定；`RQ.md` 是 RQ 问题、决策及状态的唯一权威。
 涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
+开始工作时先加载 `$domain-research`，在讨论、起草和修订中遵循其术语与文档表达规则；
+定位目标后提供项目根、RQ 目录及相关记录。术语的收录、确认和更新遵循 `$domain-research`。
 
 1. 解析唯一计算项目。读取其 `ARCHITECTURE.md` 的 `## Calculation Configuration`，再解析配置的
    `Data root:`、`Tracker adapter:` 与 `RQ location:`。要求使用 `local-markdown` adapter。
@@ -15,10 +17,7 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
 2. 创建时读取已解析主线下的 sibling RQ 目录以避免 ID 冲突。既有 RQ 工作时读取所选 `RQ.md`；
    意图涉及 concluded Spec 影响时还读取相关已发布 Spec。将这些文件视为权威，而非对话摘要。
    RQ 问题与已接受决策只保存在 `RQ.md`；进度跟踪表按项目 `AGENTS.md` 的进度跟踪表约定维护。
-   读取项目根 `CONTEXT.md` 和当前 RQ 目录下已有的 `RQ-CONTEXT.md`。
-   创建或修改 RQ 时加载 `$domain-research`，提供项目根与目标 RQ 目录，由它维护 RQ 上下文；
-   术语的收录、确认和更新遵循 `$domain-research`。
-   重点核对研究问题及假说／假设的表述；本技能继续负责问题推敲、已接受决策及 RQ 写入。
+   本技能继续负责问题推敲、已接受决策及 RQ 写入。
 3. 创建或推导 RQ，或变更其 Question、Question 下的 `Boundary:` 或 Success Criterion 时，
    调用 `$dev-engineering:grill-with-docs`。若此依赖不可用，只停止该工作流并报告；不需要
    此工作流的检查和已决定 RQ 更新仍可进行。访谈形成的项目共用概念交给
@@ -32,7 +31,9 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
 4. 创建时用[RQ 模板](references/rq-template.md)起草 RQ。`RQ-NNN` ID 在其父主线内稳定且未使用。
    用户可在 RQ 上明确设置 `Evidence level: light | strict`；未设置时省略该字段并默认 `light`。
    已发布 Spec 的生效档位在其发布时固定，不因后续 RQ 更新而自动变化。
-5. 展示准确的拟议文件路径和完整 Markdown 变更。等待调用约定要求的所有批准：创建或推导 RQ，
+5. 展示批准前按 `$domain-research` 检查完整 RQ 草稿或修订后的全文，清理冗余表达并核对原意；
+   科学问题、边界、成功判据及决策仍由本技能负责。
+   展示准确的拟议文件路径和完整 Markdown 变更。等待调用约定要求的所有批准：创建或推导 RQ，
    以及每次正式 RQ 更新，都需要明确批准。批准只约束已展示提案；任何变更后都要修订并重新展示。
    concluded Spec 的 Closure 影响在批准前仍是提案；报告其为已接受、已拒绝或待定。批准创建后，
    创建配置的 RQ 目录及其中的 `RQ.md` 与 `specs/`，再将已确认的 RQ 术语交给

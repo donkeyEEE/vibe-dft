@@ -40,7 +40,10 @@ def test_context_ownership_and_consumers(plugin_root):
     assert (plugin_root / "resources/project-context.md").is_file()
     for name in ("calc-rq", "calc-to-spec", "calc-execute"):
         skill = (plugin_root / "skills" / name / "SKILL.md").read_text()
-        assert "RQ-CONTEXT.md" in skill
+        if name != "calc-to-spec":
+            assert "RQ-CONTEXT.md" in skill
+        else:
+            assert "提供项目根、RQ 目录及相关记录" in skill
         assert "$domain-research" in skill
         assert "`RQ.md` 的 `## Context`" not in skill
         assert "术语的收录、确认和更新遵循 `$domain-research`" in skill
@@ -70,3 +73,13 @@ def test_rq_handoff_leaves_design_mode_to_spec_entry(plugin_root):
     assert "展示准确的拟议文件路径和完整 Markdown 变更" in skill
     assert "不在 `RQ.md` 记录设计模式" in skill
     assert "直接进入 `$calc-to-spec`" in skill
+
+
+def test_rq_expression_check_precedes_approval(plugin_root):
+    skill = " ".join((plugin_root / "skills/calc-rq/SKILL.md").read_text().split())
+
+    assert "检查完整 RQ 草稿或修订后的全文，清理冗余表达并核对原意" in skill
+    assert skill.index("开始工作时先加载 `$domain-research`") < skill.index("解析唯一计算项目")
+    assert skill.index("展示批准前按 `$domain-research`") < skill.index(
+        "展示准确的拟议文件路径和完整 Markdown 变更"
+    )

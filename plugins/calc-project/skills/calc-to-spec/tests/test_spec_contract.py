@@ -69,13 +69,12 @@ def test_domain_research_is_called_during_spec_design(plugin_root):
         .split()
     )
 
-    assert text.index("仅加载当前判断需要的科学设计参考资料") < text.index(
-        "调用 `$domain-research`"
-    ) < text.index("用 [Spec 模板]")
-    assert "起草前调用 `$domain-research`" in text
-    assert "有访谈时随问答进行，无访谈时随证据整理进行" in text
+    assert text.index("开始工作时先加载 `$domain-research`") < text.index("定位目标")
+    assert "在讨论、起草和修订中遵循其术语与文档表达规则" in text
     assert "术语的收录、确认和更新遵循 `$domain-research`" in text
-    assert "草稿或修订引入影响含义的新术语" in text
+    assert "检查完整 Spec，清理冗余表达并核对原意" in text
+    assert text.index("草稿完成后按 `$domain-research`") < text.index("取得发布批准")
+    assert "修订后重复此检查" in text
 
 
 def test_mode_gate_covers_direct_and_continued_design(plugin_root):
