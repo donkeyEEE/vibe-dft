@@ -20,7 +20,8 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
    本技能继续负责问题推敲、已接受决策及 RQ 写入。
 3. 创建或推导 RQ，或变更其 Question、Question 下的 `Boundary:` 或 Success Criterion 时，
    调用 `$dev-engineering:grill-with-docs`。若此依赖不可用，只停止该工作流并报告；不需要
-   此工作流的检查和已决定 RQ 更新仍可进行。访谈形成的项目共用概念交给
+   此工作流的检查和已决定 RQ 更新仍可进行。访谈围绕当前证据、已有触发迹象及必须预先处理的
+   科学有效性条件或高代价风险；低频假设留到出现具体迹象时处理。访谈形成的项目共用概念交给
    `$dev-engineering:domain-modeling` 维护于项目根 `CONTEXT.md`；RQ 范围术语交给
    `$domain-research` 维护于同目录的 `RQ-CONTEXT.md`，不写入 `RQ.md`。
    旧 RQ 内嵌上下文按需迁移：由 `domain-research` 整理至 `RQ-CONTEXT.md`，本技能在

@@ -17,10 +17,10 @@
 
 ### 从 GitHub 安装与更新
 
-如需固定版本，使用 `v0.1` 标签：
+如需固定版本，使用 `v1.1.0` 标签：
 
 ```bash
-codex plugin marketplace add donkeyEEE/vibe-dft --ref v0.1
+codex plugin marketplace add donkeyEEE/vibe-dft --ref v1.1.0
 ```
 
 如需使用 `main` 上的开发版本：

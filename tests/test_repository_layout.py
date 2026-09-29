@@ -79,7 +79,7 @@ def check_each_plugin_has_a_valid_manifest() -> None:
         assert data["name"] == plugin
 
         if plugin == "calc-project":
-            assert data["version"] == "0.1.0+codex.20260916141145"
+            assert data["version"] == "1.1.0+codex.20260929154451"
             prompts = data["interface"]["defaultPrompt"]
             assert len(prompts) == len(EXPECTED_CALC_SKILLS)
             for name, prompt in zip(EXPECTED_CALC_SKILLS, prompts, strict=True):
@@ -165,7 +165,8 @@ def check_resource_ownership_decision_is_recorded() -> None:
     adr = ROOT / "docs" / "adr" / "0003-localize-resources-to-owning-skills.md"
     assert adr.is_file()
     text = adr.read_text(encoding="utf-8")
-    assert "Supersedes: ADR 0001" in text
+    assert "A resource used by one skill\nis co-located with its owner" in text
+    assert "only resources with at least two active consumers" in text
 
 
 def check_active_files_do_not_use_legacy_research_knowledge_path() -> None:
