@@ -7,7 +7,7 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
 
 负责 RQ 生命周期及其已接受决策。RQ 存储配置只定义存储约定；`RQ.md` 是 RQ 问题、决策及状态的唯一权威。
 涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
-开始工作时先加载 `$domain-research`，在讨论、起草和修订中遵循其术语与文档表达规则；
+开始工作时先加载 `$domain-research`，在讨论、起草和修订中使用其研究推理指引、术语与文档表达规则；
 定位目标后提供项目根、RQ 目录及相关记录。术语的收录、确认和更新遵循 `$domain-research`。
 
 1. 解析唯一计算项目。读取其 `ARCHITECTURE.md` 的 `## Calculation Configuration`，再解析配置的

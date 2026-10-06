@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>计算剪枝与物理因果链思维</title>
+  <style>
+    :root{color-scheme:light;--bg:#f5f4ef;--ink:#24302f;--muted:#65716e;--line:#c9d1cb;--blue:#296c9a;--green:#347762}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans CJK SC","Microsoft YaHei",sans-serif;line-height:1.65}
+    main{max-width:1040px;margin:auto;padding:46px 24px 40px}header{margin-bottom:24px}.eyebrow{font-size:12px;letter-spacing:2px;color:var(--muted)}h1{font-size:clamp(25px,4vw,36px);line-height:1.35;margin:10px 0}header p{color:var(--muted);margin:0;font-size:15px}
+    .diagram{position:relative;padding:12px 38px 20px}.wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}.node{position:relative;background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px 22px;box-shadow:0 3px 12px #26352b05}.shared{max-width:480px;margin:0 auto;text-align:center}.node h2,.node h3{margin:0;font-size:17px;font-weight:650}.node p{margin:5px 0 0;font-size:14px;color:var(--muted)}
+    .branches{display:grid;grid-template-columns:1fr 1fr;gap:70px;margin:40px 0 26px}.lane{display:flex;flex-direction:column;gap:30px}.lane-title{padding:8px 2px;text-align:center}.lane-title h2{font-size:21px;margin:0}.lane-title p{font-size:13px;margin:3px 0 0;color:var(--muted)}.causal h2,.causal h3{color:var(--blue)}.pruning h2,.pruning h3{color:var(--green)}.causal .node{border-color:#b9d3e3;background:#f6fbfe}.pruning .node{border-color:#bcd7cb;background:#f5fbf7}.step{font-size:11px;letter-spacing:1px;display:block;color:var(--muted);margin-bottom:4px}
+    .bridge{position:relative;text-align:center;margin:0 auto 32px;font-size:13px;color:var(--muted);background:var(--bg);width:fit-content;padding:5px 16px;border:1px dashed #bac7be;border-radius:20px}.bridge span{color:var(--blue)}.bridge b{font-weight:500;color:var(--green)}.feedback{margin-top:28px;background:#edf0ea;border-style:dashed}.key{margin-top:22px;padding:22px 26px;background:#fff;border:1px solid var(--line);border-radius:15px}.key h2{font-size:18px;margin:0 0 15px}.compare{display:grid;grid-template-columns:1fr 1fr;gap:24px}.compare p{margin:0;font-size:14px}.compare strong{display:block;font-size:15px;margin-bottom:4px}.compare .a strong{color:var(--blue)}.compare .b strong{color:var(--green)}footer{font-size:12px;color:var(--muted);margin-top:18px;text-align:right}a{color:inherit;text-underline-offset:3px}
+    @media(max-width:600px){main{padding:26px 12px}.diagram{padding:12px 18px 18px}.branches{gap:16px;margin-top:30px}.node{padding:14px 11px;border-radius:12px}.node h2,.node h3{font-size:15px}.node p{font-size:12px}.lane-title h2{font-size:17px}.lane-title p{font-size:12px}.bridge{font-size:12px;padding:5px 10px}.compare{grid-template-columns:1fr;gap:16px}.key{padding:18px}.lane{gap:24px}}
+    @media print{body{background:white}main{padding:10px}.node{box-shadow:none}.key{break-inside:avoid}footer{display:none}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">研究思维 · 模型与证据</div>
+    <h1>计算剪枝与物理因果链思维</h1>
+    <p>围绕同一个研究问题，确定要验证的物理联系，以及值得投入的计算。</p>
+  </header>
+  <section class="diagram" aria-label="两种研究思维的流程与反馈关系">
+    <svg class="wires" aria-hidden="true"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#83968b"/></marker></defs><g id="paths"></g></svg>
+    <div class="node shared" id="question"><h2>研究问题</h2><p>要解释什么现象，作出什么判断？</p></div>
+    <div class="branches">
+      <div class="lane causal">
+        <div class="lane-title" id="causal"><h2>物理因果链思维</h2><p>怎样得到有解释力的证据？</p></div>
+        <div class="node" id="mechanism"><span class="step">提出解释</span><h3>建立物理联系</h3><p>相关自由度及其相互作用，如何影响系统状态与性质？</p></div>
+        <div class="node" id="evidence"><span class="step">设计验证</span><h3>选择干预与观测</h3><p>主动改变什么、控制什么、观察什么，才能区分不同机制？</p></div>
+        <div class="node" id="prediction"><span class="step">明确预测</span><h3>判断证据的含义</h3><p>什么结果支持或否定所提出的物理解释？</p></div>
+      </div>
+      <div class="lane pruning">
+        <div class="lane-title" id="pruning"><h2>计算剪枝</h2><p>哪些计算值得投入？</p></div>
+        <div class="node" id="model"><span class="step">选择模型</span><h3>取舍自由度</h3><p>哪些保留并允许变化，哪些可以固定，哪些可以忽略？</p></div>
+        <div class="node" id="budget"><span class="step">分配投入</span><h3>限定探索与精度</h3><p>哪些参数可能改变结论？精度需要做到什么程度？</p></div>
+        <div class="node" id="boundary"><span class="step">明确边界</span><h3>决定停止与重开</h3><p>何时已有足够依据？什么新证据会要求重新考虑？</p></div>
+      </div>
+    </div>
+    <div class="bridge"><span>物理机制</span>为<b>模型取舍</b>提供依据</div>
+    <div class="node shared" id="result"><h2>实施计算或实验，判断证据</h2><p>比较预测与结果，检查不确定性和适用范围。</p></div>
+    <div class="node shared feedback" id="feedback"><h2>根据证据修正</h2><p>重新审视机制解释与模型取舍，返回两条研究路径。</p></div>
+  </section>
+  <aside class="key">
+    <h2>同样是“固定”，理由可能不同</h2>
+    <div class="compare">
+      <p class="a"><strong>控制变量：辨认因果影响</strong>固定一个变量，是为了识别另一个变量的影响。</p>
+      <p class="b"><strong>简化模型：减少无关投入</strong>固定或忽略一个自由度，需要依据说明它不会影响目标结论。</p>
+    </div>
+  </aside>
+  <footer><a href="research-thinking.md">阅读完整说明</a></footer>
+</main>
+<script>
+  const diagram=document.querySelector('.diagram'), svg=document.querySelector('.wires'), paths=document.querySelector('#paths');
+  function box(id){const a=document.getElementById(id).getBoundingClientRect(),b=diagram.getBoundingClientRect();return{x:a.left-b.left,y:a.top-b.top,w:a.width,h:a.height,cx:a.left-b.left+a.width/2};}
+  function draw(){
+    const w=diagram.clientWidth,h=diagram.clientHeight;svg.setAttribute('viewBox',`0 0 ${w} ${h}`);paths.replaceChildren();
+    function path(d,dashed=false){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke','#83968b');p.setAttribute('stroke-width','1.5');p.setAttribute('marker-end','url(#arrow)');if(dashed)p.setAttribute('stroke-dasharray','5 5');paths.append(p);}
+    function link(a,b){const s=box(a),t=box(b),y=s.y+s.h+4,ty=t.y-5,mid=(y+ty)/2;path(`M ${s.cx} ${y} C ${s.cx} ${mid},${t.cx} ${mid},${t.cx} ${ty}`);}
+    [['question','causal'],['question','pruning'],['causal','mechanism'],['pruning','model'],['mechanism','evidence'],['evidence','prediction'],['model','budget'],['budget','boundary'],['prediction','result'],['boundary','result'],['result','feedback']].forEach(([a,b])=>link(a,b));
+    const f=box('feedback');[['mechanism',8,f.x],['model',w-8,f.x+f.w]].forEach(([id,edge,start])=>{const t=box(id),end=id==='mechanism'?t.x-5:t.x+t.w+5;path(`M ${start} ${f.y+f.h/2} H ${edge} V ${t.y+t.h/2} H ${end}`,true);});
+    const s=box('mechanism'),t=box('model');path(`M ${s.x+s.w+3} ${s.y+s.h/2} H ${t.x-5}`,true);
+  }
+  new ResizeObserver(draw).observe(diagram);document.fonts.ready.then(draw);window.addEventListener('beforeprint',draw);
+</script>
+</body>
+</html>

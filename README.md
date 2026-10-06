@@ -74,7 +74,7 @@ codex plugin add calc-project@vibe-dft
 | [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 显式辅助入口，解释插件术语、核心流程和 Tracker 等用法，推荐工作接口或查询进度。 |
 | [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、RQ 存储配置、数据边界和集群配置。 |
 | [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），记录已接受决策。 |
-| [domain-research](plugins/calc-project/skills/domain-research/SKILL.md) | 在研究讨论、设计、结果解释和汇报中对齐已确认的术语及其含义，维护 RQ 目录下的 `RQ-CONTEXT.md`。 |
+| [domain-research](plugins/calc-project/skills/domain-research/SKILL.md) | 在研究讨论、设计、结果解释和汇报中分析物理因果链与计算取舍，对齐术语、维护 `RQ-CONTEXT.md` 并改善表达。 |
 | [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 在本次自动或协作模式下渐进发布完整的单份 Spec，或安全替换当前设计。 |
 | [calc-execute](plugins/calc-project/skills/calc-execute/SKILL.md) | 推进已就绪或活动中的 Spec，处理 Run 的准备、评审、提交、跟踪、同步与验收。 |
 | [calc-issue](plugins/calc-project/skills/calc-issue/SKILL.md) | 记录执行中值得独立探究的问题，跨 RQ、Spec、Task 关联证据，按编号推进调研。 |

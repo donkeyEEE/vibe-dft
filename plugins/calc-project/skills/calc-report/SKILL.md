@@ -26,6 +26,7 @@ description: 从 Calc Project 的 RQ、Spec、Run 和相关结果生成可追溯
    `data/`、`scripts/` 与 `figures/`。
 5. 调用 `$domain-research`，提供项目根、选定 RQ 目录、拟用术语和证据，按项目
    `CONTEXT.md` 及各 RQ 的 `RQ-CONTEXT.md` 对齐汇报用词；跨 RQ 含义不同时标明语境。
+   组织机制解释时使用其物理因果链与计算剪枝指引，区分已得到的证据、机制推断和未解决的关键影响。
    复用合适的已有图件。确实需要新增或重制科学图件时，向 `$prl-figure` 提供图件要表达的结论、
    证据角色、源数据与 provenance、已对齐术语、尺寸和 workspace 目标；绘图实现、后端、导出与
    视觉 QA 由 `$prl-figure` 决定。
