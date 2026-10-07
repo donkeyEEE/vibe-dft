@@ -79,7 +79,7 @@ def check_each_plugin_has_a_valid_manifest() -> None:
         assert data["name"] == plugin
 
         if plugin == "calc-project":
-            assert data["version"] == "1.1.0+codex.20260929154451"
+            assert re.fullmatch(r"1\.2\.0\+codex\.\d{14}", data["version"])
             prompts = data["interface"]["defaultPrompt"]
             assert len(prompts) == len(EXPECTED_CALC_SKILLS)
             for name, prompt in zip(EXPECTED_CALC_SKILLS, prompts, strict=True):
