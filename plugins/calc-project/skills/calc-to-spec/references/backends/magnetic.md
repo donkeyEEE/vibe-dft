@@ -1,52 +1,25 @@
-# Magnetic pipeline scientific design
+# 磁性计算链科学设计
 
-Use this reference when one principal judgment needs a VASP → Wannier90 → TB2J
-→ VAMPIRE task graph. This is a candidate scientific DAG, not a fixed directory
-layout or mandatory pipeline.
+研究目标需要 VASP → Wannier90 → TB2J → VAMPIRE 任务图时读取本参考资料。这是候选科学 DAG，是否采用以及目录布局由当前研究决定。
 
-## Design evidence
+## 设计证据
 
-Read the accepted RQ decisions, approved structure provenance, relevant prior
-Runs, and method capability records. For magnets whose intended order depends
-on atom identity or ordering, establish an unambiguous mapping between structure
-atoms, index-order `MAGMOM`, and the intended site or layer moments. Choose any
-unambiguous evidence form; a compact grouping, deterministic check, or per-atom
-table may be used according to risk. Research an unresolved mapping and
-interview only if its physical meaning remains indeterminate. Set only the
-tasks actually needed, their dependencies and conditions, material settings,
-Wannier subspaces, TB2J model choices, and the VAMPIRE observable and stopping
-criterion from the accepted RQ and evidence.
+读取已接受的 RQ 决策、批准的结构来源、相关既有 Runs 和方法能力记录。目标磁序依赖原子身份或顺序时，建立结构原子、按索引排列的 `MAGMOM` 与目标位点或层磁矩之间的无歧义映射。按风险选用简明分组、确定性检查、逐原子表或其他无歧义证据。映射未明时先调研；物理含义仍未确定时才访谈。依据已接受的 RQ 和证据确定实际需要的 Task、依赖、条件、材料设置、Wannier 子空间、TB2J 模型选择、VAMPIRE 可观测量及适用的停止准则。
 
-## Candidate DAG and evidence
+## 候选 DAG 与证据
 
-When required by the judgment, declare separate tasks for:
+研究判断需要时，分别声明以下 Task：
 
-1. VASP SCF, accepted by the stated criterion needed for its Purpose and preserving the
-   original `OUTCAR` final `E-fermi` needed downstream.
-2. SCF-derived VASP bands, accepted with the approved spin-resolved band
-   evidence and required handoff products.
-3. The VASP-to-Wannier pre-run, accepted with spin-resolved `.amn`, `.mmn`,
-   `.eig`, and generated `.win` interface files.
-4. Spin-resolved Wannier90, accepted with two nonempty `*_hr.dat`,
-   `*_centres.xyz`, band data, and fit evidence needed for the judgment.
-5. TB2J, accepted with the chosen spin assets, `exchange.out`, and the model
-   handoff required for VAMPIRE.
-6. VAMPIRE, accepted by the stated observable and stopping criterion, with
-   evidence tied to the immutable TB2J-generated source model.
+1. VASP SCF：按其 Purpose 所需的声明准则验收，并保留下游需要的原始 `OUTCAR` 最终 `E-fermi`。
+2. 基于 SCF 的 VASP 能带：以批准的自旋分辨能带证据及必要交接产物验收。
+3. VASP-to-Wannier pre-run：以自旋分辨 `.amn`、`.mmn`、`.eig` 和生成的 `.win` 接口文件验收。
+4. 自旋分辨 Wannier90：以两份非空 `*_hr.dat`、`*_centres.xyz`、能带数据及判断所需拟合证据验收。
+5. TB2J：以所选自旋文件、`exchange.out` 及 VAMPIRE 所需模型交接验收。
+6. VAMPIRE：按声明的可观测量及适用完成准则验收，证据须关联不可变的 TB2J 来源模型。
 
-Record the structure, magnetic atoms/orbitals, Fermi convention, spin
-representation, `wann2J.py` arguments, and selected TB2J k mesh. Wannier
-`mp_grid` does not determine the TB2J mesh. Require sensitivity evidence only
-when the judgment depends on its robustness or the strict level calls for it.
-Load the separate Wannier90 design reference when selecting final
-per-spin windows.
+记录结构、磁性原子/轨道、费米约定、自旋表象、`wann2J.py` 参数及所选 TB2J k mesh。Wannier `mp_grid` 不决定 TB2J mesh。由 `$domain-research` 根据可能影响研究结论的不确定性选择敏感性证据。
+选择最终逐自旋窗口时，加载独立的 Wannier90 设计参考资料。
 
-## Magnetic-order boundary
+## 磁序边界
 
-Record enough reproducible evidence to recover the approved correspondence; do
-not impose a fixed table when a simpler representation is unambiguous. No fixed
-sign pattern transfers between structures because atom numbering need
-not follow geometric layer order. A near-zero total moment, completed VASP Run,
-or converged downstream TB2J result does not validate the intended layer
-sequence. When the physical meaning is not already determined, no stage template
-or historical case supplies a default.
+记录足以复现批准映射的证据；简明表示已无歧义时无需固定表格。原子编号未必遵循几何层顺序，固定符号模式不能直接跨结构沿用。近零总磁矩、完成的 VASP Run 或收敛的下游 TB2J 结果不能证明目标层磁序。物理含义未确定时，阶段模板和历史案例均不能提供默认值。

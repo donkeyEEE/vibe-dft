@@ -74,338 +74,49 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def test_runtime_package(plugin_root, tmp_path):
+def test_runtime_package_inventory_round_trip_cli_and_workflow_metadata(plugin_root, tmp_path):
     builder = _load_builder()
-    package = builder.build_package(plugin_root, tmp_path / "calc-project.tar")
-    with tarfile.open(package) as archive:
-        names = {item.name for item in archive.getmembers() if item.isfile()}
-    expected = {
-        path.relative_to(plugin_root).as_posix()
-        for path in builder.runtime_files(plugin_root)
-    }
-    assert names == expected
-    assert {
-        "skills/calc-issue/SKILL.md",
-        "skills/calc-issue/agents/openai.yaml",
-        "skills/calc-issue/references/issue-record.md",
-    } <= names
-    assert ".codex-plugin/plugin.json" in names
-    assert "resources/progress-tracker.md" in names
-    assert "resources/project-context.md" in names
-    assert "skills/domain-research/SKILL.md" in names
-    assert "skills/domain-research/agents/openai.yaml" in names
-    assert "skills/domain-research/references/research-context.md" in names
-    assert "skills/domain-research/references/research-writing.md" in names
-    assert "skills/domain-research/references/research-reasoning.md" in names
-    assert "resources/README.md" in names
-    assert "skills/calc-execute/assets/templates/common/run.sh.template" in names
+    sources = builder.runtime_files(plugin_root)
+    names = _runtime_names(builder, plugin_root)
+    assert names == sorted(names)
+    assert len(names) == 96
     assert REQUIRED_DT005_ASSETS <= set(names)
+    assert REQUIRED_DT005_ASSETS <= set(builder.REQUIRED_DT005_ASSETS)
+    assert {
+        ".codex-plugin/plugin.json", "resources/README.md", "resources/project-context.md",
+        "resources/progress-tracker.md", "resources/progress-tracker-maintenance.md",
+        "skills/calc-issue/SKILL.md", "skills/calc-issue/agents/openai.yaml",
+        "skills/calc-issue/references/issue-record.md",
+        "skills/domain-research/SKILL.md", "skills/domain-research/agents/openai.yaml",
+        "skills/domain-research/references/research-context.md",
+        "skills/domain-research/references/research-writing.md",
+        "skills/domain-research/references/research-reasoning.md",
+    } <= set(names)
     assert not any(
-        set(Path(name).parts)
-        & {".git", ".worktrees", ".scratch", "tests", "__pycache__"}
+        set(Path(name).parts) & {".git", ".worktrees", ".scratch", "tests", "__pycache__"}
         for name in names
     )
-
-
-def test_runtime_inventory_is_sorted_and_independently_contains_dt005_assets(
-    plugin_root,
-):
-    builder = _load_builder()
-
-    names = _runtime_names(builder, plugin_root)
-
-    assert names == sorted(names)
-    assert len(names) == 94
-    assert REQUIRED_DT005_ASSETS <= set(names)
-
-
-def test_package_builder_requires_calculation_monitor_runtime(plugin_root):
-    builder = _load_builder()
-
-    assert REQUIRED_DT005_ASSETS <= set(builder.REQUIRED_DT005_ASSETS)
-
-
-@pytest.mark.parametrize(
-    "relative",
-    (
-        ".codex-plugin/plugin.json",
-        "skills/calc-review/SKILL.md",
-        "skills/calc-review/agents/openai.yaml",
-        "skills/calc-issue/SKILL.md",
-        "skills/calc-issue/agents/openai.yaml",
-    ),
-)
-def test_missing_required_metadata_is_rejected(plugin_root, tmp_path, relative):
-    builder = _load_builder()
-    copy = _copy_plugin(plugin_root, tmp_path)
-    (copy / relative).unlink()
-
-    with pytest.raises(ValueError, match="required"):
-        builder.runtime_files(copy)
-
-
-def test_removed_helper_is_rejected(plugin_root, tmp_path):
-    builder = _load_builder()
-    copy = _copy_plugin(plugin_root, tmp_path)
-    (copy / "skills/calc-execute/scripts/fingerprint_run.py").unlink()
-
-    with pytest.raises(ValueError, match="fingerprint_run.py"):
-        builder.runtime_files(copy)
-
-
-def test_omitted_template_is_rejected(plugin_root, tmp_path):
-    builder = _load_builder()
-    copy = _copy_plugin(plugin_root, tmp_path)
-    (copy / "skills/calc-execute/assets/templates/common/run.sh.template").unlink()
-
-    with pytest.raises(ValueError, match="run.sh.template"):
-        builder.runtime_files(copy)
-
-
-@pytest.mark.parametrize("metadata", ("manifest", "agent"))
-def test_malformed_metadata_is_rejected(plugin_root, tmp_path, metadata):
-    builder = _load_builder()
-    copy = _copy_plugin(plugin_root, tmp_path)
-    path = (
-        copy / ".codex-plugin/plugin.json"
-        if metadata == "manifest"
-        else copy / "skills/calc-rq/agents/openai.yaml"
-    )
-    path.write_text("{not valid metadata", encoding="utf-8")
-
-    with pytest.raises(ValueError, match="metadata"):
-        builder.runtime_files(copy)
-
-
-def test_unexpected_skill_is_rejected(plugin_root, tmp_path):
-    builder = _load_builder()
-    copy = _copy_plugin(plugin_root, tmp_path)
-    shutil.copytree(copy / "skills/ask-lyz", copy / "skills/ninth")
-
-    with pytest.raises(ValueError, match="exactly"):
-        builder.runtime_files(copy)
-
-
-def test_missing_progress_tracker_contract_is_rejected(plugin_root, tmp_path):
-    builder = _load_builder()
-    copy = _copy_plugin(plugin_root, tmp_path)
-    (copy / "resources/progress-tracker.md").unlink()
-
-    with pytest.raises(ValueError, match="required shared resource"):
-        builder.runtime_files(copy)
-
-
-@pytest.mark.parametrize(
-    ("relative", "kind"),
-    (
-        ("README.md", "file"),
-        ("unknown-resources", "directory"),
-        (".codex-plugin/extra.json", "file"),
-        ("skills/calc-rq/NOTES.md", "file"),
-    ),
-)
-def test_unknown_runtime_top_level_entry_is_rejected(
-    plugin_root, tmp_path, relative, kind
-):
-    builder = _load_builder()
-    copy = _copy_plugin(plugin_root, tmp_path)
-    path = copy / relative
-    if kind == "directory":
-        path.mkdir()
-    else:
-        path.write_text("unknown\n", encoding="utf-8")
-
-    with pytest.raises(ValueError, match="unknown"):
-        builder.runtime_files(copy)
-
-
-def test_symlink_is_rejected_even_when_it_points_inside_plugin(plugin_root, tmp_path):
-    builder = _load_builder()
-    copy = _copy_plugin(plugin_root, tmp_path)
-    link = copy / "skills/calc-execute/scripts/fingerprint-link.py"
-    link.symlink_to("fingerprint_run.py")
-
-    with pytest.raises(ValueError, match="symlink"):
-        builder.runtime_files(copy)
-
-
-def test_build_rejects_a_symlinked_plugin_root(plugin_root, tmp_path):
-    builder = _load_builder()
-    link = tmp_path / "linked-plugin"
-    link.symlink_to(plugin_root, target_is_directory=True)
-
-    with pytest.raises(ValueError, match="symlink"):
-        builder.build_package(link, tmp_path / "calc-project.tar")
-
-
-def test_stale_absolute_resource_path_is_rejected(plugin_root, tmp_path):
-    builder = _load_builder()
-    copy = _copy_plugin(plugin_root, tmp_path)
-    skill = copy / "skills/calc-rq/SKILL.md"
-    skill.write_text(
-        skill.read_text(encoding="utf-8")
-        + "\nStale: /home/old/yz-skills/plugins/calc-project/resources/template.md\n",
-        encoding="utf-8",
-    )
-
-    with pytest.raises(ValueError, match="absolute resource"):
-        builder.runtime_files(copy)
-
-
-def test_accidental_scientific_output_is_rejected(plugin_root, tmp_path):
-    builder = _load_builder()
-    copy = _copy_plugin(plugin_root, tmp_path)
-    output = copy / "skills/calc-execute/assets/templates/vasp/CHGCAR"
-    output.write_bytes(b"synthetic scientific output\n")
-
-    with pytest.raises(ValueError, match="scientific output"):
-        builder.runtime_files(copy)
-
-
-def test_build_refuses_to_replace_an_existing_archive(plugin_root, tmp_path):
-    builder = _load_builder()
-    output = tmp_path / "calc-project.tar"
-    output.write_bytes(b"preserve me")
-
-    with pytest.raises(FileExistsError):
-        builder.build_package(plugin_root, output)
-    assert output.read_bytes() == b"preserve me"
-
-
-def test_build_refuses_dangling_output_symlink_without_creating_target(
-    plugin_root, tmp_path
-):
-    builder = _load_builder()
-    target = tmp_path / "absent-archive-target.tar"
-    output = tmp_path / "calc-project.tar"
-    output.symlink_to(target)
-
-    with pytest.raises(FileExistsError):
-        builder.build_package(plugin_root, output)
-    assert output.is_symlink()
-    assert output.readlink() == target
-    assert not target.exists()
-
-
-def test_safe_extraction_preserves_every_file_byte_and_permission(plugin_root, tmp_path):
-    builder = _load_builder()
     package = builder.build_package(plugin_root, tmp_path / "calc-project.tar")
+    with tarfile.open(package) as archive:
+        assert {item.name for item in archive.getmembers() if item.isfile()} == set(names)
     extracted = builder.safe_extract(package, tmp_path / "external/calc-project")
-
-    for source in builder.runtime_files(plugin_root):
+    for source in sources:
         relative = source.relative_to(plugin_root)
         installed = extracted / relative
         assert _sha256(installed) == _sha256(source), relative
-        assert stat.S_IMODE(installed.stat().st_mode) == stat.S_IMODE(
-            source.stat().st_mode
-        ), relative
+        assert stat.S_IMODE(installed.stat().st_mode) == stat.S_IMODE(source.stat().st_mode), relative
 
-
-@pytest.mark.parametrize("member_kind", ("absolute", "traversal", "symlink", "hardlink"))
-def test_safe_extraction_rejects_malicious_members(tmp_path, member_kind):
-    builder = _load_builder()
-    package = tmp_path / f"{member_kind}.tar"
-    with tarfile.open(package, "w") as archive:
-        item = tarfile.TarInfo(
-            "/absolute.txt" if member_kind == "absolute" else "../outside.txt"
-        )
-        if member_kind in {"symlink", "hardlink"}:
-            item.name = "inside.txt"
-            item.type = tarfile.SYMTYPE if member_kind == "symlink" else tarfile.LNKTYPE
-            item.linkname = "../outside.txt"
-            archive.addfile(item)
-        else:
-            body = b"malicious\n"
-            item.size = len(body)
-            archive.addfile(item, io.BytesIO(body))
-
-    with pytest.raises(ValueError, match="unsafe archive member"):
-        builder.safe_extract(package, tmp_path / "extract")
-    assert not (tmp_path / "outside.txt").exists()
-
-
-def test_safe_extraction_validates_all_members_before_creating_destination(tmp_path):
-    builder = _load_builder()
-    package = tmp_path / "late-traversal.tar"
-    with tarfile.open(package, "w") as archive:
-        body = b"must not be written\n"
-        safe = tarfile.TarInfo("safe.txt")
-        safe.size = len(body)
-        archive.addfile(safe, io.BytesIO(body))
-        unsafe = tarfile.TarInfo("safe/../../outside.txt")
-        unsafe.size = len(body)
-        archive.addfile(unsafe, io.BytesIO(body))
-
-    destination = tmp_path / "extract"
-    with pytest.raises(ValueError, match="unsafe archive member"):
-        builder.safe_extract(package, destination)
-    assert not destination.exists()
-    assert not (tmp_path / "outside.txt").exists()
-
-
-def test_safe_extraction_refuses_existing_destination_without_altering_it(tmp_path):
-    builder = _load_builder()
-    package = tmp_path / "safe.tar"
-    with tarfile.open(package, "w") as archive:
-        body = b"new\n"
-        item = tarfile.TarInfo("file.txt")
-        item.size = len(body)
-        archive.addfile(item, io.BytesIO(body))
-    destination = tmp_path / "extract"
-    destination.mkdir()
-    sentinel = destination / "sentinel.txt"
-    sentinel.write_bytes(b"preserve me")
-
-    with pytest.raises(FileExistsError):
-        builder.safe_extract(package, destination)
-    assert sentinel.read_bytes() == b"preserve me"
-    assert not (destination / "file.txt").exists()
-
-
-def test_safe_extraction_refuses_dangling_destination_symlink_without_creating_target(
-    tmp_path,
-):
-    builder = _load_builder()
-    package = tmp_path / "safe.tar"
-    with tarfile.open(package, "w") as archive:
-        body = b"new\n"
-        item = tarfile.TarInfo("file.txt")
-        item.size = len(body)
-        archive.addfile(item, io.BytesIO(body))
-    target = tmp_path / "absent-extraction-target"
-    destination = tmp_path / "extract"
-    destination.symlink_to(target, target_is_directory=True)
-
-    with pytest.raises(FileExistsError):
-        builder.safe_extract(package, destination)
-    assert destination.is_symlink()
-    assert destination.readlink() == target
-    assert not target.exists()
-
-
-def test_cli_builds_the_requested_archive(plugin_root, tmp_path):
     output = tmp_path / "cli/calc-project.tar"
     output.parent.mkdir()
     result = subprocess.run(
-        [
-            sys.executable,
-            str(Path(__file__).with_name("build_acceptance_package.py")),
-            "--plugin-root",
-            str(plugin_root),
-            "--output",
-            str(output),
-        ],
-        check=False,
-        capture_output=True,
-        text=True,
+        [sys.executable, str(Path(__file__).with_name("build_acceptance_package.py")),
+         "--plugin-root", str(plugin_root), "--output", str(output)],
+        check=False, capture_output=True, text=True,
     )
-
     assert result.returncode == 0, result.stderr
     assert Path(result.stdout.strip()) == output.resolve()
     assert output.is_file()
 
-
-def test_manifest_and_skill_metadata_describe_exact_explicit_roster(plugin_root):
     manifest = json.loads(
         (plugin_root / ".codex-plugin/plugin.json").read_text(encoding="utf-8")
     )
@@ -431,18 +142,12 @@ def test_manifest_and_skill_metadata_describe_exact_explicit_roster(plugin_root)
         )
     )
 
-
-def test_documentation_distinguishes_skill_calls_from_local_file_references(
-    plugin_root,
-):
     rq = (plugin_root / "skills/calc-rq/SKILL.md").read_text(encoding="utf-8")
 
     assert "调用 `$dev-engineering:grill-with-docs`" in rq
     assert "[RQ 模板](references/rq-template.md)" in rq
     assert "]($" not in rq
 
-
-def test_business_skills_handoff_automatically_but_router_only_recommends(plugin_root):
     skills = plugin_root / "skills"
     router = (skills / "ask-lyz/SKILL.md").read_text(encoding="utf-8")
     rq = (skills / "calc-rq/SKILL.md").read_text(encoding="utf-8")
@@ -455,15 +160,124 @@ def test_business_skills_handoff_automatically_but_router_only_recommends(plugin
     assert "直接进入 `$calc-to-spec`" in rq
     assert "直接进入 `$calc-execute`" in spec
     assert "先加载 `$calc-setup`" in execute_flat
-    assert "调用 `$calc-rq`" in execute_flat
+    assert "RQ 变更交 `$calc-rq`" in execute_flat
     assert "does not invoke the sibling automatically" not in spec
     assert "not authorization to\ninvoke a sibling automatically" not in rq
 
-
-def test_readme_describes_requalifiable_run_inputs(plugin_root):
     readme = (plugin_root.parents[1] / "README.md").read_text(encoding="utf-8")
     readme_flat = " ".join(readme.split())
 
     assert "Run 目录保存不可变 `inputs/`" not in readme_flat
     assert "每次验证与评审固定当时的输入快照" in readme_flat
     assert "符合条件的当前 Run 可原地纠正" in readme_flat
+
+
+def test_runtime_package_rejects_invalid_sources_and_preserves_existing_outputs(plugin_root, tmp_path):
+    builder = _load_builder()
+    missing = (
+        (".codex-plugin/plugin.json", "required"),
+        ("skills/calc-review/SKILL.md", "required"),
+        ("skills/calc-review/agents/openai.yaml", "required"),
+        ("skills/calc-issue/SKILL.md", "required"),
+        ("skills/calc-issue/agents/openai.yaml", "required"),
+        ("skills/calc-execute/scripts/fingerprint_run.py", "fingerprint_run.py"),
+        ("skills/calc-execute/assets/templates/common/run.sh.template", "run.sh.template"),
+        ("resources/progress-tracker.md", "required shared resource"),
+    )
+    cases = [("missing", path, error) for path, error in missing] + [
+        ("malformed", ".codex-plugin/plugin.json", "metadata"),
+        ("malformed", "skills/calc-rq/agents/openai.yaml", "metadata"),
+        ("skill", "skills/ninth", "exactly"),
+        ("file", "README.md", "unknown"),
+        ("directory", "unknown-resources", "unknown"),
+        ("file", ".codex-plugin/extra.json", "unknown"),
+        ("file", "skills/calc-rq/NOTES.md", "unknown"),
+        ("symlink", "skills/calc-execute/scripts/fingerprint-link.py", "symlink"),
+        ("stale", "skills/calc-rq/SKILL.md", "absolute resource"),
+        ("file", "skills/calc-execute/assets/templates/vasp/CHGCAR", "scientific output"),
+    ]
+    for index, (kind, relative, error) in enumerate(cases):
+        copy = _copy_plugin(plugin_root, tmp_path / str(index))
+        path = copy / relative
+        if kind == "missing":
+            path.unlink()
+        elif kind == "skill":
+            shutil.copytree(copy / "skills/ask-lyz", path)
+        elif kind == "directory":
+            path.mkdir()
+        elif kind == "symlink":
+            path.symlink_to("fingerprint_run.py")
+        elif kind == "stale":
+            path.write_text(path.read_text() + "\nStale: /home/old/yz-skills/plugins/calc-project/resources/template.md\n")
+        else:
+            path.write_text("{not valid metadata" if kind == "malformed" else "unknown\n")
+        with pytest.raises(ValueError, match=error):
+            builder.runtime_files(copy)
+
+    link = tmp_path / "linked-plugin"
+    link.symlink_to(plugin_root, target_is_directory=True)
+    with pytest.raises(ValueError, match="not a real directory"):
+        builder.build_package(link, tmp_path / "from-link.tar")
+    for dangling in (False, True):
+        output = tmp_path / f"existing-{dangling}.tar"
+        target = tmp_path / "absent-archive-target.tar"
+        if dangling:
+            output.symlink_to(target)
+        else:
+            output.write_bytes(b"preserve me")
+        with pytest.raises(FileExistsError):
+            builder.build_package(plugin_root, output)
+        if dangling:
+            assert output.is_symlink() and output.readlink() == target
+            assert not target.exists()
+        else:
+            assert output.read_bytes() == b"preserve me"
+
+
+def test_safe_extraction_rejects_unsafe_members_and_preserves_destinations(tmp_path):
+    builder = _load_builder()
+    for kind in ("absolute", "traversal", "symlink", "hardlink", "late-traversal"):
+        package = tmp_path / f"{kind}.tar"
+        with tarfile.open(package, "w") as archive:
+            if kind == "late-traversal":
+                safe = tarfile.TarInfo("safe.txt")
+                safe.size = 1
+                archive.addfile(safe, io.BytesIO(b"x"))
+            name = {"absolute": "/absolute.txt", "late-traversal": "safe/../../outside.txt"}.get(kind, "../outside.txt")
+            item = tarfile.TarInfo(name)
+            if kind in {"symlink", "hardlink"}:
+                item.name = "inside.txt"
+                item.type = tarfile.SYMTYPE if kind == "symlink" else tarfile.LNKTYPE
+                item.linkname = "../outside.txt"
+                archive.addfile(item)
+            else:
+                item.size = 1
+                archive.addfile(item, io.BytesIO(b"x"))
+        destination = tmp_path / f"extract-{kind}"
+        with pytest.raises(ValueError, match="unsafe archive member"):
+            builder.safe_extract(package, destination)
+        assert not destination.exists()
+        assert not (tmp_path / "outside.txt").exists()
+
+    package = tmp_path / "safe.tar"
+    with tarfile.open(package, "w") as archive:
+        item = tarfile.TarInfo("file.txt")
+        item.size = 4
+        archive.addfile(item, io.BytesIO(b"new\n"))
+    for dangling in (False, True):
+        destination = tmp_path / f"existing-{dangling}"
+        target = tmp_path / "absent-extraction-target"
+        if dangling:
+            destination.symlink_to(target, target_is_directory=True)
+        else:
+            destination.mkdir()
+            sentinel = destination / "sentinel.txt"
+            sentinel.write_bytes(b"preserve me")
+        with pytest.raises(FileExistsError):
+            builder.safe_extract(package, destination)
+        if dangling:
+            assert destination.is_symlink() and destination.readlink() == target
+            assert not target.exists()
+        else:
+            assert sentinel.read_bytes() == b"preserve me"
+            assert not (destination / "file.txt").exists()

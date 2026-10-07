@@ -1,63 +1,28 @@
-# NAMDwithSOC 1.5.2 execution
+# NAMDwithSOC 1.5.2 执行
 
-Load this reference after `common.md` only for a NAMDwithSOC branch. The source
-behavior below is verified for NAMDwithSOC 1.5.2. Another implementation or
-version requires its own evidence in `$calc-to-spec` before preparing
-`inputs/run.pbs`; similarity is not evidence.
+仅在 NAMDwithSOC 分支中，且在读取 `common.md` 后读取本参考。以下来源行为已针对 NAMDwithSOC 1.5.2 核实。其他实现或版本必须先在 `$calc-to-spec` 中提供相应证据，再准备 `inputs/run.pbs`；相似性不能代替证据。
 
-## Representation contract
+## 表示约定
 
-In NAMDwithSOC 1.5.2, `couplings.f90` initializes
-`olap%ISPIN = inp%SOCTYPE` and rejects a WAVECAR when its parsed spin-component
-count differs. `fileio.f90` defines these two representations:
+在 NAMDwithSOC 1.5.2 中，`couplings.f90` 初始化 `olap%ISPIN = inp%SOCTYPE`，并在解析的自旋分量数不匹配时拒绝 WAVECAR。`fileio.f90` 定义以下两种表示：
 
-- `SOCTYPE=1` is spin-adiabatic, uses `BMIN/BMAX`, and each `INICON` row is
-  `time_index band`.
-- `SOCTYPE=2` is spin-diabatic, uses `BMINU/BMAXU` plus `BMIND/BMAXD`, and each
-  `INICON` row is `time_index band spin`.
+- `SOCTYPE=1` 表示 spin-adiabatic（自旋绝热），使用 `BMIN/BMAX`，每行 `INICON` 的格式为 `time_index band`。
+- `SOCTYPE=2` 表示 spin-diabatic（自旋透热），使用 `BMINU/BMAXU` 和 `BMIND/BMAXD`，每行 `INICON` 的格式为 `time_index band spin`。
 
-For a VASP 6.5 noncollinear SOC source, `OUTCAR` may report effective `ISPIN =
-1` while WAVECAR stores spinor coefficients. The verified choice for that case
-is spin-adiabatic `SOCTYPE=1`. `LSORBIT=.TRUE.` or
-`LNONCOLLINEAR=.TRUE.` does not establish `SOCTYPE=2`. If the approved Spec says
-otherwise, or the WAVECAR representation is not established, block the Run and
-return the conflict to `$calc-to-spec`.
+对于 VASP 6.5 非共线 SOC 来源，`OUTCAR` 可能报告生效的 `ISPIN =
+1`，而 WAVECAR 存储 spinor 系数。已核实的选择是此情形使用自旋绝热 `SOCTYPE=1`。`LSORBIT=.TRUE.` 或 `LNONCOLLINEAR=.TRUE.` 不能证明应使用 `SOCTYPE=2`。若已批准的 Spec 给出其他设置，或 WAVECAR 表示方式尚未确定，阻止 Run 并将冲突交回 `$calc-to-spec`。
 
-Before review, compare the approved `BMIN/BMAX` or
-`BMINU/BMAXU`+`BMIND/BMAXD` bounds with the `EIGENVAL` band indices and
-occupations in every frame. Each initial band and optional spin value in
-`INICON` must satisfy the matching approved window and column contract. A
-missing field, a band outside the window, or inconsistent occupations blocks;
-changing the window or initial-condition meaning belongs to `$calc-to-spec`.
+评审前，将已批准的 `BMIN/BMAX` 或 `BMINU/BMAXU`+`BMIND/BMAXD` 界限与每一帧 `EIGENVAL` 中的能带索引和占据数比较。`INICON` 中每个初始能带及可选自旋值都必须符合对应的已批准窗口和列约定。字段缺失、能带超出窗口或占据数不一致都会阻止流程；窗口或初始条件含义的变更交由 `$calc-to-spec`。
 
-## Snapshot layout
+## 快照布局
 
-The coupling source formats snapshot indices as `I0.<len(NSW)>`. For `NSW=5`,
-the exact layout is `RUNDIR/1/WAVECAR` through `RUNDIR/5/WAVECAR`; the five
-directory names have one digit and the Run expects four coupling intervals.
-For any other `NSW`, derive the width from the installed source or establish it
-with a small interface test before rendering the exact staging paths. A
-four-digit VASP-style convention is not evidence.
+耦合来源使用 `I0.<len(NSW)>` 格式化快照索引。`NSW=5` 时，准确布局为 `RUNDIR/1/WAVECAR` 到 `RUNDIR/5/WAVECAR`；五个目录名各为一位数，Run 需要四个耦合区间。其他 `NSW` 值须依据已安装来源推导位宽，或先通过小型接口测试确定，再渲染准确暂存路径。不能把 VASP 四位数字格式当作依据。
 
-Make the value written in the approved NAMD input's `RUNDIR` field match the
-Run-local staging root exactly. Preparation follows `common.md` to stage every
-named snapshot into immutable server-side inputs without modifying the source
-Runs. The concrete `inputs/run.pbs` recreates only that approved relative
-layout in its private `outputs/` working tree and runs the configured
-NAMDwithSOC executable; it does not scan for snapshots or repair names.
+已批准 NAMD 输入中的 `RUNDIR` 值必须与 Run 内暂存根目录完全一致。准备时遵循 `common.md`，将每个具名快照暂存为服务器端的不可变输入，不修改来源 Run。具体的 `inputs/run.pbs` 只在私有 `outputs/` 工作树中重建已批准的相对目录结构，并运行已配置的 NAMDwithSOC 可执行文件；它不会扫描快照或修复名称。
 
-## Targeted failure and success evidence
+## 针对性失败与成功证据
 
-Preserve the full log and staging on failure. Targeted scans treat `File I/O
-error`, `No. of spin components does NOT match`, fatal, abort, and segmentation
-markers as failure evidence. These markers identify a preflight category, not
-an established patch; missing knowledge or competing diagnoses enter
-calculation troubleshooting.
+失败时保留完整日志和暂存内容。针对性扫描将 `File I/O
+error`、`No. of spin components does NOT match`、fatal、abort 和 segmentation 标记作为失败证据。这些标记只指出预检类别，不能直接确定修补办法；缺少信息或存在相互竞争的诊断时，进入计算故障排查。
 
-For the five-snapshot interface case, success requires evidence of four
-coupling intervals plus nonempty `COUPCAR`, `NATXT`, `EIGTXT`, and at least one
-nonempty `SHPROP.*` or `PSICT.*` output family, with none of the failure markers
-in the targeted scan. These are minimal interface-success checks only. The
-approved Spec's production observables and decisive criteria still determine
-whether the Run can be accepted; an interface smoke test is not production
-trajectory validation.
+五快照接口情形的成功证据必须同时证明存在四个耦合区间、非空的 `COUPCAR`、`NATXT`、`EIGTXT`，以及至少一个非空的 `SHPROP.*` 或 `PSICT.*` 输出族；针对性扫描中不得出现任何失败标记。这些只是最低限度的接口成功检查。Run 能否验收仍由已批准 Spec 的生产观测量和决定性判据确定；接口 smoke test 不能验证生产轨迹。

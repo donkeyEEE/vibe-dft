@@ -1,7 +1,8 @@
 # Calc Project 共享资源
 
-`progress-tracker.md` 定义每个 RQ 独立跟踪表的维护、字段、项目汇总和旧项目迁移契约。
-活动消费者为 `calc-setup`、`calc-rq`、`calc-to-spec`、`calc-execute` 和 `show-cot`。
+`progress-tracker.md` 定义字段、位置和查询权威；`progress-tracker-maintenance.md` 定义更新与重建。
+两者由 `calc-setup`、`calc-rq`、`calc-to-spec`、`calc-execute` 和 `show-cot` 消费；
+`ask-lyz` 解释对应规则时读取。旧项目迁移属于 `calc-setup` 的 `references/progress-tracker-migration.md`。
 
 `project-context.md` 定义 Calc Project 的共享领域术语。
 `calc-rq`、`calc-to-spec`、`calc-execute` 在涉及稳定术语时读取它；

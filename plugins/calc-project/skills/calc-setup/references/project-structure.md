@@ -1,6 +1,6 @@
 # 计算项目结构
 
-在已获批准的项目初始化或重组中使用本参考资料。
+初始化、重组或维护时使用；写入范围遵循[入口授权](../SKILL.md)。
 
 ## 基础布局
 
@@ -31,8 +31,8 @@ Project 文献工作流负责。
 
 `.gitignore` 包含 `/.calc-project/`。该隐藏目录仅按需保存进展报告，其中内容是可再生的
 派生视图，不属于计算项目结构或进度权威。每个 RQ 的 `tracker.json` 与其 `RQ.md` 同级，
-仅记录该 RQ 的进度；根忽略规则按共享契约排除各跟踪表。空项目初始化时不建表；
-维护已有项目时，分别从各 RQ 与其已发布 Spec 建立或修复跟踪表，保留权威记录。
+仅记录该 RQ 的进度；根忽略规则按共享契约排除各份记录。空项目初始化时不创建记录；
+维护已有项目时，分别从各 RQ 与其已发布 Spec 建立或修复记录，保留权威记录。
 
 项目根 `CONTEXT.md` 是项目上下文，由 `$dev-engineering:domain-modeling` 维护。
 每个 RQ 目录下的 `RQ-CONTEXT.md` 是 RQ 上下文，由 `$domain-research`
@@ -60,7 +60,7 @@ Software profile: software-profiles.md
 ```
 
 在该文件配置前省略 `Software profile:`。`Data root:` 是选定的项目相对数据根路径。
-RQ 存储配置沿用机器字段 `Tracker adapter:`，初始且唯一值为 `local-markdown`。`RQ location:` 是位置约定，
+RQ配置沿用机器字段 `Tracker adapter:`，初始且唯一值为 `local-markdown`。`RQ location:` 是位置约定，
 不是已创建的 RQ，也不是状态 schema。
 
 ## 生成的 AGENTS.md 契约
@@ -78,12 +78,20 @@ RQ 存储配置沿用机器字段 `Tracker adapter:`，初始且唯一值为 `lo
 生成的文件将项目操作规则保持在项目范围。Spec 是任务状态、DAG、Runs、current-Run
 指定、执行进度和闭包的唯一权威。
 
-初始化或维护项目时，按[进度跟踪表契约](../../../resources/progress-tracker.md)
-将维护约定写入项目 `AGENTS.md`，保留其他项目规则；字段和重建要求以该共享契约为准。
+初始化或维护时，将[字段契约](../../../resources/progress-tracker.md)和
+[维护契约](../../../resources/progress-tracker-maintenance.md)中适用于项目的规则写入
+`ARCHITECTURE.md` 的 `## Progress Record Contract`，保留其他章节与四个计算配置字段。
+项目 `AGENTS.md` 仅保留即时更新要求及精确指针，例如：
+
+```markdown
+权威记录的状态或索引字段变更后，立即更新所属 RQ 的 tracker.json 并核对一致性，
+再继续执行或交接；更新、字段和重建要求见
+[进度记录契约](ARCHITECTURE.md#progress-record-contract)。
+```
 
 ## 项目文档
 
 生成简洁的项目专用文档。`CONTEXT.md` 由 `$dev-engineering:domain-modeling` 依据
 [共享领域术语](../../../resources/project-context.md)和已确认的项目定义维护。
-在本项目配置流程中，除非用户逐项批准拟议变更，否则保留已有 `CONTEXT.md`。`.gitignore`
+项目文档变更遵循本次配置入口授权；变更术语含义仍按 `$dev-engineering:domain-modeling` 确认。`.gitignore`
 排除编辑器/Python 缓存、HDF5、`CHGCAR`、`WAVECAR` 和其他已识别的大型计算输出。

@@ -35,7 +35,7 @@ SSH 失败是不具备可用性的证据；档案更新后会返回失败。重�
 
 | 组件 | 配置示例 | 探测示例 | 初始状态 |
 |---|---|---|---|
-| PBS / Torque | `qsub`, `qstat` after project-reviewed initialization | `source /etc/profile && qstat -B` | unverified |
+| PBS / Torque | 在项目已评审的初始化后使用 `qsub`、`qstat` | `source /etc/profile && qstat -B` | unverified |
 | VASP standard | `/data1/yuzheli-alkemie/01Soft/vasp.x/vasp.6.5.0/bin/vasp_std` | `test -x /data1/yuzheli-alkemie/01Soft/vasp.x/vasp.6.5.0/bin/vasp_std` | unverified |
 | VASP noncollinear | `/data1/yuzheli-alkemie/01Soft/vasp.x/vasp.6.5.0/bin/vasp_ncl` | `test -x /data1/yuzheli-alkemie/01Soft/vasp.x/vasp.6.5.0/bin/vasp_ncl` | unverified |
 | VASPKIT | `/data1/yuzheli-alkemie/01Soft/vaspkit.1.3.5/bin/vaspkit` | `test -x /data1/yuzheli-alkemie/01Soft/vaspkit.1.3.5/bin/vaspkit` | unverified |

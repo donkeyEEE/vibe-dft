@@ -4,7 +4,6 @@
 ID: SPEC-001
 Status: ready
 RQ: ../RQ.md
-Evidence level: light
 
 ## 判断
 
@@ -33,9 +32,6 @@ Acceptance: <acceptance condition>
 `Context` 是最后一节。它记录解释判断、Task、条件、验收规则、Run 以及（如存在）
 Closure 所需的 Spec 范围内术语和框架。
 
-`Evidence level` 是证据档位，取值为 `light | strict`，发布时记录生效档位：Spec 的明确设置优先，
-否则继承 RQ 的设置；两者均缺失时为 `light`。档位在本 Spec 发布时固定。
-
 Spec 状态为 `ready | active | concluded`。Task 状态为 `pending | completed
 | failed | needs-review`。Run 状态为 `prepared | submitted | finished | failed |
 cancelled`；`submitted` 包含排队和执行。`Current` 为 `yes | no`，每个 Task 至多有
@@ -50,15 +46,15 @@ Spec 内的 `TASK-NNN` ID，且图必须无环。`Condition` 为 `always`，或�
 上游结果的自然语言句子。在其依赖和条件允许前，Task 保持 pending。条件被明确判定为假或
 Task 被取消时，该 Task 的状态为 `failed`；不明确之处回到 Spec 设计。
 
-每份 Spec 有一个主要判断。记录决定科学问题、解释或可比性的参数。只有当
+`判断` 节说明本 Spec 的连贯研究目标，可以包含相关的探索与判断。
+研究推理由 `$domain-research` 指导，记录决定科学问题、解释或可比性的参数。只有当
 `$calc-execute` 具备确定性的后端、软件配置或上游证据依据，且该选择不改变科学含义时，
 未写入 Spec 的参数才可由执行负责；Spec 中的显式值具有约束力。
 
-`Acceptance` 说明 `Purpose` 已被回答所需的最小充分证据。它可以要求成功产出指定
-工件或诊断，而不要求得到有利的科学结果。仅当 Task 的 Purpose 或主要判断依赖它们时，
-才加入收敛、质量、比较或交接阈值。`light` 不默认增加独立收敛扫描、参数敏感性、
-重复 Run 或替代方法对照；判断本身必需的物理有效性与交接检查仍保留。`strict`
-按主要判断加入相关增强检查并满足用户或已接受 RQ 的明确要求，不套固定清单。
+`Acceptance` 说明 Task 的完成条件，供执行阶段判断是否推进。探索任务可以要求取得
+指定观察、工件、诊断或比较，并说明其对后续选择的作用；完成任务不要求得到有利的科学结果，
+也不等于机制已被证实。验证投入、定量阈值及停止规则由 `$domain-research` 根据研究目的
+和用户具体要求指导，实际采用的要求记录于 Spec。
 concluded Spec 在同一文件中加入以下一节：
 
 ```markdown

@@ -5,7 +5,8 @@ def _field_values(text, field):
     return re.findall(rf"^{re.escape(field)}:\s*(.+)$", text, re.MULTILINE)
 
 
-def test_rq_template(plugin_root):
+def test_rq_schema_context_and_handoff_contract(plugin_root):
+    # Rq template.
     text = (plugin_root / "skills/calc-rq/references/rq-template.md").read_text()
     for field in (
         "ID: RQ-001",
@@ -27,8 +28,7 @@ def test_rq_template(plugin_root):
     assert text.index("Boundary:") < text.index("## 成功判据")
     assert "RQ 范围内术语和框架" in text
 
-
-def test_context_ownership_and_consumers(plugin_root):
+    # Context ownership and consumers.
     domain = (plugin_root / "skills/domain-research/SKILL.md").read_text()
     assert "`CONTEXT.md`（项目上下文）" in domain
     assert "`RQ-CONTEXT.md`（RQ 上下文）" in domain
@@ -50,21 +50,18 @@ def test_context_ownership_and_consumers(plugin_root):
         assert "实际文件路径" not in skill
         assert "将内容和来源交给它" not in skill
 
-
-def test_rq_template_documents_allowed_statuses(plugin_root):
+    # Rq template documents allowed statuses.
     text = (plugin_root / "skills/calc-rq/references/rq-template.md").read_text()
 
     assert _field_values(text, "Status") == ["active"]
     assert "RQ 状态为 `active | concluded`。" in text
 
-
-def test_rq_skill_has_only_its_rq_template(plugin_root):
+    # Rq skill has only its rq template.
     references = plugin_root / "skills/calc-rq/references"
 
     assert {path.name for path in references.iterdir()} == {"rq-template.md"}
 
-
-def test_rq_handoff_leaves_design_mode_to_spec_entry(plugin_root):
+    # Rq handoff leaves design mode to spec entry.
     template = (plugin_root / "skills/calc-rq/references/rq-template.md").read_text()
     skill = (plugin_root / "skills/calc-rq/SKILL.md").read_text()
 
@@ -74,8 +71,7 @@ def test_rq_handoff_leaves_design_mode_to_spec_entry(plugin_root):
     assert "不在 `RQ.md` 记录设计模式" in skill
     assert "直接进入 `$calc-to-spec`" in skill
 
-
-def test_rq_expression_check_precedes_approval(plugin_root):
+    # Rq expression check precedes approval.
     skill = " ".join((plugin_root / "skills/calc-rq/SKILL.md").read_text().split())
 
     assert "检查完整 RQ 草稿或修订后的全文，清理冗余表达并核对原意" in skill

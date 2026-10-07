@@ -1,14 +1,5 @@
-# Wannier90 Read-only Checks
+# Wannier90 只读检查
 
-For each spin, compare the prepared projections, `NUM_WANN`, outer window,
-frozen window, and their evidence with the current Spec. Require distinct
-approved spin values; never silently share, shrink, or expand a window. Count
-frozen states at every k point. A count exceeding `NUM_WANN` requires a change
-to the scientific subspace or window.
+逐自旋将 prepared 投影、`NUM_WANN`、外窗口、冻结窗口及其证据与当前 Spec 比较。每个自旋须分别采用批准值，不得擅自共用、缩小或扩大窗口。统计每个 k 点的冻结态数；超过 `NUM_WANN` 时需要修改科学子空间或窗口。
 
-Inspect the exact accepted `.amn`, `.mmn`, `.eig`, and `.win` sources, both
-spin-range files, reformatted spin bands, DOSCAR, rendered environment and
-window inputs, expected WOUT/HR/centres products, and planned fit plots.
-Bandrange or a broad pre-run window does not establish an adequate physical
-subspace. Distinguish a scientifically missing or changed subspace/window from
-a snapshot or handoff defect.
+检查准确的已接受 `.amn`、`.mmn`、`.eig` 和 `.win` 来源、两份自旋范围文件、重排自旋能带、DOSCAR、渲染环境和窗口输入、预期 WOUT/HR/centres 产物及拟合图计划。Bandrange 或宽 pre-run 窗口不能证明物理子空间适当。区分科学子空间/窗口缺失或变更与快照或交接缺陷。

@@ -4,6 +4,8 @@ status: amended by ADR-0019
 
 # Let Calc To Spec publish scientific designs autonomously
 
+相关研究推理职责、Spec 目标与证据档位规则已由 [ADR-0021](0021-guide-spec-reasoning-with-domain-research.md) 修订；以下保留原决策记录。
+
 ## Decision
 
 - For an accepted RQ, `calc-to-spec` may publish a new Spec without a separate approval.

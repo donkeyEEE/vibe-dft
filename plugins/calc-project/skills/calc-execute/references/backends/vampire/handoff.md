@@ -1,12 +1,5 @@
-# TB2J 至 VAMPIRE 交接
+# TB2J 到 VAMPIRE 的交接
 
-准确的已接受 TB2J `TB2J_results/Vampire/` 文件是来源。`run.sh prepare` 期间，逐个通过
-`copy_immutable SOURCE DESTINATION || return 1` 复制 `vampire.UCF` 与 `vampire.mat`。从准确 TB2J
-来源在私有临时路径创建 `input`，仅将 `output:material-magnetisation` 改为两个已批准的命名输出，
-再不可变复制。任何其他 model/input 差异都阻止流程。
+来源必须是准确且已接受的 TB2J `TB2J_results/Vampire/` 文件。执行 `run.sh prepare` 时，分别通过 `copy_immutable SOURCE DESTINATION || return 1` 复制 `vampire.UCF` 和 `vampire.mat`。从准确的 TB2J 来源在私有临时路径创建 `input`；只将 `output:material-magnetisation` 改成两个已批准的具名输出，然后以不可变方式复制。input 或模型中有其他差异都会阻止流程。
 
-评审前从命名的 TB2J 源 UCF 与 material 文件创建 `model-source.sha256`，不可变暂存，并以准备好的副本验证。
-清单恰有两项：有效 SHA-256 digest 后接裸文件名 `vampire.UCF` 的一项，以及后接裸文件名
-`vampire.mat` 的一项。重复、缺失、额外、绝对路径或带目录的名称都会在执行 VAMPIRE 前阻止流程。
-记录准确的源至副本路径和校验和。之后的源、准备模型、清单或环境变更会使评审失效；prepare 绝不
-覆盖不同的目标。
+评审前，根据具名 TB2J 来源 UCF 和 material 文件创建 `model-source.sha256`，以不可变方式暂存，并使用准备好的副本进行验证。清单必须恰有两项：一项为有效的 SHA-256 digest，后接裸文件名 `vampire.UCF`；另一项后接裸文件名 `vampire.mat`。重复、缺失、多余、绝对路径或包含目录的名称都会在运行 VAMPIRE 前阻止流程。记录准确的来源与副本路径及校验和。之后若来源、准备好的模型、清单或环境发生变化，评审即失效；prepare 绝不覆盖内容不同的目标文件。

@@ -1,11 +1,11 @@
-# VASP execution common
+# VASP 通用执行要求
 
-Use only after the Spec fixes the calculation type, structure and species order, `ENCUT`, k mesh, `ISPIN`/`MAGMOM`, smearing, and any SOC or DFT+U commitments. A template supplies no physical default for these commitments; a missing or conflicting one returns to `$calc-to-spec`. When the Spec does not bind `LORBIT`, `LWAVE`, or `LCHARG`, derive only the values required by its named products and declared downstream handoffs, and record them in the Run inputs.
+仅当 Spec 已确定计算类型、结构与元素顺序、`ENCUT`、k 网格、`ISPIN`/`MAGMOM`、展宽方式，以及适用的 SOC 或 DFT+U 承诺后，才使用本参考。模板不提供这些承诺的物理默认值；承诺缺失或冲突时，转交 `$calc-to-spec`。若 Spec 未指定 `LORBIT`、`LWAVE` 或 `LCHARG`，只能根据 Spec 指定的产物和已声明的下游交接来推导所需值，并将其记录在 Run inputs 中。
 
-Render `assets/templates/vasp/cluster-env.sh.template`, the selected VASP PBS template, and the common `assets/templates/common/run.sh.template` into the selected Run's `inputs/`. Recheck profile paths before review. Prepare `POTCAR` beside the approved `POSCAR` in a private temporary directory with a deterministic configured or project-approved mechanism that preserves the approved species order and records enough evidence to reproduce it. VASPKIT task 103 is the built-in mechanism, not a universal scientific requirement; task 102 generates KPOINTS only when the Spec requests generated KPOINTS. Copy the result with `copy_immutable TEMP/POTCAR "$INPUTS_DIR/POTCAR" || return 1`. Every preparation command propagates failure.
+将 `assets/templates/vasp/cluster-env.sh.template`、所选 VASP PBS 模板和通用 `assets/templates/common/run.sh.template` 渲染到所选 Run 的 `inputs/`。评审前重新检查配置文件路径。在私有临时目录中准备 `POTCAR`，使用已配置或项目批准且可确定复现的方法，保持其元素顺序与已批准的 `POSCAR` 一致，并记录足够的复现证据。VASPKIT task 103 是内置方法，不是通用科学要求；只有 Spec 要求生成 KPOINTS 时，task 102 才生成 KPOINTS。通过 `copy_immutable TEMP/POTCAR "$INPUTS_DIR/POTCAR" || return 1` 复制结果。每条准备命令都必须传递失败状态。
 
-Require nonempty `INCAR`, `POSCAR`, `KPOINTS`, `POTCAR`, `cluster-env.sh`, `run.pbs`, and the stage-specific handoffs. Check POSCAR/POTCAR order and species-indexed INCAR arrays. When an upstream VASP input must be preserved, stage `scripts/vasp/compare_incar_parameters.sh` and run it with only the Spec-declared exception keys. Any mismatch stops before review.
+`INCAR`、`POSCAR`、`KPOINTS`、`POTCAR`、`cluster-env.sh`、`run.pbs` 和各阶段交接文件都必须非空。检查 POSCAR/POTCAR 的元素顺序，以及按元素索引的 INCAR 数组。必须保留上游 VASP 输入时，暂存 `scripts/vasp/compare_incar_parameters.sh`，并且只将 Spec 声明的例外键传给它。任何不匹配都会在评审前阻止流程。
 
-When magnetic meaning depends on atom identity or ordering, establish an unambiguous mapping between the prepared index-order `MAGMOM` assignment and the Spec-approved site or layer moments. Use any reproducible evidence form suited to the structure; a per-atom table is optional. Repair rendering defects automatically, but stop when the intended physical order is not determined. A small total moment or successful downstream Run is not evidence of the intended order.
+若磁性含义取决于原子身份或顺序，必须明确建立准备后按索引排列的 `MAGMOM` 赋值与 Spec 批准的位点或层磁矩之间的映射。可以选择任何可复现的证据形式；逐原子表格并非必需。若预期的物理顺序尚未确定，自动修复渲染缺陷后仍须停止。总磁矩较小或下游 Run 成功都不能证明顺序符合预期。
 
-PBS receives the exact Run directory as `PBS_O_WORKDIR`, reads only its immutable `inputs/`, copies named approved bytes into its private `outputs/`, and records backend command output under `logs/`. It refuses any prior output rather than deleting products or guessing another Run.
+PBS 将准确的 Run 目录作为 `PBS_O_WORKDIR`，仅读取不可变的 `inputs/`，把具名且已批准的文件复制到私有 `outputs/`，并将 backend 命令输出记入 `logs/`。若已有任何输出就拒绝运行，不删除产物，也不猜测其他 Run。

@@ -1,55 +1,34 @@
-# Task Advancement
+# Task 推进
 
-## Accept results and select the current Run
+## 验收并选择 current Run
 
-Apply the task's current approved `Acceptance` statement to the declared Run
-evidence. Decisive satisfaction completes the task without another approval.
-Acceptance asks whether the Purpose received its minimum sufficient evidence,
-not whether the scientific result was favorable. Do not add unrecorded quality,
-convergence, or best-practice gates. Ambiguous criteria, conflicting evidence,
-or a newly required scientific judgment stops acceptance and returns the exact
-evidence to `$calc-to-spec`.
+用 Task 当前批准的 `Acceptance` 判断声明的 Run 证据，明确满足时完成 Task，无需额外批准。
+探索性 Task 可通过取得指定观测、诊断或比较完成；完成不代表机制成立，也不要求有利的科学结果。
+按已记录要求验收，不增设质量、收敛或最佳实践门禁。条件含糊、证据冲突或需要新科学判断时，
+暂停验收，将准确证据交 `$calc-to-spec` 按本次设计模式处理。
 
-The first accepted Run that satisfies the current task definition may become
-`Current: yes`. Replacing an existing current Run requires an explicit reason
-grounded in the current definition and evidence. When multiple valid Runs
-conflict, compare them against the approved task definition and available evidence;
-select one only when that evidence resolves the conflict. Otherwise retain their
-states, mark the task `needs-review`, and report the unresolved scientific question.
-Preserve each Run's status and evidence;
-the `Current` field selects a result and does not rewrite history.
+首个满足当前 Task 定义的已接受 Run 可设为 `Current: yes`。
+替换已有 current Run 须依据当前定义与证据说明理由。多个有效 Runs 冲突时按批准定义比较，
+仅在证据解决冲突后选择；否则保留状态，将 Task 标为 `needs-review` 并报告未解决科学问题。
+保留各 Run 状态和证据，`Current` 只选择结果。
 
-Whenever acceptance evidence changes, update the Run row's `Result` as a
-compact table entry. When applicable, prefer the order outcome, concise failure
-cause, material difference from the previous Run, then advancement. Cite an
-evidence path when useful. Keep raw excerpts, diagnostic reasoning, attempted
-fixes, and investigation history in Run logs or the troubleshooting record
-rather than the Spec table.
+验收证据变化后，将 Run 行的 `Result` 更新为简短表格条目：适用时依次写结果、简短失败原因、
+与前一 Run 的实质差异、推进判断，可引用证据路径。原始片段、诊断推理、尝试修复和调查历史
+留在 Run 日志或排查记录中。
 
-After any upstream current-Run change, find every downstream task that used
-the former Run:
+上游 current Run 变化后，找到所有使用旧 Run 的下游 Task：
 
-- block an unsubmitted prepared snapshot until its dependency is rebuilt and
-  reviewed;
-- retain an already submitted Run and its scheduler facts, but do not
-  automatically accept it against the changed dependency;
-- set an already accepted downstream task to `needs-review` while preserving
-  its Run evidence; and
-- restore `completed` only after the current dependency and acceptance have
-  been demonstrated again.
+- 尚未提交的 prepared 快照暂缓提交，直至重建依赖并重新评审；
+- 已提交 Run 保留调度器事实，不能自动按新依赖接受；
+- 已接受 Task 改为 `needs-review`，保留 Run 证据；
+- 重新证明当前依赖及验收满足后才恢复 `completed`。
 
-Propagate transitively through the Spec DAG. The propagation is a reasoned
-update to the Spec's current task state, never a separate invalidation cache.
+沿 Spec DAG 传递处理，依据证据更新 Task 状态，不另建失效缓存。
 
-## Close once
+## 闭合
 
-Normal and early closure use the same evidence gate. Derive an empty or otherwise
-terminal frontier from the current Spec and evidence. Record the principal judgment,
-accepted tasks and current Runs, disposition of every unfinished task, closure
-reason, and proposed RQ impact. When each point follows from the approved Spec and
-observed evidence, set the Spec to `concluded` and add one `## Closure` with
-`Judgment`, `Evidence`, and `RQ impact`; report the completed closure to the user.
-If closure requires a new scientific design judgment, route that change through
-`$calc-to-spec` before continuing. A concluded Spec remains closed unless the
-user specifically authorizes its concrete modification or reopening.
-Its RQ impact remains a proposal until a later `$calc-rq` update.
+正常和提前闭合使用相同证据门禁。从当前 Spec 与证据确认执行前沿为空或已终止，
+记录研究目标发现、已接受 Task 和 current Runs、每个未完成 Task 的处置、闭合原因及拟议 RQ 影响。
+各项均由批准 Spec 与观测证据支持时，设为 `concluded`，添加一份含 `Judgment`、`Evidence`、
+`RQ impact` 的 `## Closure`，并向用户报告。需新科学设计判断时先交 `$calc-to-spec` 按本次设计模式处理。
+已闭合 Spec 的具体修改或重开须用户专门授权；RQ 影响在后续 `$calc-rq` 更新前仍为提案。

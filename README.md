@@ -17,10 +17,10 @@
 
 ### 从 GitHub 安装与更新
 
-如需固定版本，使用 `v1.1.0` 标签：
+如需固定版本，使用 `v1.2.0` 标签：
 
 ```bash
-codex plugin marketplace add donkeyEEE/vibe-dft --ref v1.1.0
+codex plugin marketplace add donkeyEEE/vibe-dft --ref v1.2.0
 ```
 
 如需使用 `main` 上的开发版本：
@@ -72,7 +72,7 @@ codex plugin add calc-project@vibe-dft
 | Skill | 用途 |
 | --- | --- |
 | [ask-lyz](plugins/calc-project/skills/ask-lyz/SKILL.md) | 显式辅助入口，解释插件术语、核心流程和 Tracker 等用法，推荐工作接口或查询进度。 |
-| [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、RQ 存储配置、数据边界和集群配置。 |
+| [calc-setup](plugins/calc-project/skills/calc-setup/SKILL.md) | 初始化或维护项目结构、RQ配置、数据边界和集群配置。 |
 | [calc-rq](plugins/calc-project/skills/calc-rq/SKILL.md) | 建立和推进研究问题（RQ），记录已接受决策。 |
 | [domain-research](plugins/calc-project/skills/domain-research/SKILL.md) | 在研究讨论、设计、结果解释和汇报中分析物理因果链与计算取舍，对齐术语、维护 `RQ-CONTEXT.md` 并改善表达。 |
 | [calc-to-spec](plugins/calc-project/skills/calc-to-spec/SKILL.md) | 在本次自动或协作模式下渐进发布完整的单份 Spec，或安全替换当前设计。 |
@@ -91,22 +91,22 @@ RQ ─────────────▶ Spec ─────────�
 calc-rq          calc-to-spec        calc-execute        calc-execute
 ```
 
-- **RQ（研究问题）**：记录一条研究主线中的问题、边界、成功标准和已接受决策。一个 RQ 可以有多份 Spec，各自回答不同的主要判断。
-- **Spec（计算规范）**：针对一个主要判断制定科学设计，定义任务依赖，并记录任务目的、条件、验收规则、状态、Run 和闭合结论。
-- **Task（计算任务）**：Spec 中支持主要判断的可执行工作单元。父 Spec 管理它的身份、目的、依赖、条件和验收标准。
+- **RQ（研究问题）**：记录一条研究主线中的问题、边界、成功标准和已接受决策。一个 RQ 可以有多份 Spec，各自服务连贯的研究目标。
+- **Spec（计算规范）**：围绕一个连贯研究目标组织科学设计，定义任务依赖，并记录任务目的、条件、验收规则、状态、Run 和闭合结论。
+- **Task（计算任务）**：Spec 中服务研究目标的可执行工作单元。父 Spec 管理它的身份、目的、依赖、条件和验收标准。
 - **Run（运行）**：一个 Task 的一次具体执行尝试。Run 在独立目录中保存实际输入、输出和日志。每次验证与评审固定当时的输入快照；新的尝试使用新的 Run 编号，符合条件的当前 Run 可原地纠正。
-- **Progress Tracker（进度跟踪表）**：每个 RQ 目录下的 `tracker.json`，随该 RQ 及其 Spec、Task、Run 状态变化直接维护。项目 COT 按需汇总各表；RQ.md 和 Spec 仍是权威记录。
+- **Progress Record（进度记录）**：每个 RQ 目录下的 `tracker.json`，随该 RQ 及其 Spec、Task、Run 状态变化直接维护。项目 COT 按需汇总各份记录；RQ.md 和 Spec 仍是权威记录。
 
-通常先用 `calc-setup` 建立项目根目录、数据根、RQ 存储配置和集群配置，然后推进 RQ、Spec 和 Run：
+通常先用 `calc-setup` 建立项目根目录、数据根、RQ配置和集群配置，然后推进 RQ、Spec 和 Run：
 
 1. 用 `calc-rq` 建立或推进 RQ，并把用户在访谈中确认的答案写入 RQ 的 `## Decisions`。
-2. 每次进入 Spec 新建或替换时，`calc-to-spec` 采用用户本次指定的自动或协作模式；未指定则先询问。它为当前有依据的主要判断设计并发布一份完整 Spec。后续判断可根据结果逐份发布。证据档位优先采用 Spec 的设置，其次继承 RQ；都未设置时采用轻量档。
+2. 每次进入 Spec 新建或替换时，`calc-to-spec` 采用用户本次指定的自动或协作模式；未指定则先询问。它由 `domain-research` 指导物理因果链、证据设计与计算剪枝，围绕连贯研究目标组织并发布可执行的 Spec。后续目标可根据结果逐份发布。
 3. 用 `calc-execute` 推进已发布的 Spec：选择可执行的 Task，创建或继续 Run，准备并验证输入。评审通过后自主提交作业，接收结果并处理后续 Task。需要改变科学设计时，交由 `calc-to-spec`。
 4. 全部 Task 都已处理且闭合证据充分时，`calc-execute` 自主结束 Spec。需要调整 RQ 时，交由后续 `calc-rq` 流程。
 
 ### Calc Project 的自主执行与人工参与
 
-进入已接受 RQ 的 Spec 新建或替换时，用户可选择自动或协作设计，自动是建议的默认选项。选择只用于本次设计，不写入 RQ 或其他持久记录；下一份 Spec 会再次选择，除非用户明确将模式指定给整个连续委托。自动模式下，`calc-to-spec` 可依据证据自主发布或安全替换未结束的 Spec，只在关键科学缺口仍未解决时访谈。协作模式下，先讨论科学设计，再展示当前 Spec 的主要判断、任务、验收、停止规则和替换影响；具体方案获批后才写入。没有答复或批准时不发布。两种模式都逐份发布，无需事先列齐，也都可自行调研设计证据。默认的轻量证据档位只要求当前判断和必要交接所需的检查；用户可在 RQ 或 Spec 中明确要求严格档。
+进入已接受 RQ 的 Spec 新建或替换时，用户可选择自动或协作设计，自动是建议的默认选项。选择只用于本次设计，不写入 RQ 或其他持久记录；下一份 Spec 会再次选择，除非用户明确将模式指定给整个连续委托。自动模式下，`calc-to-spec` 可依据证据自主发布或安全替换未结束的 Spec，只在关键科学缺口仍未解决时访谈。协作模式下，先讨论科学设计，再展示当前 Spec 的研究目标、任务、验收、适用的停止规则和替换影响；具体方案获批后才写入。没有答复或批准时不发布。两种模式都逐份发布，无需事先列齐，也都可自行调研设计证据。验证投入按研究目标、物理依据和用户具体要求决定；探索任务可以以取得观察、诊断或比较为完成条件。
 
 用户委托执行选定 Spec 后，`calc-execute` 可以准备和评审 Run，提交、监控和排查作业问题，同步结果，调整资源或成本，取消过时作业，处理执行产物，并在证据充分时结束 Spec。若委托范围是推进整个 RQ，有依据的下一项判断可继续进入新 Spec。需要修改执行中的科学设计时，`calc-to-spec` 会安全替换当前设计，并保留旧 Run 证据。
 
@@ -122,7 +122,7 @@ Issue 是执行时达到较高门槛才记录的附加产物，存放于研究�
 ```text
 $calc-project:calc-setup 为当前目录建立计算项目配置。
 $calc-project:calc-rq 为这条研究主线建立 RQ-001。
-$calc-project:calc-to-spec 为 RQ-001 当前有依据的下一主要判断设计并发布一份完整 Spec。
+$calc-project:calc-to-spec 为 RQ-001 当前有依据的下一研究目标设计并发布一份完整 Spec。
 $calc-project:calc-execute 推进 SPEC-001 中当前可执行的 Task 和 Run。
 ```
 

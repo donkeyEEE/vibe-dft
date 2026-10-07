@@ -1,20 +1,8 @@
-# PBS Snapshot Checks
+# PBS 快照检查
 
-Read the rendered `inputs/run.sh`, `inputs/run.pbs`, cluster environment, and
-current profile/probe evidence without modifying or executing them.
+只读检查渲染后的 `inputs/run.sh`、`inputs/run.pbs`、集群环境及当前软件配置和探测证据，不修改或执行这些文件。
 
-- Establish that the job is anchored to the exact Run, reads the reviewed
-  immutable inputs, isolates mutable outputs and logs, refuses unsafe output
-  reuse, and cannot escape into another task or Run. Equivalent script layouts
-  are acceptable when they prove these properties.
-- Establish that upstream inputs come only from approved named sources, command
-  evidence remains attributable to the Run, reviewed inputs stay unchanged,
-  and declared products are checked before success.
-- Queue, nodes, processors, walltime, executable, environment, and any backend
-  resource values must match the current Spec, project profile, intended
-  submission environment, and the user's explicit constraints. A generic historical
-  default is not evidence.
-- `run.sh submit` must verify the unchanged reviewed snapshot and submit the
-  exact `inputs/run.pbs` from the Run directory. Preparation or validation
-  during submit, destructive flags, cancellation, or output reuse prevents
-  submission.
+- 确认作业绑定准确的 Run，读取已评审的不可变输入，隔离可变输出和日志，拒绝不安全的输出复用，且不能进入其他 Task 或 Run。能证明这些性质的等效脚本布局均可使用。
+- 确认上游输入只来自已批准的指定来源，命令证据可追溯到该 Run，受评输入保持不变，且成功前检查声明的产物。
+- 队列、节点、处理器、时限、可执行文件、环境和 backend 资源值须符合当前 Spec、项目软件配置、目标提交环境及用户明确约束。历史通用默认值不能作为证据。
+- `run.sh submit` 必须核实受评快照未变，并从 Run 目录提交准确的 `inputs/run.pbs`。提交阶段出现准备、验证、破坏性标志、取消或输出复用时，阻止提交。

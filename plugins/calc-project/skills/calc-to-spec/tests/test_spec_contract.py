@@ -1,4 +1,5 @@
-def test_spec_template(plugin_root):
+def test_spec_schema_design_and_publication_contract(plugin_root):
+    # Spec template.
     text = (
         plugin_root / "skills/calc-to-spec/references/spec-template.md"
     ).read_text()
@@ -6,7 +7,6 @@ def test_spec_template(plugin_root):
         "ID: SPEC-001",
         "Status: ready",
         "RQ: ../RQ.md",
-        "Evidence level: light",
         "## 判断",
         "## 任务",
         "### TASK-001:",
@@ -22,8 +22,7 @@ def test_spec_template(plugin_root):
     assert "`Context` 是最后一节。" in text
     assert "将 `Closure` 紧接在 `Context` 前插入" in text
 
-
-def test_spec_template_uses_reduced_task_statuses(plugin_root):
+    # Spec template uses reduced task statuses.
     text = (
         plugin_root / "skills/calc-to-spec/references/spec-template.md"
     ).read_text()
@@ -31,8 +30,7 @@ def test_spec_template_uses_reduced_task_statuses(plugin_root):
     assert "Task 状态为 `pending | completed\n| failed | needs-review`" in text
     assert "条件被明确判定为假或\nTask 被取消时，该 Task 的状态为 `failed`" in text
 
-
-def test_run_result_is_a_compact_advancement_summary(plugin_root):
+    # Run result is a compact advancement summary.
     text = (
         plugin_root / "skills/calc-to-spec/references/spec-template.md"
     ).read_text(encoding="utf-8")
@@ -44,8 +42,7 @@ def test_run_result_is_a_compact_advancement_summary(plugin_root):
     assert "允许|不允许|待定" not in flat
     assert "不粘贴原始日志、排障过程或 详细诊断" in flat
 
-
-def test_design_flow_is_incremental_and_mode_dependent(plugin_root):
+    # Design flow is incremental and mode dependent.
     text = " ".join(
         (plugin_root / "skills/calc-to-spec/SKILL.md")
         .read_text(encoding="utf-8")
@@ -54,15 +51,14 @@ def test_design_flow_is_incremental_and_mode_dependent(plugin_root):
 
     assert "$dev-engineering:grill-with-docs" in text
     assert "无需预先穷尽该 RQ 的全部 Spec" in text
-    assert "自动设计只在影响主要判断、必要可比性或验收" in text
+    assert "自动设计只在现有证据仍无法决定的关键科学缺口" in text
     assert "自动设计" in text
     assert "协作设计" in text
     assert "明确批准" in text
     assert "`concluded` Spec 可只读引用" in text
     assert "直接进入 `$calc-execute`" in text
 
-
-def test_domain_research_is_called_during_spec_design(plugin_root):
+    # Domain research is called during spec design.
     text = " ".join(
         (plugin_root / "skills/calc-to-spec/SKILL.md")
         .read_text(encoding="utf-8")
@@ -70,14 +66,13 @@ def test_domain_research_is_called_during_spec_design(plugin_root):
     )
 
     assert text.index("开始工作时先加载 `$domain-research`") < text.index("定位目标")
-    assert "在讨论、起草和修订中遵循其术语与文档表达规则" in text
+    assert "由它指导物理因果链、证据设计与计算剪枝" in text
     assert "术语的收录、确认和更新遵循 `$domain-research`" in text
     assert "检查完整 Spec，清理冗余表达并核对原意" in text
     assert text.index("草稿完成后按 `$domain-research`") < text.index("取得发布批准")
     assert "修订后重复此检查" in text
 
-
-def test_mode_gate_covers_direct_and_continued_design(plugin_root):
+    # Mode gate covers direct and continued design.
     spec = " ".join(
         (plugin_root / "skills/calc-to-spec/SKILL.md")
         .read_text(encoding="utf-8")
@@ -91,21 +86,19 @@ def test_mode_gate_covers_direct_and_continued_design(plugin_root):
     assert "下一份" in spec
     assert "方案变化" in spec
 
-
-def test_evidence_level_inheritance_and_research_handoff(plugin_root):
+    # Design has no evidence level and keeps research handoff.
     spec = (plugin_root / "skills/calc-to-spec/SKILL.md").read_text(encoding="utf-8")
     template = (plugin_root / "skills/calc-to-spec/references/spec-template.md").read_text(encoding="utf-8")
     rq_template = (plugin_root / "skills/calc-rq/references/rq-template.md").read_text(encoding="utf-8")
 
-    assert "Spec 的明确设置优先" in spec
-    assert "两者都未设置时为 `light`" in spec
-    assert "证据档位" in template
-    assert "Evidence level:" in rq_template
+    assert "证据档位？" not in spec
+    assert "Evidence level:" not in template
+    assert "Evidence level:" not in rq_template
+    assert "旧 Spec 保留原样" in spec
     assert "$dev-engineering:research" in spec
     assert "$paper-project:literature-review" in spec
 
-
-def test_spec_separates_scientific_commitments_from_execution_discretion(plugin_root):
+    # Spec separates scientific commitments from execution discretion.
     spec = (plugin_root / "skills/calc-to-spec/SKILL.md").read_text(encoding="utf-8")
     template = (
         plugin_root / "skills/calc-to-spec/references/spec-template.md"
@@ -114,6 +107,6 @@ def test_spec_separates_scientific_commitments_from_execution_discretion(plugin_
     spec_flat = " ".join(spec.split())
     template_flat = " ".join(template.split())
     assert "execution-owned" in spec_flat
-    assert "最低充分证据" in spec_flat
+    assert "探索任务可以用于取得尚缺的科学证据" in spec_flat
     assert "由执行负责" in template_flat
     assert "有利的科学结果" in template_flat

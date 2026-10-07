@@ -1,33 +1,16 @@
-# Exchange-parameter energy-mapping design
+# 交换参数的能量映射设计
 
-Use this reference when a Spec derives exchange parameters by energy mapping.
-It records the assumptions and fit diagnostics required for the scientific
-judgment; it does not choose a Hamiltonian, cutoff, configuration subset, or
-physical acceptance criterion.
+Spec 通过能量映射推导交换参数时读取本参考资料。模型假设和拟合诊断用于由 `$domain-research` 指导的研究推理。
 
-## Design evidence
+## 设计证据
 
-Read the accepted RQ decisions, approved structures and magnetic
-configurations, relevant computed or planned energies, symmetry/equivalence
-evidence, and prior model evidence. Set the Hamiltonian and fitted unknowns,
-simulation cell, configuration set, reference-energy convention, interaction
-cutoff, bond-equivalence assumptions, and acceptance criteria from the RQ and
-evidence. Add extra coverage or sensitivity studies only when the judgment
-requires them or the strict level calls for them.
+读取已接受的 RQ 决策、批准的结构与磁构型、相关已算或计划计算的能量、对称性/等价性证据及既有模型证据。依据 RQ 和证据确定 Hamiltonian、拟合未知量、模拟胞、构型集合、参考能量约定、相互作用截断、键等价假设及验收准则。覆盖范围和敏感性研究由研究目标决定。
 
-## Required design and acceptance record
+## 模型承诺与诊断选项
 
-- State the Hamiltonian and fitted unknowns, simulation cell, magnetic
-  configurations, and reference-energy convention.
-- State the periodic bond-counting method, including its no-double-counting
-  convention.
-- Require the design matrix, matrix rank, duplicate rows, configuration
-  coverage, and number of independent equations relative to fitted unknowns.
-- Require the fit residual or RMSE, units, and the evidence used to judge it.
+- 声明 Hamiltonian、拟合未知量、模拟胞、磁构型和参考能量约定。
+- 声明周期性键计数方法及其避免重复计数的约定。
+- 按推断需要选择诊断：设计矩阵、矩阵秩、重复行、构型覆盖范围，或相对于拟合未知量的独立方程数可用于发现信息缺口。
+- 拟合残差或 RMSE 可评估拟合质量；记录单位及诊断解释的依据。
 
-Duplicate rows and rank deficiency are reported rather than counted as added
-constraints. A zero-RMSE exactly determined subset does not by itself establish
-reliable exchange parameters, and selecting a subset to obtain a desired fitted
-sign is not valid validation. Numerical signs or a small residual alone do not
-establish a magnetic ground state. Interface bond equivalence, model, cutoffs,
-and physical interpretation remain explicit modelling choices supported by evidence.
+报告重复行和秩亏，不能将其计作新增约束。恰定子集的零 RMSE 不能单独证明交换参数可靠，为获得预期拟合符号而选择子集不构成有效验证。数值符号或小残差也不能单独证明磁基态。界面键等价性、模型、截断及物理解释均须作为有证据支持的建模选择明确记录。

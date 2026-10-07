@@ -1,27 +1,11 @@
-# Prepared Snapshot Checks
+# Prepared 快照检查
 
-Inspect the exact prepared Run and report evidence; change nothing.
+只读检查准确的 prepared Run，并报告证据。
 
-- Establish the current Spec task declaration, its Run row, the exact Run path,
-  and the expected Run layout and backend inputs. A missing directory, file, or
-  `prepared` status is an execution defect; report the exact missing or
-  conflicting object.
-- Compare every scientific setting with the current approved Spec and its
-  named evidence. Templates and project source instructions are rendering
-  baselines or mechanics, not authority for a missing or different scientific
-  value.
-- Check that every upstream handoff names the current accepted Run and exact
-  source, that immutable copies match their sources, and that server-only HDF5,
-  `CHGCAR`, and `WAVECAR` handling is explicit. A guessed source, stale current
-  Run, mutable handoff, or local large-file transfer prevents submission.
-- Inspect the intended executable environment, cluster, queue, resources,
-  submission command, cost/concurrency effects, and expected products. Compare
-  stable profile configuration with the current Run-specific probe evidence;
-  defaults and stale probes are not current evidence.
-- Look for evident waste, destructive behavior, output replacement, broad
-  copies, path escape, hidden directory discovery, or changes made after
-  preparation. Report the exact risk, affected object, and observed evidence.
+- 核实当前 Spec 的 Task 声明、Run 行、准确 Run 路径、预期目录布局及 backend 输入。目录、文件或 `prepared` 状态缺失属于执行缺陷；指出具体缺失或冲突对象。
+- 将每项科学设置与当前批准的 Spec 及其指定证据比较。模板和项目来源说明只提供渲染基线或实现方式，不能补充或覆盖科学值。
+- 核实每项上游交接指定当前已接受的 Run 和准确来源，不可变副本与来源一致，并明确仅在服务端处理 HDF5、`CHGCAR` 和 `WAVECAR`。猜测来源、过时 current Run、可变交接或向本地传输大型文件均阻止提交。
+- 检查目标可执行环境、集群、队列、资源、提交命令、成本与并发影响及预期产物。将稳定软件配置与当前 Run 的探测证据比较；默认值和过时探测不能作为当前证据。
+- 检查明显浪费、破坏性行为、输出替换、宽泛复制、路径越界、隐式目录发现及准备后的变更。报告具体风险、受影响对象及观察证据。
 
-`pass_with_warnings` is limited to findings that require no action or decision
-before submission. A checksum establishes identity only; it is neither review
-nor submission permission.
+`pass_with_warnings` 仅适用于提交前无需行动或决策的发现。校验和只证明字节身份，不能代替评审或提交授权。

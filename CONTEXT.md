@@ -30,32 +30,32 @@ RQ 目录下 `RQ-CONTEXT.md` 中服务于该研究问题的术语、含义及适
 RQ 上下文收录本研究已确认的关键术语；项目与插件已有定义按需读取，不复制到 RQ 术语清单。
 _Avoid_: RQ.md 的 Context 章节，项目上下文
 
-**RQ 存储配置**:
+**RQ配置**:
 每个 RQ 用于存放 `RQ.md` 与已发布 Spec 的配置化存储约定；RQ 属于一条计算研究主线，本地 Markdown adapter 下对应 `<project-root>/01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，不是独立状态文档。
 _Avoid_: Tracker 数据库，进度缓存，session registry
 
 **Spec 设计模式（Spec Design Mode）**:
 本次 Spec 新建或替换使用的 `automatic | collaborative` 交互选择，不写入项目记录。
 自动模式按证据自主发布，协作模式先访谈并在具体方案获批后发布。
-模式不改变证据档位或既有 Spec、Run。
-_Avoid_: RQ 属性，证据档位，Spec 状态，执行授权
+模式不改变既有 Spec、Run。
+_Avoid_: RQ 属性，Spec 状态，执行授权
 
 **低频假设**:
 当前研究路径缺少触发迹象、通常无需处理，却被预先写入 RQ 或 Spec 的例外情境。
 它可能改变后续判断，但尚不足以成为当前设计的条件或停止规则；已知的科学有效性条件和高代价风险不属于此类。
 
-**计算剪枝**:
+**计算剪枝思维**:
 围绕研究问题，依据物理判断和必要的验证，削减不影响核心结论的模型细节、参数探索与精度投入，将计算资源集中于关键的不确定性。取舍原则与适用边界见[计算剪枝与物理因果链思维](docs/research-thinking.md#计算剪枝)。
 
 **物理因果链思维**:
 从相关自由度、相互作用与外部条件出发，追踪系统状态如何形成和转变，并解释这些状态如何产生可观测的物理性质。研究方式及与计算剪枝的关系见[计算剪枝与物理因果链思维](docs/research-thinking.md#物理因果链思维)。
 
-**进度跟踪表（Progress Tracker）**:
+**进度记录（Progress Record）**:
 由智能体随状态变化直接维护的单个 RQ 及其 Spec、Task、Run 派生摘要；每个 RQ 一份，项目总览按需汇总。
-跟踪表可从权威记录重建；RQ.md 与 Spec 保持状态权威，RQ 存储配置定义这些记录的存储位置。
+记录可从权威记录重建；RQ.md 与 Spec 保持状态权威，RQ配置定义这些记录的存储位置。
 _Avoid_: 进度索引，独立状态权威
 
-**计算工具脚本（Calculation Utility Script）**:
+**计算脚本（Calculation Script）**:
 计算项目中可复用的可执行工具资产，用于辅助计算工作，但不作为生成任务输入的来源。
 _Avoid_: 计算模板，任务专用脚本
 
@@ -72,11 +72,11 @@ _Avoid_: 执行故障工单，Task，RQ 子对象
 探究中形成的、对以后工作有帮助的认识或做法，包含来源、适用范围和验证情况。
 _Avoid_: 未标明依据的通用结论
 
-**执行研究（Execution Research）**:
-`calc-execute` 在任务执行中遇到不确定性时，为补充软件用法、输入格式、命令、环境要求、产物与机械校验规则而开展的临时研究。其结果先作为临时证据，经排障验证且可复用时可沉淀为计算规范；它不是任务级执行方案，也不取代 Spec 的科学权威。
+**临时调研（Temporary Research）**:
+`calc-execute` 在任务执行中遇到软件用法、输入格式、命令、环境要求、产物或机械校验规则等不确定性时，调用 `$dev-engineering:research` 开展定向调研，补充临时证据。
 _Avoid_: 通用 Run，任务级后端方案，搜索授权
 
-**计算排障（Calculation Troubleshooting）**:
+**计算故障排查（Calculation Troubleshooting）**:
 `calc-execute` 对异常计算任务定位问题、补充证据、提出方案并验证处置结果的执行流程；根因明确且满足原地纠正条件的异常进入简单纠错分支。
 _Avoid_: 简单纠错，结果解释，Spec 修改
 
@@ -86,7 +86,7 @@ Calc Project 面向用户的显式辅助入口，用于解释插件术语、核�
 _Avoid_: ask-dnk（当前名称）
 
 关键索引词，完整定义以[插件共享领域术语](plugins/calc-project/resources/project-context.md)为准：计算项目、计算项目结构、数据根、计算线、RQ、Spec、计算任务、运行、计算归属树（COT）、进展报告、计算汇报、汇报源数据、Run-local inputs、计算模板、项目计算模板、插件计算模板。
-证据档位（`light | strict`）的完整定义也在该领域术语文档中。
+
 
 ## Paper Project
 

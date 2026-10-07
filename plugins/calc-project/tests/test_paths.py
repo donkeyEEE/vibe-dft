@@ -84,22 +84,21 @@ def assert_runtime_paths(plugin_root: Path, source: Path, paths: tuple[str, ...]
         assert_packaged_path(plugin_root, source, relative)
 
 
-def test_markdown_links_resolve_inside_the_package(plugin_root):
+def test_runtime_paths_and_rejected_escapes(plugin_root, tmp_path):
+    # Markdown links resolve inside the package.
     for markdown in plugin_root.rglob("*.md"):
         if "tests" in markdown.relative_to(plugin_root).parts:
             continue
         for target in _local_link_targets(markdown):
             assert_packaged_path(plugin_root, markdown, target)
 
-
-def test_exact_asset_and_helper_references_resolve(plugin_root):
+    # Exact asset and helper references resolve.
     for source_path, paths in EXACT_RUNTIME_PATHS.items():
         source = plugin_root / source_path
         assert source.is_file()
         assert_runtime_paths(plugin_root, source, paths)
 
-
-def test_broken_relative_link_is_rejected(tmp_path):
+    # Broken relative link is rejected.
     plugin = tmp_path / "calc-project"
     source = plugin / "skills" / "demo" / "SKILL.md"
     source.parent.mkdir(parents=True)
@@ -108,9 +107,8 @@ def test_broken_relative_link_is_rejected(tmp_path):
     with pytest.raises(AssertionError, match="broken or escaping"):
         assert_packaged_path(plugin, source, next(_local_link_targets(source)))
 
-
-def test_escaping_symlink_is_rejected(tmp_path):
-    plugin = tmp_path / "calc-project"
+    # Escaping symlink is rejected.
+    plugin = tmp_path / "linked-project"
     source = plugin / "skills" / "demo" / "SKILL.md"
     outside = tmp_path / "outside.md"
     source.parent.mkdir(parents=True)

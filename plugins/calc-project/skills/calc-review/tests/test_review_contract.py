@@ -14,7 +14,8 @@ REVIEW_REFERENCES = {
 }
 
 
-def test_review_owns_only_the_exact_instruction_bundle(plugin_root):
+def test_exact_read_only_review_contract(plugin_root):
+    # Review owns only the exact instruction bundle.
     review_root = plugin_root / "skills" / "calc-review"
 
     assert (review_root / "SKILL.md").is_file()
@@ -26,8 +27,7 @@ def test_review_owns_only_the_exact_instruction_bundle(plugin_root):
     assert not (review_root / "assets").exists()
     assert not (review_root / "scripts").exists()
 
-
-def test_review_references_do_not_repeat_main_routing_policy(plugin_root):
+    # Review references do not repeat main routing policy.
     review_root = plugin_root / "skills" / "calc-review"
     references = [
         review_root / "references/pre-submit.md",
@@ -42,3 +42,6 @@ def test_review_references_do_not_repeat_main_routing_policy(plugin_root):
         assert "return to the active execution flow" not in text, path
         assert "returns to the active execution flow" not in text, path
         assert "Repair safe Run-local defects automatically" not in text, path
+        assert "停止并等待用户判断" not in text, path
+        assert "交回活跃执行流" not in text, path
+        assert "自动修复安全的 Run-local 缺陷" not in text, path

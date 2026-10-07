@@ -49,12 +49,12 @@ S13_FIXTURES = (
         ),
         "expected_owner": "calc-execute validation",
         "contract_tokens": (
-            "effective `ISPIN`",
+            "生效的 `ISPIN`",
             "`NKPTS`",
             "`NBANDS`",
             "`LSORBIT`",
             "`LNONCOLLINEAR`",
-            "every snapshot",
+            "每一个快照",
         ),
     },
     {
@@ -69,8 +69,8 @@ S13_FIXTURES = (
         "contract_tokens": (
             "`BMIN/BMAX`",
             "`EIGENVAL`",
-            "occupations",
-            "every frame",
+            "占据数",
+            "每一帧",
             "$calc-to-spec",
         ),
     },
@@ -84,9 +84,9 @@ S13_FIXTURES = (
         ),
         "expected_owner": "$calc-to-spec",
         "contract_tokens": (
-            "approved Spec",
-            "decisive criteria",
-            "ambiguous",
+            "已批准 Spec",
+            "决定性判据",
+            "含糊",
             "$calc-to-spec",
         ),
     },
@@ -97,56 +97,49 @@ def _backend_root(plugin_root: Path) -> Path:
     return plugin_root / "skills/calc-execute/references/backends"
 
 
-def test_dmft_namd_bundle_files(plugin_root):
+def test_dmft_namd_backend_contract(plugin_root):
+    # Dmft namd bundle files.
     base = _backend_root(plugin_root)
     for relative in BACKEND_FILES:
         assert (base / relative).is_file()
     assert "1.5.2" in (base / "namd/namdwithsoc.md").read_text(encoding="utf-8")
 
-
-def test_dmft_namd_exact_environment_probe_coverage(plugin_root):
-    """Catch a mutable backend check being omitted or replaced by a fallback."""
+    # Dmft namd exact environment probe coverage.
     text = (plugin_root / "skills/calc-execute/references/pbs.md").read_text(
         encoding="utf-8"
     )
     for label, command in EXPECTED_ENVIRONMENT_PROBES.items():
         assert f"| {label} | `{command}` |" in text
 
-
-def test_dmft_execution_applies_spec_criteria_without_local_hdf5(plugin_root):
-    """Catch execution reverting to the legacy no-interpretation or local-HDF5 path."""
+    # Dmft execution applies spec criteria without local hdf5.
     base = _backend_root(plugin_root)
     common = (base / "dmft/common.md").read_text(encoding="utf-8")
     postprocessing = (base / "dmft/postprocessing.md").read_text(encoding="utf-8")
     combined = common + postprocessing
 
     for token in (
-        "approved Spec",
-        "decisive criteria",
+        "已批准 Spec",
+        "决定性判据",
         "$calc-to-spec",
-        "impurity spectral function",
-        "self-energy MaxEnt",
-        "self-energy Pade",
-        "server",
-        "lightweight",
+        "杂质谱函数",
+        "自能 MaxEnt",
+        "自能 Pade",
+        "服务器",
+        "轻量",
     ):
         assert token in combined
-    assert "Do not interpret physical convergence" not in combined
+    assert "结果明确时，可判定满足或未满足判据" in common
 
-
-def test_dmft_source_instructions_cannot_override_spec_authority(plugin_root):
-    """Catch rendering mechanics being promoted to scientific parameter authority."""
+    # Dmft source instructions cannot override spec authority.
     common = (_backend_root(plugin_root) / "dmft/common.md").read_text(
         encoding="utf-8"
     )
-    assert "Spec is the sole scientific parameter authority" in common
-    assert "supply rendering mechanics only" in common
-    assert "never override or add a missing scientific parameter" in common
-    assert "They are parameter authority" not in common
+    assert "Spec 是唯一的科学参数依据" in common
+    assert "来源说明只提供渲染方法" in common
+    assert "不能覆盖或补入缺失的科学参数" in common
+    assert "来源说明可覆盖 Spec" not in common
 
-
-def test_namdwithsoc_preserves_the_verified_interface_contract(plugin_root):
-    """Catch loss of a 1.5.2 representation, snapshot, or success-evidence rule."""
+    # Namdwithsoc preserves the verified interface contract.
     base = _backend_root(plugin_root)
     common = (base / "namd/common.md").read_text(encoding="utf-8")
     soc = (base / "namd/namdwithsoc.md").read_text(encoding="utf-8")
@@ -170,13 +163,11 @@ def test_namdwithsoc_preserves_the_verified_interface_contract(plugin_root):
         "`SHPROP.*`",
         "`PSICT.*`",
         "No. of spin components does NOT match",
-        "read-only by convention",
+        "按约定将其文件视为只读",
     ):
         assert token in combined
 
-
-def test_backend_references_define_run_rendering_integration(plugin_root):
-    """Catch a backend inventing a universal template or malformed injected body."""
+    # Backend references define run rendering integration.
     base = _backend_root(plugin_root)
     for relative in BACKEND_FILES:
         text = (base / relative).read_text(encoding="utf-8")
@@ -190,13 +181,11 @@ def test_backend_references_define_run_rendering_integration(plugin_root):
             "`__VALIDATE_BODY__`",
             "copy_immutable SOURCE DESTINATION",
             "`|| return 1`",
-            "approved source instructions",
+            "已批准来源说明",
         ):
             assert token in text
 
-
-def test_s13_dmft_namd_fixtures_are_concrete_and_covered(plugin_root):
-    """Keep the four agreed refusal fixtures available for Task 11 inference."""
+    # S13 dmft namd fixtures are concrete and covered.
     assert {fixture["name"] for fixture in S13_FIXTURES} == {
         "wrong-soctype",
         "missing-snapshot-fields",

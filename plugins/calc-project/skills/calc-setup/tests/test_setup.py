@@ -5,16 +5,6 @@ import subprocess
 from pathlib import Path
 
 
-def test_setup_configuration_pointer(plugin_root):
-    text = (plugin_root / "skills/calc-setup/references/project-structure.md").read_text()
-    for field in (
-        "Calculation Configuration",
-        "Data root:",
-        "Tracker adapter:",
-        "RQ location:",
-    ):
-        assert field in text
-    assert "01-rqs/" in text
 
 
 def _profile(path: Path) -> Path:
@@ -86,147 +76,82 @@ def _run_verifier(
     return result, argv_file
 
 
-def test_verifier_records_supplied_successful_probe(plugin_root, tmp_path):
+
+def test_setup_configuration_and_verifier_evidence_preserve_other_components(plugin_root, tmp_path):
+    structure = (plugin_root / "skills/calc-setup/references/project-structure.md").read_text()
+    for field in ("Calculation Configuration", "Data root:", "Tracker adapter:", "RQ location:", "01-rqs/"):
+        assert field in structure
+
+    for status, output in ((0, "probe available"), (255, "connection refused")):
+        directory = tmp_path / str(status)
+        directory.mkdir()
+        profile = _profile(directory)
+        result, argv_file = _run_verifier(plugin_root, directory, profile, status=status, output=output)
+        assert result.returncode == (0 if status == 0 else 1)
+        assert argv_file.read_text().splitlines() == [
+            "--", "cluster.example", "test -x /reviewed/vasp_std",
+        ]
+        text = profile.read_text()
+        assert "This unrelated paragraph must survive verification." in text
+        assert "VASP standard" in text and "test -x /reviewed/vasp_std" in text
+        assert output in text
+        assert ("| verified |" in text) is (status == 0)
+        assert ("| unavailable |" in text) is (status != 0)
+        assert "old evidence" not in text
+
     profile = _profile(tmp_path)
-
-    result, argv_file = _run_verifier(
-        plugin_root, tmp_path, profile, status=0, output="probe available"
-    )
-
-    assert result.returncode == 0
-    assert argv_file.read_text(encoding="utf-8").splitlines() == [
-        "--",
-        "cluster.example",
-        "test -x /reviewed/vasp_std",
-    ]
-    text = profile.read_text(encoding="utf-8")
-    assert "This unrelated paragraph must survive verification." in text
-    assert "VASP standard" in text
-    assert "test -x /reviewed/vasp_std" in text
-    assert "probe available" in text
-    assert "| verified |" in text
-    assert "old evidence" not in text
-
-
-def test_verifier_records_ssh_failure_as_unavailable(plugin_root, tmp_path):
-    profile = _profile(tmp_path)
-
-    result, argv_file = _run_verifier(
-        plugin_root, tmp_path, profile, status=255, output="connection refused"
-    )
-
-    assert result.returncode == 1
-    assert argv_file.exists()
-    text = profile.read_text(encoding="utf-8")
-    assert "This unrelated paragraph must survive verification." in text
-    assert "connection refused" in text
-    assert "| unavailable |" in text
-    assert "| verified |" not in text
-
-
-def test_verifier_retains_other_components_and_replaces_matching_component(
-    plugin_root, tmp_path
-):
-    profile = _profile(tmp_path)
-
-    first, _ = _run_verifier(
-        plugin_root,
-        tmp_path,
-        profile,
-        status=0,
-        output="vasp first",
-        label="VASP standard",
-        command="test -x /reviewed/vasp_std",
-    )
-    second, _ = _run_verifier(
-        plugin_root,
-        tmp_path,
-        profile,
-        status=0,
-        output="wannier available",
-        label="Wannier90",
-        command="test -x /reviewed/wannier90.x",
-    )
-    repeated, _ = _run_verifier(
-        plugin_root,
-        tmp_path,
-        profile,
-        status=255,
-        output="vasp moved",
-        label="VASP standard",
-        command="test -x /new/vasp_std",
-    )
-
-    assert [first.returncode, second.returncode, repeated.returncode] == [0, 0, 1]
-    text = profile.read_text(encoding="utf-8")
+    results = []
+    for label, command, status, output in (
+        ("VASP standard", "test -x /reviewed/vasp_std", 0, "vasp first"),
+        ("Wannier90", "test -x /reviewed/wannier90.x", 0, "wannier available"),
+        ("VASP standard", "test -x /new/vasp_std", 255, "vasp moved"),
+    ):
+        result, _ = _run_verifier(
+            plugin_root, tmp_path, profile, label=label, command=command, status=status, output=output,
+        )
+        results.append(result.returncode)
+    assert results == [0, 0, 1]
+    text = profile.read_text()
     assert text.count("| VASP standard |") == 1
-    assert "test -x /new/vasp_std" in text
-    assert "vasp moved" in text
+    assert "test -x /new/vasp_std" in text and "vasp moved" in text
     assert "vasp first" not in text
-    assert text.count("| Wannier90 |") == 1
-    assert "wannier available" in text
+    assert text.count("| Wannier90 |") == 1 and "wannier available" in text
+
+    result, _ = _run_verifier(
+        plugin_root, tmp_path, profile, status=0, output="begin-" + "x" * 400 + "-tail",
+    )
+    assert result.returncode == 0
+    text = profile.read_text()
+    assert "begin-" in text and "[truncated]" in text and "-tail" not in text
 
 
-def test_verifier_rejects_reversed_markers_without_modifying_profile(
-    plugin_root, tmp_path
-):
+def test_setup_verifier_rejects_invalid_requests_without_ssh_or_profile_changes(plugin_root, tmp_path):
     profile = tmp_path / "software-profiles.md"
     original = """# Profile
 <!-- cluster-profile-status:end -->
 Following text must survive.
 <!-- cluster-profile-status:start -->
 """
-    profile.write_text(original, encoding="utf-8")
-
-    result, argv_file = _run_verifier(
-        plugin_root, tmp_path, profile, status=0, output="unexpected"
-    )
-
+    profile.write_text(original)
+    result, argv_file = _run_verifier(plugin_root, tmp_path, profile, status=0, output="unexpected")
     assert result.returncode != 0
     assert not argv_file.exists()
-    assert profile.read_text(encoding="utf-8") == original
+    assert profile.read_text() == original
 
-
-def test_verifier_marks_truncated_output_summary(plugin_root, tmp_path):
     profile = _profile(tmp_path)
-    long_output = "begin-" + ("x" * 400) + "-tail"
-
-    result, _ = _run_verifier(
-        plugin_root, tmp_path, profile, status=0, output=long_output
-    )
-
-    assert result.returncode == 0
-    text = profile.read_text(encoding="utf-8")
-    assert "begin-" in text
-    assert "[truncated]" in text
-    assert "-tail" not in text
-
-
-def test_verifier_rejects_invalid_invocations_without_ssh(plugin_root, tmp_path):
-    profile = _profile(tmp_path)
+    original = profile.read_bytes()
     bin_dir, argv_file = _fake_ssh(tmp_path)
     env = os.environ.copy()
     env.update(
-        PATH=f"{bin_dir}{os.pathsep}{env['PATH']}",
-        FAKE_SSH_ARGV=str(argv_file),
-        FAKE_SSH_STATUS="0",
-        FAKE_SSH_OUTPUT="unexpected",
+        PATH=f"{bin_dir}{os.pathsep}{env['PATH']}", FAKE_SSH_ARGV=str(argv_file),
+        FAKE_SSH_STATUS="0", FAKE_SSH_OUTPUT="unexpected",
     )
     script = plugin_root / "skills/calc-setup/scripts/verify_cluster_profile.sh"
-
-    cases = [
-        [],
-        [str(tmp_path / "missing.md"), "cluster.example", "label", "true"],
+    for args in (
+        [], [str(tmp_path / "missing.md"), "cluster.example", "label", "true"],
         [str(profile), "-oProxyCommand=bad", "label", "true"],
-    ]
-    for args in cases:
-        result = subprocess.run(
-            ["bash", str(script), *args],
-            text=True,
-            capture_output=True,
-            env=env,
-            check=False,
-        )
+    ):
+        result = subprocess.run(["bash", str(script), *args], text=True, capture_output=True, env=env)
         assert result.returncode != 0
-
-    assert not argv_file.exists()
+        assert not argv_file.exists()
+        assert profile.read_bytes() == original

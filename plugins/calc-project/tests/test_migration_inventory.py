@@ -33,7 +33,8 @@ def _baseline_sources(plugin_root: Path) -> set[str]:
     return {path.removeprefix(PREFIX) for path in output}
 
 
-def test_inventory_accounts_for_every_baseline_source_once(plugin_root):
+def test_migration_inventory_has_complete_existing_targets(plugin_root):
+    # Inventory accounts for every baseline source once.
     records = _records(plugin_root)
     sources = [record["source"] for record in records]
 
@@ -44,8 +45,7 @@ def test_inventory_accounts_for_every_baseline_source_once(plugin_root):
     assert all(record["targets"] or record["reason"] for record in records)
     assert all(not (record["targets"] and record["reason"]) for record in records)
 
-
-def test_every_retained_source_has_concrete_existing_targets(plugin_root):
+    # Every retained source has concrete existing targets.
     missing = []
     for record in _records(plugin_root):
         for target in record["targets"]:

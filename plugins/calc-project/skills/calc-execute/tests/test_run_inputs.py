@@ -17,152 +17,6 @@ REMOTE_COMPLETION_REFERENCE = "skills/calc-execute/references/remote-completion.
 TROUBLESHOOTING_REFERENCE = "skills/calc-execute/references/calculation-troubleshooting.md"
 
 
-def test_execute_skill_has_compact_three_part_contract(plugin_root):
-    skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(
-        encoding="utf-8"
-    )
-    body = skill.split("---", 2)[2].strip()
-    sections = [line for line in body.splitlines() if line.startswith("#")]
-
-    assert sections == ["# Calc Execute", "## 工作流", "## 原则"]
-
-    overview, remainder = body.split("## 工作流", 1)
-    overview_text = " ".join(overview.removeprefix("# Calc Execute").split())
-    assert overview_text
-    assert len(overview_text) <= 500
-    assert "\n\n" not in overview.removeprefix("# Calc Execute").strip()
-
-    workflow, principles = remainder.split("## 原则", 1)
-    workflow_steps = [
-        line for line in workflow.splitlines() if line[:1].isdigit() and ". " in line
-    ]
-    assert [line.split(".", 1)[0] for line in workflow_steps] == [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-    ]
-    for reference in (
-        "references/task-advancement.md",
-        "references/run-preparation.md",
-        "references/pbs.md",
-        "references/simple-correction.md",
-        "references/calculation-troubleshooting.md",
-        "references/remote-completion.md",
-        "references/sync.md",
-    ):
-        assert reference in workflow
-    for sibling in (
-        "`$calc-setup`",
-        "`$dev-engineering:research`",
-        "`$calc-review`",
-        "`$calc-rq`",
-    ):
-        assert sibling in workflow
-
-    for status in ("`finished`", "`failed`", "`cancelled`"):
-        assert status in principles
-    assert "`$calc-to-spec`" in principles
-
-
-def test_execution_frontier_is_resolved_in_the_main_workflow(plugin_root):
-    skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(encoding="utf-8")
-    advancement = (
-        plugin_root / "skills/calc-execute/references/task-advancement.md"
-    ).read_text(encoding="utf-8")
-
-    workflow = skill.split("## 工作流", 1)[1].split("## 原则", 1)[0]
-    first_step = " ".join(workflow.split("2.", 1)[0].split())
-
-    for contract in (
-        "选定 Spec",
-        "已记录 Run",
-        "权威资料格式错误",
-        "不足以调和",
-        "可运行 Task",
-        "`submitted` Run",
-        "不得直接另行分配 Run",
-        "确定为假的条件",
-        "`failed`",
-        "`$calc-to-spec`",
-        "持久化每项确定的状态变更",
-    ):
-        assert contract in first_step
-    assert "## Derive the frontier" not in advancement
-    assert "## Accept results and select the current Run" in advancement
-    assert "## Close once" in advancement
-
-
-def test_result_updates_stay_compact_across_execution_branches(plugin_root):
-    references = plugin_root / "skills/calc-execute/references"
-    advancement = (references / "task-advancement.md").read_text(encoding="utf-8")
-    pbs = (references / "pbs.md").read_text(encoding="utf-8")
-    completion = (references / "remote-completion.md").read_text(encoding="utf-8")
-    correction = (references / "simple-correction.md").read_text(encoding="utf-8")
-
-    assert "compact table entry" in advancement
-    assert "prefer the order outcome, concise failure" in advancement
-    assert "returned job ID" in pbs
-    assert "whether the task may advance" in completion
-    assert "material difference from the prior attempt" in correction
-    for text in (advancement, completion, correction):
-        assert "Run logs" in text
-        assert "troubleshooting record" in text
-
-
-def test_calculation_troubleshooting_covers_simple_and_researched_paths(plugin_root):
-    reference_path = plugin_root / TROUBLESHOOTING_REFERENCE
-
-    assert reference_path.is_file()
-    reference = reference_path.read_text(encoding="utf-8")
-    normalized = reference.lower()
-    for contract in (
-        "locate the anomaly",
-        "simple correction",
-        "02-计算规范/",
-        "`$dev-engineering:research`",
-        "luna",
-        "`/tmp`",
-        "competing technical solutions",
-        "targeted checks",
-        "write an independent stable",
-    ):
-        assert contract in normalized
-
-
-def test_calculation_monitor_is_conditional_and_post_submission(plugin_root):
-    skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(encoding="utf-8")
-    skill_flat = " ".join(skill.split())
-    reference_path = plugin_root / REMOTE_COMPLETION_REFERENCE
-
-    assert reference_path.is_file()
-    assert not (
-        plugin_root / "skills/calc-execute/references/calculation-monitor.md"
-    ).exists()
-    assert "references/remote-completion.md" in skill
-    assert "需要等待异步作业并恢复本次执行" in skill
-    assert skill_flat.index("将 Spec 的 Run 行更新为 `submitted`") < skill_flat.index(
-        "references/remote-completion.md"
-    )
-
-    reference = reference_path.read_text(encoding="utf-8")
-    reference_flat = " ".join(reference.split())
-    for contract in (
-        "scripts/calculation-monitor.py",
-        "CODEX_THREAD_ID",
-        "current platform's available supervisor",
-        "Prefer `systemd-run --user` when it is available",
-        "equivalent local background mechanism",
-        "argv array",
-        "submitting process's `PATH`",
-        "discard monitor stdout and stderr",
-        "missing suitable launcher leaves monitoring inactive",
-    ):
-        assert contract in reference_flat
-
-
 def _expected_fingerprint(files: dict[str, bytes]) -> str:
     snapshot = hashlib.sha256()
     for relative, content in sorted(files.items()):
@@ -178,8 +32,7 @@ def _write_executable(path: Path, text: str) -> None:
     path.chmod(path.stat().st_mode | stat.S_IXUSR)
 
 
-@pytest.fixture
-def fake_commands(tmp_path, monkeypatch):
+def _fake_commands(tmp_path, monkeypatch):
     commands = tmp_path / "commands"
     commands.mkdir()
     qsub_calls = tmp_path / "qsub.calls"
@@ -264,20 +117,147 @@ def _run_action(run: Path, *args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def test_snapshot_changes_and_rejects_links(load_script, tmp_path):
-    module = load_script(SCRIPT)
-    inputs = tmp_path / "inputs"
-    inputs.mkdir()
-    (inputs / "INCAR").write_text("ENCUT=520\n")
-    first = module.fingerprint_inputs(inputs)
-    (inputs / "INCAR").write_text("ENCUT=600\n")
-    assert module.fingerprint_inputs(inputs) != first
-    (inputs / "linked").symlink_to(inputs / "INCAR")
-    with pytest.raises(ValueError):
-        module.fingerprint_inputs(inputs)
+
+def test_execution_workflow_delegation_and_result_contract(plugin_root):
+    skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    body = skill.split("---", 2)[2].strip()
+    sections = [line for line in body.splitlines() if line.startswith("#")]
+
+    assert sections == ["# Calc Execute", "## 工作流", "## 原则"]
+
+    overview, remainder = body.split("## 工作流", 1)
+    overview_text = " ".join(overview.removeprefix("# Calc Execute").split())
+    assert overview_text
+    assert len(overview_text) <= 500
+    assert "\n\n" not in overview.removeprefix("# Calc Execute").strip()
+
+    workflow, principles = remainder.split("## 原则", 1)
+    workflow_steps = [
+        line for line in workflow.splitlines() if line[:1].isdigit() and ". " in line
+    ]
+    assert [line.split(".", 1)[0] for line in workflow_steps] == [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+    ]
+    for reference in (
+        "references/task-advancement.md",
+        "references/run-preparation.md",
+        "references/pbs.md",
+        "references/simple-correction.md",
+        "references/calculation-troubleshooting.md",
+        "references/remote-completion.md",
+        "references/sync.md",
+    ):
+        assert reference in workflow
+    for sibling in (
+        "`$calc-setup`",
+        "`$dev-engineering:research`",
+        "`$calc-review`",
+        "`$calc-rq`",
+    ):
+        assert sibling in workflow
+
+    for status in ("`finished`", "`failed`", "`cancelled`"):
+        assert status in principles
+    assert "`$calc-to-spec`" in principles
+
+    skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(encoding="utf-8")
+    advancement = (
+        plugin_root / "skills/calc-execute/references/task-advancement.md"
+    ).read_text(encoding="utf-8")
+
+    workflow = skill.split("## 工作流", 1)[1].split("## 原则", 1)[0]
+    first_step = " ".join(workflow.split("2.", 1)[0].split())
+
+    for contract in (
+        "选定 Spec",
+        "已记录 Run",
+        "权威资料格式错误",
+        "不足以调和",
+        "可运行 Task",
+        "`submitted` Run",
+        "不得直接另行分配 Run",
+        "确定为假的条件",
+        "`failed`",
+        "`$calc-to-spec`",
+        "持久化每项确定的状态变更",
+    ):
+        assert contract in first_step
+    assert "## Derive the frontier" not in advancement
+    assert "## 验收并选择 current Run" in advancement
+    assert "## 闭合" in advancement
+
+    references = plugin_root / "skills/calc-execute/references"
+    advancement = (references / "task-advancement.md").read_text(encoding="utf-8")
+    pbs = (references / "pbs.md").read_text(encoding="utf-8")
+    completion = (references / "remote-completion.md").read_text(encoding="utf-8")
+    correction = (references / "simple-correction.md").read_text(encoding="utf-8")
+
+    assert "简短表格条目" in advancement
+    assert "依次写结果、简短失败原因" in advancement
+    assert "qsub 作业 ID" in pbs
+    assert "Task 推进判断" in completion
+    assert "与上次尝试的实质差异" in correction
+    for text in (advancement, completion, correction):
+        assert "Run 日志" in text
+        assert "排查记录" in text
+
+    reference_path = plugin_root / TROUBLESHOOTING_REFERENCE
+
+    assert reference_path.is_file()
+    reference = reference_path.read_text(encoding="utf-8")
+    normalized = reference.lower()
+    for contract in (
+        "定位异常",
+        "简单纠错",
+        "02-计算规范/",
+        "`$dev-engineering:research`",
+        "luna",
+        "`/tmp`",
+        "竞争技术方案",
+        "针对性检查",
+        "独立稳定笔记",
+    ):
+        assert contract in normalized
+
+    skill = (plugin_root / "skills/calc-execute/SKILL.md").read_text(encoding="utf-8")
+    skill_flat = " ".join(skill.split())
+    reference_path = plugin_root / REMOTE_COMPLETION_REFERENCE
+
+    assert reference_path.is_file()
+    assert not (
+        plugin_root / "skills/calc-execute/references/calculation-monitor.md"
+    ).exists()
+    assert "references/remote-completion.md" in skill
+    assert "需要等待异步作业并恢复本次执行" in skill
+    assert skill_flat.index("将 Spec 的 Run 行更新为 `submitted`") < skill_flat.index(
+        "references/remote-completion.md"
+    )
+
+    reference = reference_path.read_text(encoding="utf-8")
+    reference_flat = " ".join(reference.split())
+    for contract in (
+        "scripts/calculation-monitor.py",
+        "CODEX_THREAD_ID",
+        "当前平台可用的监督器",
+        "优先 `systemd-run --user`",
+        "等价后台机制",
+        "argv 数组",
+        "提交进程的 `PATH`",
+        "丢弃监控器 stdout 和 stderr",
+        "没有适用启动器时报告监控未启用",
+    ):
+        assert contract in reference_flat
 
 
-def test_fingerprint_is_length_delimited_sorted_and_read_only(load_script, tmp_path):
+
+def test_run_fingerprint_identity_read_only_behavior_and_errors(load_script, plugin_root, tmp_path, monkeypatch):
     module = load_script(SCRIPT)
     inputs = tmp_path / "inputs"
     (inputs / "nested").mkdir(parents=True)
@@ -285,193 +265,139 @@ def test_fingerprint_is_length_delimited_sorted_and_read_only(load_script, tmp_p
     for relative, content in reversed(tuple(files.items())):
         (inputs / relative).write_bytes(content)
     before = {path.relative_to(inputs): path.read_bytes() for path in inputs.rglob("*") if path.is_file()}
-
-    assert module.fingerprint_inputs(inputs) == _expected_fingerprint(files)
+    first = module.fingerprint_inputs(inputs)
+    assert first == _expected_fingerprint(files)
     assert {path.relative_to(inputs): path.read_bytes() for path in inputs.rglob("*") if path.is_file()} == before
+    (inputs / "INCAR").write_text("ENCUT=600\n")
+    assert module.fingerprint_inputs(inputs) != first
+    (inputs / "linked").symlink_to(inputs / "INCAR")
+    with pytest.raises(ValueError):
+        module.fingerprint_inputs(inputs)
     with pytest.raises(ValueError):
         module.fingerprint_inputs(tmp_path / "absent")
-
-
-def test_fingerprint_reports_an_unreadable_directory(load_script, tmp_path, monkeypatch):
-    module = load_script(SCRIPT)
-    inputs = tmp_path / "inputs"
-    inputs.mkdir()
 
     def denied_walk(_path, *, followlinks, onerror):
         assert followlinks is False
         onerror(PermissionError("denied by fixture"))
         return iter(())
 
-    monkeypatch.setattr(module.os, "walk", denied_walk)
-    with pytest.raises(ValueError, match="cannot inspect inputs"):
-        module.fingerprint_inputs(inputs)
+    with monkeypatch.context() as patch:
+        patch.setattr(module.os, "walk", denied_walk)
+        with pytest.raises(ValueError, match="cannot inspect inputs"):
+            module.fingerprint_inputs(inputs)
 
-
-def test_fingerprint_cli_prints_one_digest(plugin_root, tmp_path):
-    inputs = tmp_path / "inputs"
-    inputs.mkdir()
-    (inputs / "run.sh").write_bytes(b"run\n")
+    cli_inputs = tmp_path / "cli-inputs"
+    cli_inputs.mkdir()
+    (cli_inputs / "run.sh").write_bytes(b"run\n")
     result = subprocess.run(
-        ["python", str(plugin_root / SCRIPT), str(inputs)], capture_output=True, text=True
+        ["python", str(plugin_root / SCRIPT), str(cli_inputs)], capture_output=True, text=True,
     )
     assert result.returncode == 0
     assert result.stderr == ""
     assert result.stdout == _expected_fingerprint({"run.sh": b"run\n"}) + "\n"
 
 
-@pytest.mark.parametrize("stage", ["scf", "band"])
-def test_prepare_copies_declared_bytes_without_changing_source_or_old_run(
-    plugin_root, tmp_path, fake_commands, stage
-):
-    run, source = _render_run(plugin_root, tmp_path, stage)
-    old_run_file = run.parent / "RUN-001" / "inputs" / "preserved"
-    old_run_file.parent.mkdir(parents=True)
-    old_run_file.write_bytes(b"old run bytes\n")
-    source_before = source.read_bytes()
-    old_before = old_run_file.read_bytes()
+def test_run_preparation_preserves_sources_and_validation_covers_complete_inputs(plugin_root, tmp_path, monkeypatch):
+    for stage in ("scf", "band"):
+        case = tmp_path / stage
+        case.mkdir()
+        with monkeypatch.context() as patch:
+            commands = _fake_commands(case, patch)
+            run, source = _render_run(plugin_root, case, stage)
+            old = run.parent / "RUN-001/inputs/preserved"
+            old.parent.mkdir(parents=True)
+            old.write_bytes(b"old run bytes\n")
+            before = source.read_bytes()
+            prepared = _run_action(run, "prepare")
+            assert prepared.returncode == 0, prepared.stderr
+            assert (run / "inputs" / f"{stage.upper()}-HANDOFF").read_bytes() == before
+            assert (run / "inputs/fingerprint_run.py").read_bytes() == (plugin_root / SCRIPT).read_bytes()
+            assert source.read_bytes() == before
+            assert old.read_bytes() == b"old run bytes\n"
+            assert len(commands["rsync"].read_text().splitlines()) == 2
+            validation = _run_action(run, "validate")
+            assert validation.returncode == 0, validation.stderr
+            digest = validation.stdout.strip()
+            assert len(digest) == 64
+            assert digest == subprocess.run(
+                ["python3", str(run / "inputs/fingerprint_run.py"), str(run / "inputs")],
+                check=True, capture_output=True, text=True,
+            ).stdout.strip()
 
-    result = _run_action(run, "prepare")
-
-    assert result.returncode == 0, result.stderr
-    assert (run / "inputs" / f"{stage.upper()}-HANDOFF").read_bytes() == source_before
-    assert (run / "inputs" / "fingerprint_run.py").read_bytes() == (plugin_root / SCRIPT).read_bytes()
-    assert source.read_bytes() == source_before
-    assert old_run_file.read_bytes() == old_before
-    assert len(fake_commands["rsync"].read_text().splitlines()) == 2
-
-
-def test_prepare_refuses_a_different_existing_destination(plugin_root, tmp_path, fake_commands):
-    run, source = _render_run(plugin_root, tmp_path, "band")
-    destination = run / "inputs" / "BAND-HANDOFF"
-    destination.write_bytes(b"different prior snapshot\n")
-    source_before = source.read_bytes()
-
-    result = _run_action(run, "prepare")
-
-    assert result.returncode != 0
-    assert "existing destination differs" in result.stderr
-    assert destination.read_bytes() == b"different prior snapshot\n"
-    assert source.read_bytes() == source_before
-
-
-def test_validate_reports_the_complete_run_fingerprint(plugin_root, tmp_path, fake_commands):
-    run, _ = _render_run(plugin_root, tmp_path, "scf")
-    assert _run_action(run, "prepare").returncode == 0
-
-    result = _run_action(run, "validate")
-
-    assert result.returncode == 0, result.stderr
-    digest = result.stdout.strip()
-    assert len(digest) == 64
-    assert digest == subprocess.run(
-        ["python3", str(run / "inputs" / "fingerprint_run.py"), str(run / "inputs")],
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
+    case = tmp_path / "different-destination"
+    case.mkdir()
+    with monkeypatch.context() as patch:
+        _fake_commands(case, patch)
+        run, source = _render_run(plugin_root, case, "band")
+        destination = run / "inputs/BAND-HANDOFF"
+        destination.write_bytes(b"different prior snapshot\n")
+        before = source.read_bytes()
+        rejected = _run_action(run, "prepare")
+        assert rejected.returncode != 0
+        assert "existing destination differs" in rejected.stderr
+        assert destination.read_bytes() == b"different prior snapshot\n"
+        assert source.read_bytes() == before
 
 
-def test_validate_and_submit_load_the_run_local_scheduler_environment(
-    plugin_root, tmp_path, fake_commands
-):
-    run, _ = _render_run(plugin_root, tmp_path, "scf")
-    assert _run_action(run, "prepare").returncode == 0
+def test_run_submission_digest_environment_and_exact_remote_probe(plugin_root, tmp_path, monkeypatch):
+    # The digest checks byte identity; this fixture does not authenticate approval.
+    for scenario in ("local-environment", "environment-mutation", "missing-or-stale-digest", "unchanged"):
+        case = tmp_path / scenario
+        case.mkdir()
+        with monkeypatch.context() as patch:
+            commands = _fake_commands(case, patch)
+            stage = "band" if scenario == "missing-or-stale-digest" else "scf"
+            run, _ = _render_run(plugin_root, case, stage)
+            assert _run_action(run, "prepare").returncode == 0
+            if scenario == "local-environment":
+                scheduler = case / "scheduler-commands"
+                scheduler.mkdir()
+                (case / "commands/qsub").rename(scheduler / "qsub")
+                (run / "inputs/cluster-env.sh").write_text(
+                    f'export PATH={shlex.quote(str(scheduler))}:"$PATH"\n',
+                )
+            elif scenario == "environment-mutation":
+                counter = case / "cluster-env-source.count"
+                (run / "inputs/cluster-env.sh").write_text(
+                    f'count_file={shlex.quote(str(counter))}\n'
+                    'count="$(cat "$count_file" 2>/dev/null || printf 0)"\n'
+                    'if test "$count" -gt 0; then\n'
+                    '    printf "# changed after review\\n" >> "$INPUTS_DIR/run.pbs"\n'
+                    'fi\n'
+                    'printf "%s\\n" "$((count + 1))" > "$count_file"\n',
+                )
+            validation = _run_action(run, "validate")
+            assert validation.returncode == 0, validation.stderr
+            digest = validation.stdout.strip()
+            commands["rsync"].write_text("")
+            if scenario == "missing-or-stale-digest":
+                (run / "logs/band.prepared").unlink()
+                assert _run_action(run, "submit").returncode != 0
+                assert not commands["qsub"].exists()
+                (run / "inputs/BAND-HANDOFF").write_bytes(b"mutated\n")
+            submission = _run_action(run, "submit", digest)
+            if scenario in {"environment-mutation", "missing-or-stale-digest"}:
+                assert submission.returncode != 0
+                assert "input snapshot changed" in submission.stderr
+                assert not commands["qsub"].exists()
+            else:
+                assert submission.returncode == 0, submission.stderr
+                assert submission.stdout == "731.server\n"
+                assert commands["qsub"].read_text().splitlines() == [
+                    f"cwd={run}|-o|{run / 'logs/pbs.stdout'}|-e|{run / 'logs/pbs.stderr'}|{run / 'inputs/run.pbs'}",
+                ]
+            assert commands["rsync"].read_text() == ""
+            if scenario == "missing-or-stale-digest":
+                assert not (run / "logs/band.prepared").exists()
 
-    scheduler_commands = tmp_path / "scheduler-commands"
-    scheduler_commands.mkdir()
-    (tmp_path / "commands" / "qsub").rename(scheduler_commands / "qsub")
-    (run / "inputs" / "cluster-env.sh").write_text(
-        f"export PATH={shlex.quote(str(scheduler_commands))}:\"$PATH\"\n",
-        encoding="utf-8",
-    )
-
-    validation = _run_action(run, "validate")
-
-    assert validation.returncode == 0, validation.stderr
-    digest = validation.stdout.strip()
-    submission = _run_action(run, "submit", digest)
-    assert submission.returncode == 0, submission.stderr
-    assert submission.stdout == "731.server\n"
-
-
-def test_submit_rejects_inputs_changed_while_loading_environment(
-    plugin_root, tmp_path, fake_commands
-):
-    run, _ = _render_run(plugin_root, tmp_path, "scf")
-    assert _run_action(run, "prepare").returncode == 0
-    source_count = tmp_path / "cluster-env-source.count"
-    (run / "inputs" / "cluster-env.sh").write_text(
-        f'count_file={shlex.quote(str(source_count))}\n'
-        'count="$(cat "$count_file" 2>/dev/null || printf 0)"\n'
-        'if test "$count" -gt 0; then\n'
-        '    printf "# changed after review\\n" >> "$INPUTS_DIR/run.pbs"\n'
-        'fi\n'
-        'printf "%s\\n" "$((count + 1))" > "$count_file"\n',
-        encoding="utf-8",
-    )
-    digest = _run_action(run, "validate").stdout.strip()
-
-    submission = _run_action(run, "submit", digest)
-
-    assert submission.returncode != 0
-    assert "input snapshot changed" in submission.stderr
-    assert not fake_commands["qsub"].exists()
-
-
-def test_submit_requires_current_digest_and_never_prepares(plugin_root, tmp_path, fake_commands):
-    run, _ = _render_run(plugin_root, tmp_path, "band")
-    assert _run_action(run, "prepare").returncode == 0
-    digest = _run_action(run, "validate").stdout.strip()
-    fake_commands["rsync"].write_text("")
-    (run / "logs" / "band.prepared").unlink()
-
-    missing = _run_action(run, "submit")
-    assert missing.returncode != 0
-    assert not fake_commands["qsub"].exists()
-
-    (run / "inputs" / "BAND-HANDOFF").write_bytes(b"mutated\n")
-    mutated = _run_action(run, "submit", digest)
-    assert mutated.returncode != 0
-    assert "input snapshot changed" in mutated.stderr
-    assert not fake_commands["qsub"].exists()
-    assert fake_commands["rsync"].read_text() == ""
-    assert not (run / "logs" / "band.prepared").exists()
-
-
-def test_unchanged_reviewed_test_chain_submits_once(plugin_root, tmp_path, fake_commands):
-    """The digest models byte identity; this fixture does not authenticate approval."""
-    run, _ = _render_run(plugin_root, tmp_path, "scf")
-    assert _run_action(run, "prepare").returncode == 0
-    digest = _run_action(run, "validate").stdout.strip()
-    fake_commands["rsync"].write_text("")
-
-    result = _run_action(run, "submit", digest)
-
-    assert result.returncode == 0, result.stderr
-    assert result.stdout == "731.server\n"
-    calls = fake_commands["qsub"].read_text().splitlines()
-    assert calls == [
-        f"cwd={run}|-o|{run / 'logs' / 'pbs.stdout'}|-e|{run / 'logs' / 'pbs.stderr'}|{run / 'inputs' / 'run.pbs'}"
-    ]
-    assert fake_commands["rsync"].read_text() == ""
-
-
-def test_probe_forwards_exact_reviewed_command_and_status(plugin_root, fake_commands, monkeypatch):
-    command = "source /reviewed/profile && test -x '/path with spaces/vasp'"
-    success = subprocess.run(
-        ["bash", str(plugin_root / PROBE), "cluster.example", command],
-        capture_output=True,
-        text=True,
-    )
-    assert success.returncode == 0
-    assert success.stdout == "remote probe output\n"
-    assert fake_commands["ssh"].read_text().splitlines() == ["--", "cluster.example", command]
-
-    monkeypatch.setenv("FAKE_SSH_STATUS", "23")
-    failure = subprocess.run(
-        ["bash", str(plugin_root / PROBE), "cluster.example", command],
-        capture_output=True,
-        text=True,
-    )
-    assert failure.returncode == 23
-    assert failure.stdout == "remote probe output\n"
+            if scenario == "unchanged":
+                command = "source /reviewed/profile && test -x '/path with spaces/vasp'"
+                for status in (0, 23):
+                    patch.setenv("FAKE_SSH_STATUS", str(status))
+                    probe = subprocess.run(
+                        ["bash", str(plugin_root / PROBE), "cluster.example", command],
+                        capture_output=True, text=True,
+                    )
+                    assert probe.returncode == status
+                    assert probe.stdout == "remote probe output\n"
+                    assert commands["ssh"].read_text().splitlines() == ["--", "cluster.example", command]

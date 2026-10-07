@@ -4,6 +4,8 @@ status: accepted
 
 # Choose the Spec design mode at each design entry
 
+相关研究推理职责、Spec 目标与证据档位规则已由 [ADR-0021](0021-guide-spec-reasoning-with-domain-research.md) 修订；以下保留原决策记录。
+
 At a Spec design entry, `calc-to-spec` uses an explicit user choice of automatic
 or collaborative mode. If the current request does not specify one, it presents
 both and waits for an answer. Automatic is the suggested default, not consent

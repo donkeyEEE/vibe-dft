@@ -11,7 +11,7 @@
 _Avoid_: 项目目录，计算仓库
 
 **计算项目结构（Calculation Project Structure）**:
-由稳定知识、RQ 存储配置和数据根组成的项目级管理结构。
+由稳定知识、RQ配置和数据根组成的项目级管理结构。
 _Avoid_: 任务状态，Spec DAG
 
 **项目上下文（Project Context）**:
@@ -46,10 +46,10 @@ _Avoid_: RQ 主线，固定三层路径
 Spec 的任务 DAG 表达，而不是由并行状态文档拥有。
 _Avoid_: 计算线，状态文件
 
-**RQ 存储配置**:
+**RQ配置**:
 一个 RQ 的配置化存储约定。`local-markdown` adapter 将其存储在
 `01<main-line-slug>/01-rqs/<rq-id>-<slug>/`，其中包含 `RQ.md`、按需维护的
-`RQ-CONTEXT.md` 和已明确发布的 Specs。RQ 存储配置不是独立状态文档，也不拥有执行进度。
+`RQ-CONTEXT.md` 和已明确发布的 Specs。RQ配置不是独立状态文档，也不拥有执行进度。
 _Avoid_: Tracker 数据库，进度缓存，会话注册表
 
 **研究问题（Research Question, RQ）**:
@@ -59,12 +59,12 @@ _Avoid_: 研究计划目录，任务列表
 **Spec 设计模式（Spec Design Mode）**:
 一次 Spec 新建或替换入口采用的 `automatic | collaborative` 交互选择。用户未明确指定时
 询问，`automatic` 是建议的默认选项；选择不写入 RQ.md 或其他持久记录。
-它不改变科学证据档位、已发布 Spec 或 Run。
-_Avoid_: RQ 属性，证据档位，Spec 状态，执行授权
+它不改变已发布 Spec 或 Run。
+_Avoid_: RQ 属性，Spec 状态，执行授权
 
-**进度跟踪表（Progress Tracker）**:
+**进度记录（Progress Record）**:
 每个 RQ 目录下 `tracker.json` 中由智能体直接维护的该 RQ、Spec、Task、Run 派生摘要。
-任一对象状态变化后立即同步所属 RQ 的表；项目 COT 汇总各表，缺失或异常时按 RQ 修复。
+任一对象状态变化后立即同步所属 RQ 的记录；项目 COT 汇总各份记录，缺失或异常时按 RQ 修复。
 维护契约写在项目 `AGENTS.md`。索引可重建，不拥有科学设计或执行状态的权威。
 
 **待探究问题（Issue）**:
@@ -77,20 +77,12 @@ _Avoid_: 执行故障工单，Task，RQ 子对象
 _Avoid_: 未标明依据的通用结论
 
 **计算规范（Spec）**:
-一个主判断的当前已发布科学设计，也是其任务目的、DAG、状态、Runs、current Run、
+一个连贯研究目标的当前已发布科学设计，也是其任务目的、DAG、状态、Runs、current Run、
 执行记录和闭包的唯一权威。Spec 不维护修订历史。
 _Avoid_: Tracker 状态，工作流状态文件
 
-**证据档位（Evidence Level）**:
-RQ 或 Spec 对验收与可比性检查采用的 `light | strict` 设置。Spec 的明确设置优先，
-否则在发布时继承 RQ；两者均缺失时为 `light`。`light` 要求足以回答 Task Purpose
-的直接结果和必要交接，不默认增加独立收敛扫描、参数敏感性、重复 Run 或替代方法对照；
-判断本身必需的检查始终保留。`strict` 增加与主要判断相关的增强检查，并遵循
-用户或已接受 RQ 的明确要求。
-_Avoid_: Run 状态，执行批准
-
 **计算任务（Calculation Task）**:
-Spec 中为支持主判断声明的可执行工作。身份、目的、依赖、条件、验收和状态由父 Spec
+Spec 中服务研究目标的可执行工作。身份、目的、依赖、条件、验收和状态由父 Spec
 拥有；状态为 `pending`、`completed`、`failed` 或 `needs-review`。数据目录仅保存计算文件和最小同步配置。
 _Avoid_: 独立任务元数据，目录 README 权威
 
@@ -148,7 +140,7 @@ _Avoid_: 插件计算模板，Run 输入
 随插件发布并由明确技能路径消费的计算基线。
 _Avoid_: 项目计算模板，运行时资源发现
 
-**计算工具脚本（Calculation Utility Script）**:
+**计算脚本（Calculation Script）**:
 辅助计算的可执行资产，不是生成科学输入的参数来源。
 _Avoid_: 计算模板，任务专用脚本
 
@@ -160,7 +152,7 @@ _Avoid_: 主数据，本地任务
 计算数据在计算集群中的受管位置；HDF5、`CHGCAR`、`WAVECAR` 和大输出保留于此。
 _Avoid_: 主数据，远程任务
 
-## Scoped IDs and references
+## ID 范围与引用
 
 ID 在父对象内编号且不复用：`RQ-NNN` 属于一条主线，`SPEC-NNN` 属于一个 RQ，
 `TASK-NNN` 属于一个 Spec，`RUN-NNN` 属于一个任务。同父引用使用 ID，

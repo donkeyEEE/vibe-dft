@@ -5,7 +5,7 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
 
 # Calc RQ
 
-负责 RQ 生命周期及其已接受决策。RQ 存储配置只定义存储约定；`RQ.md` 是 RQ 问题、决策及状态的唯一权威。
+负责 RQ 生命周期及其已接受决策。RQ配置只定义存储约定；`RQ.md` 是 RQ 问题、决策及状态的唯一权威。
 涉及 Calc Project 稳定术语或对象边界时，读取[共享领域术语](../../resources/project-context.md)。
 开始工作时先加载 `$domain-research`，在讨论、起草和修订中使用其研究推理指引、术语与文档表达规则；
 定位目标后提供项目根、RQ 目录及相关记录。术语的收录、确认和更新遵循 `$domain-research`。
@@ -16,7 +16,7 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
    缺失或无效配置会停止本动作，并应交由 `$calc-setup`。
 2. 创建时读取已解析主线下的 sibling RQ 目录以避免 ID 冲突。既有 RQ 工作时读取所选 `RQ.md`；
    意图涉及 concluded Spec 影响时还读取相关已发布 Spec。将这些文件视为权威，而非对话摘要。
-   RQ 问题与已接受决策只保存在 `RQ.md`；进度跟踪表按项目 `AGENTS.md` 的进度跟踪表约定维护。
+   RQ 问题与已接受决策只保存在 `RQ.md`；进度记录按项目 `AGENTS.md` 的进度记录约定维护。
    本技能继续负责问题推敲、已接受决策及 RQ 写入。
 3. 创建或推导 RQ，或变更其 Question、Question 下的 `Boundary:` 或 Success Criterion 时，
    调用 `$dev-engineering:grill-with-docs`。若此依赖不可用，只停止该工作流并报告；不需要
@@ -30,18 +30,17 @@ description: 创建、检查、修订或推导一个计算研究问题，并记�
    持久化 RQ 访谈待答问题。执行发现的 Issue 由 `$calc-issue` 独立维护。
    来自 Issue 的新 RQ 提案读取其证据，沿用本流程批准；获批后回传实际 RQ 路径供 Issue 关联。
 4. 创建时用[RQ 模板](references/rq-template.md)起草 RQ。`RQ-NNN` ID 在其父主线内稳定且未使用。
-   用户可在 RQ 上明确设置 `Evidence level: light | strict`；未设置时省略该字段并默认 `light`。
-   已发布 Spec 的生效档位在其发布时固定，不因后续 RQ 更新而自动变化。
+   用户的具体验证要求记录在成功判据或已接受决策中。
 5. 展示批准前按 `$domain-research` 检查完整 RQ 草稿或修订后的全文，清理冗余表达并核对原意；
-   科学问题、边界、成功判据及决策仍由本技能负责。
+   研究逻辑由 `$domain-research` 指导，本技能负责问题、边界、成功判据及决策的批准与记录。
    展示准确的拟议文件路径和完整 Markdown 变更。等待调用约定要求的所有批准：创建或推导 RQ，
    以及每次正式 RQ 更新，都需要明确批准。批准只约束已展示提案；任何变更后都要修订并重新展示。
    concluded Spec 的 Closure 影响在批准前仍是提案；报告其为已接受、已拒绝或待定。批准创建后，
    创建配置的 RQ 目录及其中的 `RQ.md` 与 `specs/`，再将已确认的 RQ 术语交给
    `$domain-research` 按需创建 `RQ-CONTEXT.md`；RQ 未获批创建前只保留术语提案。
-6. 每次写入后重读 `RQ.md`；RQ 状态或其他索引字段变化、新增 RQ 时，立即直接维护
-   所属 RQ 目录下的 `tracker.json` 并核对一致性。遵循项目 `AGENTS.md` 和
-   [进度跟踪表契约](../../resources/progress-tracker.md)；缺少项目约定时，规则补齐交由 `$calc-setup`。
+6. 每次写入后重读 `RQ.md`；状态或索引字段变更后，立即按项目 `AGENTS.md`、
+   [字段契约](../../resources/progress-tracker.md)和[维护契约](../../resources/progress-tracker-maintenance.md)
+   更新所属 RQ 的 `tracker.json` 并核对一致性。
    当已接受决策足以覆盖预期回答范围，且用户未完成请求包含 Spec 设计时，
    直接进入 `$calc-to-spec`，携带已解析 RQ、路径、已接受决策和完整剩余意图，使其能设计
    当前有证据支持的下一份完整 Spec。设计模式由 `$calc-to-spec` 在本次设计入口选择，

@@ -6,7 +6,6 @@ import stat
 import subprocess
 from pathlib import Path
 
-import pytest
 
 
 TEMPLATE_ROOT = Path("skills/calc-execute/assets/templates")
@@ -38,8 +37,7 @@ def _render_scf_template(plugin_root: Path, tmp_path: Path, handoff: str) -> Pat
     return rendered
 
 
-@pytest.fixture
-def vasp_commands(tmp_path):
+def _vasp_commands(tmp_path):
     commands = tmp_path / "commands"
     commands.mkdir()
     _write_executable(
@@ -110,7 +108,12 @@ def _vasp_run(tmp_path: Path, plugin_root: Path, vasp_commands, stage: str) -> t
     }
 
 
-def test_incar_mismatch_blocks(plugin_root, tmp_path):
+
+def test_vasp_scf_mae_and_parameter_integrity(plugin_root, tmp_path):
+    root = tmp_path
+    # Incar mismatch blocks.
+    tmp_path = root / 'incar_mismatch_blocks'
+    tmp_path.mkdir()
     upstream, prepared = tmp_path / "up", tmp_path / "new"
     upstream.write_text("ENCUT = 520\nISPIN = 2\n")
     script = plugin_root / SCRIPT_ROOT / "vasp/compare_incar_parameters.sh"
@@ -122,8 +125,10 @@ def test_incar_mismatch_blocks(plugin_root, tmp_path):
     result = subprocess.run(["bash", str(script), str(upstream), str(prepared), ""], capture_output=True)
     assert result.returncode != 0
 
-
-def test_scf_pbs_uses_run_local_immutable_inputs(plugin_root, tmp_path, vasp_commands):
+    # Scf pbs uses run local immutable inputs.
+    tmp_path = root / 'scf_pbs_uses_run_local_immutable_inputs'
+    tmp_path.mkdir()
+    vasp_commands = _vasp_commands(tmp_path)
     run, env = _vasp_run(tmp_path, plugin_root, vasp_commands, "scf")
     before = {path.name: path.read_bytes() for path in (run / "inputs").iterdir()}
 
@@ -134,8 +139,10 @@ def test_scf_pbs_uses_run_local_immutable_inputs(plugin_root, tmp_path, vasp_com
     assert (run / "logs/vasp.log").is_file()
     assert {path.name: path.read_bytes() for path in (run / "inputs").iterdir()} == before
 
-
-def test_scf_pbs_refuses_missing_input_and_prior_outputs(plugin_root, tmp_path, vasp_commands):
+    # Scf pbs refuses missing input and prior outputs.
+    tmp_path = root / 'scf_pbs_refuses_missing_input_and_prior_outputs'
+    tmp_path.mkdir()
+    vasp_commands = _vasp_commands(tmp_path)
     template = _render_scf_template(plugin_root, tmp_path, "none")
     run, env = _vasp_run(tmp_path, plugin_root, vasp_commands, "scf")
     (run / "inputs/POTCAR").unlink()
@@ -146,8 +153,10 @@ def test_scf_pbs_refuses_missing_input_and_prior_outputs(plugin_root, tmp_path, 
     assert result.returncode != 0
     assert (run / "outputs/prior").read_text() == "preserve\n"
 
-
-def test_mae_rendering_copies_the_approved_charge_handoff(plugin_root, tmp_path, vasp_commands):
+    # Mae rendering copies the approved charge handoff.
+    tmp_path = root / 'mae_rendering_copies_the_approved_charge_handoff'
+    tmp_path.mkdir()
+    vasp_commands = _vasp_commands(tmp_path)
     commands, _, _ = vasp_commands
     called = tmp_path / "mae.called"
     _write_executable(
@@ -172,10 +181,10 @@ printf 'completed from charge\n' > OUTCAR
     assert called.read_text().splitlines() == ["called"]
     assert {path.name: path.read_bytes() for path in (run / "inputs").iterdir()} == before
 
-
-def test_mae_rendering_blocks_before_execution_when_charge_handoff_is_missing(
-    plugin_root, tmp_path, vasp_commands
-):
+    # Mae rendering blocks before execution when charge handoff is missing.
+    tmp_path = root / 'mae_rendering_blocks_before_execution_when_charge_handoff_is_missing'
+    tmp_path.mkdir()
+    vasp_commands = _vasp_commands(tmp_path)
     commands, _, _ = vasp_commands
     called = tmp_path / "missing-mae.called"
     _write_executable(
@@ -191,8 +200,12 @@ def test_mae_rendering_blocks_before_execution_when_charge_handoff_is_missing(
     assert result.returncode != 0
     assert not called.exists()
 
-
-def test_band_pbs_runs_exact_vaspkit_and_vest_path(plugin_root, tmp_path, vasp_commands):
+def test_vasp_band_and_wannier_spin_interfaces(plugin_root, tmp_path):
+    root = tmp_path
+    # Band pbs runs exact vaspkit and vest path.
+    tmp_path = root / 'band_pbs_runs_exact_vaspkit_and_vest_path'
+    tmp_path.mkdir()
+    vasp_commands = _vasp_commands(tmp_path)
     run, env = _vasp_run(tmp_path, plugin_root, vasp_commands, "band")
     inputs_before = {path.name: path.read_bytes() for path in (run / "inputs").iterdir()}
 
@@ -207,8 +220,10 @@ def test_band_pbs_runs_exact_vaspkit_and_vest_path(plugin_root, tmp_path, vasp_c
     assert vasp_commands[2].read_text().splitlines() == ["21 211 1 "]
     assert {path.name: path.read_bytes() for path in (run / "inputs").iterdir()} == inputs_before
 
-
-def test_band_pbs_blocks_incomplete_spin_outputs(plugin_root, tmp_path, vasp_commands):
+    # Band pbs blocks incomplete spin outputs.
+    tmp_path = root / 'band_pbs_blocks_incomplete_spin_outputs'
+    tmp_path.mkdir()
+    vasp_commands = _vasp_commands(tmp_path)
     run, env = _vasp_run(tmp_path, plugin_root, vasp_commands, "band")
     incomplete = run / "inputs/vest2.py"
     _write_executable(incomplete, "from pathlib import Path\nPath('bandrange_spin0.dat').write_text('up')\n")
@@ -218,8 +233,10 @@ def test_band_pbs_blocks_incomplete_spin_outputs(plugin_root, tmp_path, vasp_com
     assert result.returncode != 0
     assert not (run / "outputs/bandrange_spin1.dat").exists()
 
-
-def test_wannier_prerun_requires_both_spin_interfaces(plugin_root, tmp_path, vasp_commands):
+    # Wannier prerun requires both spin interfaces.
+    tmp_path = root / 'wannier_prerun_requires_both_spin_interfaces'
+    tmp_path.mkdir()
+    vasp_commands = _vasp_commands(tmp_path)
     commands, nodefile, _ = vasp_commands
     _write_executable(
         commands / "vasp-wannier",
@@ -248,8 +265,9 @@ done
             assert (run / "outputs" / f"wannier90.{spin}.{suffix}").stat().st_size > 0
     assert {path.name: path.read_bytes() for path in inputs.iterdir()} == before
 
-
-def test_every_backend_pbs_uses_the_exact_run_local_prologue(plugin_root):
+def test_backend_prologue_and_server_handoff(plugin_root, tmp_path):
+    root = tmp_path
+    # Every backend pbs uses the exact run local prologue.
     expected = """RUN_DIR="${PBS_O_WORKDIR:?missing PBS work directory}"
 INPUTS_DIR="$RUN_DIR/inputs"
 OUTPUTS_DIR="$RUN_DIR/outputs"
@@ -271,8 +289,9 @@ cd "$OUTPUTS_DIR" || exit 1"""
         assert "rm -f" not in text
         assert "cp -f" not in text
 
-
-def test_common_prepare_stages_the_named_server_handoff_before_review(plugin_root, tmp_path):
+    # Common prepare stages the named server handoff before review.
+    tmp_path = root / 'common_prepare_stages_the_named_server_handoff_before_review'
+    tmp_path.mkdir()
     run = tmp_path / "TASK-band/RUN-002"
     inputs = run / "inputs"
     inputs.mkdir(parents=True)

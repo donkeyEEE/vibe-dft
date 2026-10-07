@@ -11,42 +11,20 @@ description: 显式辅助 Calc Project 用户了解插件术语与流程、domai
 
 ## 插件使用说明
 
-用户询问术语含义、核心流程、各记录及 skill 的职责、Tracker 在流程中的位置等插件用法时，
-直接解释。以 [领域术语](../../resources/project-context.md) 为概念依据；涉及进度跟踪表的
-存储、维护、重建或权威边界时，读取 [进度跟踪表契约](../../resources/progress-tracker.md)；
-涉及某阶段的具体操作时，读取该阶段 owning skill 的 `SKILL.md`。结合已配置项目的约定回答
-项目特定问题，并说明通用设计与项目实际配置的区别。
-
-回答应交代用户所问概念的作用及其与相邻记录或流程的关系。例如解释 Tracker 时，说明每个
-RQ 的 `tracker.json` 是 RQ、Spec、Task、Run 状态的派生摘要，由状态写入者同步维护，
-`show-cot` 汇总查询；RQ.md 和 Spec 保持权威。解释核心流程时，串起项目配置、RQ 决策、
-Spec 设计、Task/Run 执行与汇报或进度查询，并指出各阶段的 owning skill。说明每次
-进入 Spec 设计可选择自动或协作模式，选择不持久记录，后者在具体方案获批后发布。仅在用户要
-解决术语冲突、重新定义概念或修改领域词汇时调用 `$dev-engineering:domain-modeling`。
+用户询问插件术语、流程或记录职责时，以[领域术语](../../resources/project-context.md)解释。
+涉及进度记录的字段与权威时读取[字段契约](../../resources/progress-tracker.md)；
+涉及维护或重建时再读[维护契约](../../resources/progress-tracker-maintenance.md)。
+具体操作读取 owning skill 的 `SKILL.md`，项目特定问题结合已有配置回答。
+说明所问概念的作用、相邻流程和负责技能；科学设计或操作授权遵循对应入口。
+需要修改领域词汇时调用 `$dev-engineering:domain-modeling`。
 
 ## domain-research 使用说明
 
-用户询问 `domain-research` 的用途、适用场景或开发定位时，说明它属于 `calc-project`，
-用于在科研讨论和汇报中对齐科学术语及其物理含义。主要解决：
-
-- AI 将临时概括写成已有的专业术语。
-- 同一术语跨文献、材料、尺度或计算方法使用时，含义发生偏移。
-- 表达超出证据，例如将模型预测写成已观测现象，或将可能解释写成确定机制。
-
-它支持隐式调用，加载内置科研通用定义，在讨论中说明术语含义与适用范围，
-并依据已有证据校准表达强弱；确认后当场维护已有 RQ 的 `RQ-CONTEXT.md`（RQ 上下文），
-新 RQ 则在获批创建后写入，保留名称、简短解释和适用范围。例如解释“稳定”时，应交代所指的是
-动力学稳定、热力学稳定，还是实验条件下能够保存。
-
-`domain-research` 维护术语并核查“可能、支持、证实”等措辞是否符合已有证据。
-研究问题、科学设计和验收由对应 Calc 工作流负责。创建或修改 RQ、
-设计 Spec、解释执行结果和制作汇报时应用术语对齐，汇报尽量沿用已确认的项目与 RQ 术语，
-普通提交和状态查询无需重复检查。项目根 `CONTEXT.md`（项目上下文）由
-`$dev-engineering:domain-modeling` 维护；RQ 上下文由 `domain-research` 维护，`RQ.md` 不再
-维护上下文。Spec 保留具体设计假设和限定条件；科学决策变更由对应 Calc 技能处理。
-RQ 上下文从本研究已确认的关键术语开始建立；项目和插件已有定义按需读取，不重复收录。
-涉及具体操作时，读取同插件 `$domain-research` 的 `SKILL.md`；
-需要实际对齐研究术语时推荐该技能。
+`domain-research` 用物理因果链和计算剪枝分析研究机制、证据与计算取舍；
+对齐术语含义及适用范围，维护 RQ 的 `RQ-CONTEXT.md`，校准证据措辞并精简科学表达。
+它可隐式用于研究讨论、RQ/Spec 设计、结果解释和汇报。
+项目 `CONTEXT.md` 由 `$dev-engineering:domain-modeling` 维护，问题、设计和验收决策由对应 Calc 技能记录。
+涉及操作时读取同插件 `$domain-research` 的 `SKILL.md`；需要实际研究分析或术语对齐时推荐该技能。
 
 ## 推荐工作接口
 
@@ -54,9 +32,9 @@ RQ 上下文从本研究已确认的关键术语开始建立；项目和插件�
 
 | 用户目标 | 推荐 |
 |---|---|
-| 缺失或变更了稳定项目、RQ 存储配置、数据边界或集群配置 | `$calc-setup` |
+| 缺失或变更了稳定项目、RQ配置、数据边界或集群配置 | `$calc-setup` |
 | RQ 生命周期、已接受决策、未回答的 RQ 问题，或 concluded Spec 对 RQ 的影响 | `$calc-rq` |
-| RQ 当前下一主要判断的 Spec、科学承诺、Task DAG、条件、验收、停止规则或替换一份 Spec | `$calc-to-spec` |
+| RQ 当前研究目标的 Spec、科学承诺、Task DAG、条件、验收或替换一份 Spec | `$calc-to-spec` |
 | 推进 ready/active Spec；准备、提交、跟踪、同步、接受、纠正或闭合其 Run 与 Task | `$calc-execute` |
 | 按编号查询、记录、关联或合并 Issue，或委托推进其调研 | `$calc-issue` |
 | 围绕主题或选定 RQ/Spec 汇总已有证据，生成阶段汇报或结果汇报 | `$calc-report` |

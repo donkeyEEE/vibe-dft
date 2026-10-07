@@ -1,15 +1,5 @@
-# DFT+DMFT Read-only Checks
+# DFT+DMFT 只读检查
 
-Compare the exact prepared snapshot with the Spec-approved correlated atoms and
-subspace, projection/local-orbital window and order, U/J, double counting,
-solver and statistical settings, magnetic or PM interpretation, observables,
-and decisive convergence/acceptance criteria. Project source instructions may
-supply invocation and rendering mechanics only; they cannot add or override a
-scientific value.
+将准确的 prepared 快照与 Spec 批准的关联原子及子空间、投影/局域轨道窗口和顺序、U/J、双计数、求解器与统计设置、磁性或 PM 解释、可观测量及决定性的收敛/验收准则比较。项目来源说明只提供调用和渲染方式，不能增加或覆盖科学值。
 
-For postprocessing, establish that the prepared route is the approved
-impurity-spectral MaxEnt, self-energy MaxEnt, self-energy Pade, or another route
-explicitly fixed by the Spec, and that it produces the declared lightweight
-outputs. HDF5 sources and operations stay server-side, while synchronization
-excludes HDF5. Identify any missing commitment, ambiguous scientific criterion,
-or prepared input, path, environment, and packaging defect precisely.
+后处理须采用已批准的杂质谱 MaxEnt、自能 MaxEnt、自能 Pade 或 Spec 明确指定的其他路径，并产生声明的轻量输出。HDF5 来源与操作保留在服务端，同步排除 HDF5。准确指出缺失的科学承诺、含糊的科学准则，以及准备输入、路径、环境或打包缺陷。

@@ -1,14 +1,5 @@
-# Magnetic VASP Read-only Checks
+# 磁性 VASP 只读检查
 
-From the exact prepared POSCAR and INCAR, establish an unambiguous mapping when
-magnetic meaning depends on atom identity or ordering. Compare the index-order
-`MAGMOM` assignment with the intended site or layer moments in the approved
-Spec. A per-atom table is optional; use a compact grouping, deterministic check,
-table, or other reproducible evidence suited to the structure. For a uniform,
-single-sublattice assignment with unchanged ordering, verifying array length,
-grouping, and values is sufficient. Do not assign or infer a magnetic order.
+磁性含义依赖原子身份或顺序时，从准确的 prepared POSCAR 和 INCAR 建立无歧义映射，将按索引排列的 `MAGMOM` 与 Spec 批准的位点或层磁矩比较。按结构选择简明分组、确定性检查、表格或其他可复现证据，无需固定逐原子表。对于顺序未变的均匀单子晶格赋值，核对数组长度、分组和值即可。评审不指定或推断磁序。
 
-Distinguish inability to establish the mapping because the intended order is
-scientifically underdetermined from a rendering or ordering defect with an
-already approved meaning. A near-zero total moment, completed VASP job, or
-downstream convergence does not establish the intended order.
+区分因目标磁序科学含义未定而无法建立映射，与已有批准含义下的渲染或排序缺陷。近零总磁矩、完成的 VASP 作业或下游收敛均不能证明目标磁序。

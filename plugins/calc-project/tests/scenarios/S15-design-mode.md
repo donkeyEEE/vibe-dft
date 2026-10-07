@@ -48,9 +48,9 @@ authorities; neither records a design-mode selection.
 ## Expected observations
 
 - Without an explicit choice, the agent offers automatic (suggested default) and collaborative, then waits. Silence does not select automatic or publish a Spec. A choice already stated in this request avoids the question.
-- An automatic answer allows incremental publication without a separate Spec approval. Collaborative design interviews before drafting and shows judgment, Task graph, acceptance, stopping rule, target, and RQ index effect before requesting explicit publication approval.
+- An automatic answer allows incremental publication without a separate Spec approval. Collaborative design interviews before drafting and shows judgment, Task graph, acceptance, any applicable stopping rule, target, and RQ index effect before requesting explicit publication approval.
 - The choice is only for the current new Spec or replacement. A fresh request asks again; the next Spec reached through calc-execute asks again unless the user explicitly scoped the choice to the whole continuous request. No RQ.md field, Spec field, preference file, or tracker entry records the choice.
 - A changed proposal invalidates earlier approval. Without approval, collaborative publication and replacement leave the current RQ index, Spec, physical Runs, and accepted evidence unchanged.
 - Collaborative replacement only cancels an active writer after approval of the concrete impact, then waits for no writer before changing the design. It preserves old Runs and uses a new Run for changed scientific meaning.
 - Calc-rq's handoff reaches the choice without updating RQ.md for the choice. Calc-execute's RQ continuation reaches the same entry rule; its execution mandate does not approve the next scientific design. Design-only requests stop after publication and never submit a job.
-- Mode choice does not alter previous Specs, Run evidence, or `light | strict` settings.
+- Mode choice does not alter previous Specs or Run evidence. The only entry choice is design mode; evidence levels are no longer offered.

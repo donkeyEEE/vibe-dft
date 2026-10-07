@@ -1,31 +1,17 @@
-# Spin-resolved Wannier90 window design
+# 自旋分辨 Wannier90 窗口设计
 
-Use this reference before a Spec selects final spin-resolved Wannier90 outer and
-frozen windows. A VASP-to-Wannier pre-run may provide broad evidence, but it
-does not determine the final physical subspace.
+Spec 选择最终自旋分辨外窗口和冻结窗口前读取本参考资料。VASP-to-Wannier pre-run 可提供宽范围证据，但不能决定最终物理子空间。
 
-## Design evidence
+## 设计证据
 
-Read the accepted RQ decisions and, for each spin channel, bandrange or
-equivalent band evidence, projection character, `NUM_WANN`, frozen-state counts
-per k point, WOUT diagnostics, and VASP-versus-Wannier fit evidence. Set the
-target subspace, projections, separate outer and frozen window bounds, fit
-criteria, and stopping rule for each spin channel from the RQ and evidence.
+读取已接受的 RQ 决策及每个相关自旋通道的可用证据。Bandrange、投影特征、冻结态数、WOUT 诊断及 VASP-versus-Wannier 拟合可支持子空间选择，也可成为探索 Task 的输出。由 `$domain-research` 选择所需证据。依据 RQ 和证据确定目标子空间、投影、分别指定的外窗口与冻结窗口边界、拟合准则及适用的停止规则。
 
-## Commitments and acceptance
+## 承诺与验收
 
-For each spin channel, the Spec records:
+逐自旋通道记录所选科学承诺，并按目标用途选择验收证据：
 
-- outer and frozen window bounds;
-- `NUM_WANN`, the maximum frozen-state count per k point, and the projection
-  set;
-- the WOUT diagnostics and spin-resolved VASP-versus-Wannier fit evidence that
-  decide acceptance. The light level asks only for the fit evidence needed to
-  support the principal judgment; it does not default to extra window scans.
+- 外窗口和冻结窗口边界；
+- `NUM_WANN`、投影集合及冻结态数兼容性；
+- 评估目标子空间或下游用途需要时，提供 WOUT 诊断或自旋分辨 VASP-versus-Wannier 拟合证据。
 
-A frozen window containing more states at any k point than `NUM_WANN` is not an
-acceptable design. Do not silently shrink, expand, or share a window between
-spin channels. Bandrange does not replace inspection of projections, WOUT
-diagnostics, and fit evidence; a successful Wannier90 Run or broad pre-run
-window alone does not establish physical adequacy. Replaced attempts remain
-preserved Runs rather than a Spec revision-history section.
+任一 k 点的冻结窗口态数超过 `NUM_WANN` 时，设计不合格。不得擅自缩小、扩大或跨自旋共用窗口。仅有 Bandrange 可能仍无法确定子空间特征或插值质量；成功的 Wannier90 Run 或宽 pre-run 窗口也不能单独证明物理适当性。被替换的尝试保留为 Runs，不另设 Spec 修订历史章节。

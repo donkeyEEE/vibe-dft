@@ -1,5 +1,5 @@
-# VASP SCF execution
+# VASP SCF 计算
 
-Use `assets/templates/vasp/scf/run.pbs.template` and render `__VASP_CHARGE_HANDOFF__` as `none`. The preparation body creates only the Spec-approved POTCAR or KPOINTS described in `common.md`; it does not defer VASPKIT input generation to PBS. The validation body checks every named input, the rendered cluster environment, `mpirun`, and the configured VASP executable, with each command propagating failure by `|| return 1`.
+使用 `assets/templates/vasp/scf/run.pbs.template`，并将 `__VASP_CHARGE_HANDOFF__` 渲染为 `none`。准备部分只生成 `common.md` 中说明且经 Spec 批准的 POTCAR 或 KPOINTS；不得把 VASPKIT 输入生成推迟到 PBS。验证部分检查所有具名输入、渲染后的集群环境、`mpirun` 和已配置的 VASP 可执行文件；每条命令都必须以 `|| return 1` 传递失败。
 
-Require a nonempty `OUTCAR` and the Spec's convergence and handoff outputs. Keep the original final `E-fermi` in `OUTCAR`; downstream TB2J uses that declared convention rather than an inferred Fermi value.
+要求 `OUTCAR` 非空，并检查 Spec 指定的收敛和交接产物。保留原始的最终 `E-fermi`（记录在 `OUTCAR` 中）；下游 TB2J 使用这个已声明的约定，不推断其他费米能级值。

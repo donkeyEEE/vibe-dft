@@ -1,34 +1,17 @@
-# Directional SOC-MAE scientific design
+# 方向 SOC-MAE 科学设计
 
-Use this reference for a magnetocrystalline anisotropy energy
-(MAE) judgment based on directional static SOC calculations. It defines a
-comparable pair; it does not generate inputs or choose material settings.
+基于方向静态 SOC 计算研究磁晶各向异性能（MAE）时读取本参考资料。以下承诺描述固定电荷比较；`$domain-research` 可指导选择其他有证据支持的方法，并明确其可比性条件。
 
-## Design evidence
+## 设计证据
 
-Read the accepted RQ decisions, source SCF and charge-density provenance,
-chemical cells and lattice constants, and material-specific VASP settings.
-Set the compared directions, `MAGMOM`, cutoff, k mesh, Hubbard parameters,
-electronic convergence settings, spinor `NBANDS`, and reported energy-difference
-convention from the accepted question and evidence. Add directions or angular
-scans only when the judgment requires them or the strict level explicitly asks.
+读取已接受的 RQ 决策、来源 SCF 和电荷密度来源、化学晶胞、晶格常数及材料特定 VASP 设置。依据已接受问题和证据确定比较方向、`MAGMOM`、截断、k mesh、Hubbard 参数、电子收敛设置、旋量 `NBANDS` 及报告能量差的约定。按研究目标和材料证据决定是否增加方向或角度扫描。
 
-## Comparable-pair commitments
+## 固定电荷可比对的承诺
 
-1. Both directional tasks use the same selected SCF charge density with
-   `ISTART=0` and `ICHARG=11`.
-2. Both use `LSORBIT=.TRUE.`, `ISYM=-1`, and the selected spinor `NBANDS`.
-3. With `LSORBIT=.TRUE.`, `MAGMOM` has three components for every ion in the
-   spinor-space basis defined by `SAXIS`. With the default `SAXIS`, that is the
-   Cartesian basis. Retain all three components even for collinear initial
-   moments.
-4. The paired physical inputs are identical except for the selected `SAXIS`
-   direction.
-5. The Spec states the energy convention explicitly, for example
-   `MAE = E[100] - E[001]`, and requires the result and units under that same
-   convention.
+1. 两个方向 Task 使用同一选定 SCF 电荷密度，并采用 `ISTART=0` 和 `ICHARG=11`。
+2. 两者均采用 `LSORBIT=.TRUE.`、`ISYM=-1` 及所选旋量 `NBANDS`。
+3. `LSORBIT=.TRUE.` 时，每个离子的 `MAGMOM` 在 `SAXIS` 定义的旋量空间基底中有三个分量。默认 `SAXIS` 对应笛卡尔基底；即使初始磁矩共线，也须保留三个分量。
+4. 两者物理输入除所选 `SAXIS` 方向外完全相同。
+5. Spec 明确能量约定，例如 `MAE = E[100] - E[001]`，并要求按同一约定报告结果及单位。
 
-Unequal chemical cells or lattice constants do not by themselves establish a
-pure interface effect. The acceptance rule must preserve and compare the source
-task and both directional inputs. Research unresolved choices and interview
-only if the principal judgment remains indeterminate.
+不同化学晶胞或晶格常数本身不能证明纯界面效应。采用固定电荷方法时，保留解释比较所需的来源 Task 与方向输入 provenance。未决选择先调研，主要判断仍未确定时才访谈。

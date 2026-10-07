@@ -1,59 +1,35 @@
-# Simple Correction
+# 简单纠错
 
-Use this branch for a reproducible execution failure with one direct root cause
-established by logs, deterministic checks, or the loaded backend rules. The
-repair must leave the Spec's scientific commitments, task commitment, DAG,
-acceptance, and stopping rule unchanged.
+用于可复现且已由日志、确定性检查或后端规则确定单一直接根因的执行故障。
+修复须保持 Spec 的科学承诺、Task 承诺、DAG、验收和停止规则。
 
-## Choose the Run
+## 选择 Run
 
-Reuse the current Run by default when it is `prepared`, `failed`, or `finished`,
-no job for it is active or may still write, and its products have not been
-adopted by task acceptance and need not remain available for provenance,
-evidence, or comparison. Execution-only
-repairs include command spelling, environment-loading order, paths, scheduler
-directives, resource-launch mechanics, generated script mechanics, and file
-placement. It may also revise an execution-owned parameter selected by
-`$calc-execute` when the new value remains within the same deterministic basis
-and scientific meaning. An explicit Spec value and upstream identity stay
-unchanged.
+默认复用 `prepared`、`failed` 或 `finished` 的 current Run，前提是没有活动或可能写入的作业，
+产物尚未被 Task 验收采用，也无需保留作 provenance、证据或比较。
+执行修复包括命令拼写、环境加载顺序、路径、调度器指令、资源启动、生成脚本和文件位置。
+`$calc-execute` 选定的执行参数也可在相同确定性依据与科学含义内调整；Spec 显式值和上游身份保持不变。
 
-Create a new Run when any of these applies:
+以下情况创建新 Run：
 
-- the current Run is accepted or supplies recorded scientific evidence;
-- a scientific input, method, structure, parameter, upstream identity, task
-  commitment, acceptance, or stopping rule changes;
-- old and corrected results must remain comparable;
-- the provenance of existing products is uncertain; or
-- a submitted job is active, cancellation is unconfirmed, or another process
-  may write the Run.
+- current Run 已接受或提供已记录科学证据；
+- 科学输入、方法、结构、参数、上游身份、Task 承诺、验收或停止规则变化；
+- 旧结果和纠正结果需保留比较；
+- 现有产物 provenance 不确定；
+- 已提交作业仍活动、取消未确认，或其他进程可能写入。
 
-A required Spec change is not made here. Preserve the current Run and route the
-change to `$calc-to-spec`; after safe replacement, execute it in a new Run.
+Spec 变更交 `$calc-to-spec` 按本次设计模式处理，保留 current Run，安全替换后用新 Run 执行。
 
-## Apply and requalify
+## 修复并重新取得提交资格
 
-Establish the evidence, root cause, exact changes, selected Run path, artifacts
-that will be replaced, and effects before writing. Continue automatically when
-the repair preserves the approved scientific meaning and the user's explicit
-constraints. Handle submission, cancellation, resource changes, and affected
-Run-local replacement through the normal execution path. Before reusing a
-failed Run, record its scheduler identity and concise failure cause in the Spec
-Run row, leaving detailed diagnosis in the Run logs or troubleshooting record.
-After correction, record only the material difference from the prior attempt
-and the current advancement decision. Then replace only the affected Run-local
-inputs and derived outputs or logs needed for a clean retry. Do not touch
-another Run, an accepted artifact, an approved upstream source, or the
-task-level sources.
+写入前明确证据、根因、准确变更、Run 路径、将替换的产物及影响。
+符合既有科学含义和用户约束时自动继续；提交、取消、资源调整和 Run-local 替换走正常执行流程。
+复用失败 Run 前，在 Spec 的 Run 行记录调度器身份和简短失败原因，详细诊断保留在 Run 日志或排查记录中。
+修复后仅记录与上次尝试的实质差异及当前推进判断，再替换重试所需的受影响 Run-local 输入、派生产物或日志。
+保留其他 Run、已接受产物、已批准上游来源及 Task 级来源。
 
-Any in-place change invalidates the Run's previous digest, validation, and
-review. Prepare and validate the corrected snapshot, invoke a fresh transient
-review, and submit only that unchanged reviewed snapshot. Update the same Run record from new scheduler and
-result evidence, and accept it only through the unchanged approved criteria.
+原地变更使旧 digest、验证和评审失效。重新准备、验证并调用瞬时评审，
+仅提交未再变动的受评快照；用新调度器与结果证据更新同一 Run，仍按原验收要求接受。
 
-When the root cause is not yet established, return to [calculation
-troubleshooting](calculation-troubleshooting.md) and come back once evidence
-supports a correction. A possible
-change to scientific commitment is not simple correction and stops only when
-approved authorities cannot determine the needed scientific judgment. Preserve
-evidence across the diagnostic path.
+根因未确定时返回[计算故障排查](calculation-troubleshooting.md)，补足证据后再纠正。
+涉及科学承诺的潜在变化进入相应科学设计流程；仅在既有权威无法确定所需科学判断时停止，沿途保留证据。

@@ -1,4 +1,4 @@
 interface:
   display_name: "Calc to Spec"
   short_description: "按本次选择的模式发布或替换 Spec"
-  default_prompt: "$calc-to-spec 为指定 RQ 的下一份完整 Spec 或当前设计替换选择本次模式并推进。"
+  default_prompt: "$calc-to-spec 由 $domain-research 指导研究逻辑与计算取舍，为指定 RQ 的下一份可执行 Spec 或当前设计替换选择本次模式并推进。"

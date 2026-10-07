@@ -1,5 +1,5 @@
-# VASP Wannier pre-run execution
+# VASP Wannier 预计算
 
-Use `assets/templates/vasp/wannier-prerun/cluster-env.sh.template` and `assets/templates/vasp/wannier-prerun/run.pbs.template`. Before review, prepare POTCAR and copy the exact approved SCF `CHGCAR` and `WAVECAR` through the common immutable handoff.
+使用 `assets/templates/vasp/wannier-prerun/cluster-env.sh.template` 和 `assets/templates/vasp/wannier-prerun/run.pbs.template`。评审前准备 POTCAR，并通过通用的不可变交接复制准确且已批准的 SCF `CHGCAR` 和 `WAVECAR`。
 
-The prepared INCAR contains only the approved broad pre-run outer window (`dis_win_min = -10`, `dis_win_max = 10`) and omits `dis_froz_*`; it does not determine the final subspace. Require nonempty spin-resolved `wannier90.1.{amn,mmn,eig,win}` and `wannier90.2.{amn,mmn,eig,win}`. A missing channel blocks the handoff.
+准备好的 INCAR 只包含 Spec 批准的宽预计算外窗口（`dis_win_min = -10`、`dis_win_max = 10`），不包含 `dis_froz_*`；它不用于确定最终子空间。以下各自旋通道文件都必须非空：`wannier90.1.{amn,mmn,eig,win}` 和 `wannier90.2.{amn,mmn,eig,win}`。任一通道缺失都会阻止交接。

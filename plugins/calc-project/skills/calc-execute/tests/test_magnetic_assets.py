@@ -51,7 +51,12 @@ def _prepare_vampire_run(plugin_root: Path, tmp_path: Path, executable: Path, na
     return run
 
 
-def test_vest2_is_byte_identical_and_runs_noninteractively(plugin_root, tmp_path):
+
+def test_magnetic_asset_provenance_plotting_and_scientific_boundaries(plugin_root, tmp_path):
+    root = tmp_path
+    # Vest2 is byte identical and runs noninteractively.
+    tmp_path = root / 'vest2_is_byte_identical_and_runs_noninteractively'
+    tmp_path.mkdir()
     script = plugin_root / SCRIPT_ROOT / "wannier90/vest2.py"
     assert hashlib.sha256(script.read_bytes()).hexdigest() == VEST2_SHA256
     (tmp_path / "DOSCAR").write_text("1\n2\n3\n4\n5\n0 0 0 0.5\n")
@@ -66,10 +71,7 @@ def test_vest2_is_byte_identical_and_runs_noninteractively(plugin_root, tmp_path
     assert (tmp_path / "bandrange_spin0.dat").stat().st_size > 0
     assert (tmp_path / "bandrange_spin1.dat").stat().st_size > 0
 
-
-def test_migrated_assets_match_accepted_hashes(plugin_root):
-    # Helper hashes are the byte-preserved DT005 sources. The environment
-    # template hash includes its accepted Run-local filename comment rewrite.
+    # Migrated assets match accepted hashes.
     expected = {
         "skills/calc-execute/scripts/vasp/compare_incar_parameters.sh": "fcbff4b79759e677bd886918004b62e6e3d02aa48cb7f614152934f8ad9f4141",
         "skills/calc-execute/scripts/vasp/plot_vasp_band.py": "16a814d3b4aaf7148994461fd87959b3eaf2729b8b206b4a45d4751e428517ff",
@@ -83,14 +85,14 @@ def test_migrated_assets_match_accepted_hashes(plugin_root):
     for target, digest in expected.items():
         assert hashlib.sha256((plugin_root / target).read_bytes()).hexdigest() == digest
 
-
-def test_wannier_window_template_names_the_run_local_pbs(plugin_root):
+    # Wannier window template names the run local pbs.
     template = plugin_root / TEMPLATE_ROOT / "wannier90/wannier-run.env.template"
     first_line = template.read_text(encoding="utf-8").splitlines()[0]
     assert first_line == "# Fill all eight values before submitting inputs/run.pbs."
 
-
-def test_all_plot_helpers_run_on_synthetic_data(plugin_root, tmp_path):
+    # All plot helpers run on synthetic data.
+    tmp_path = root / 'all_plot_helpers_run_on_synthetic_data'
+    tmp_path.mkdir()
     env = {**os.environ, "MPLBACKEND": "Agg"}
     band = tmp_path / "BAND.dat"
     band.write_text("0 0\n1 1\n\n0 0.5\n1 1.5\n")
@@ -125,8 +127,22 @@ def test_all_plot_helpers_run_on_synthetic_data(plugin_root, tmp_path):
     ], check=True, env=env)
     assert vampire_png.stat().st_size > 0
 
+    # Scientific changes stop while rendering defects repair.
+    backend = plugin_root / "skills/calc-execute/references/backends"
+    magnetic = (backend / "vasp/common.md").read_text()
+    mae = (backend / "vasp/mae.md").read_text()
+    windows = (backend / "wannier90/common.md").read_text()
+    assert "MAGMOM" in magnetic
+    assert "自动修复渲染缺陷" in magnetic
+    assert "若预期的物理顺序尚未确定" in magnetic
+    assert "未经批准的方向只要有一项不同，就阻止流程" in mae and "$calc-to-spec" in mae
+    assert "值发生变化、两边共享、缺失或顺序错误都会阻止流程" in windows and "$calc-to-spec" in windows
 
-def test_wannier90_pbs_preserves_per_spin_windows_and_outputs(plugin_root, tmp_path):
+def test_wannier_windows_and_tb2j_handoff(plugin_root, tmp_path):
+    root = tmp_path
+    # Wannier90 pbs preserves per spin windows and outputs.
+    tmp_path = root / 'wannier90_pbs_preserves_per_spin_windows_and_outputs'
+    tmp_path.mkdir()
     run = _make_run(tmp_path, "RUN-wannier")
     inputs = run / "inputs"
     commands = tmp_path / "commands"
@@ -172,8 +188,9 @@ printf 'converged\n' > "${seed}.wout"
     assert "test -s wannier90.1.wout" in template_text
     assert "test -s wannier90.2.wout" in template_text
 
-
-def test_wannier90_pbs_rejects_an_incomplete_window_set(plugin_root, tmp_path):
+    # Wannier90 pbs rejects an incomplete window set.
+    tmp_path = root / 'wannier90_pbs_rejects_an_incomplete_window_set'
+    tmp_path.mkdir()
     run = _make_run(tmp_path, "RUN-wannier-missing")
     inputs = run / "inputs"
     (inputs / "cluster-env.sh").write_text("export WANNIER90_EXE=/bin/true\n")
@@ -181,8 +198,9 @@ def test_wannier90_pbs_rejects_an_incomplete_window_set(plugin_root, tmp_path):
     result = _run_pbs(plugin_root / TEMPLATE_ROOT / "wannier90/run.pbs.template", run)
     assert result.returncode != 0
 
-
-def test_tb2j_pbs_uses_declared_fermi_and_kmesh_and_requires_handoff(plugin_root, tmp_path):
+    # Tb2j pbs uses declared fermi and kmesh and requires handoff.
+    tmp_path = root / 'tb2j_pbs_uses_declared_fermi_and_kmesh_and_requires_handoff'
+    tmp_path.mkdir()
     run = _make_run(tmp_path, "RUN-tb2j")
     inputs = run / "inputs"
     commands = tmp_path / "commands-tb2j"
@@ -220,8 +238,11 @@ printf 'output:material-magnetisation\n' > TB2J_results/Vampire/input
         (missing / "inputs" / name).write_bytes((inputs / name).read_bytes())
     assert _run_pbs(rendered, missing, env).returncode != 0
 
-
-def test_vampire_pbs_checks_model_bytes_and_named_columns(plugin_root, tmp_path):
+def test_vampire_model_manifest_output_and_result_packaging(plugin_root, tmp_path):
+    root = tmp_path
+    # Vampire pbs checks model bytes and named columns.
+    tmp_path = root / 'vampire_pbs_checks_model_bytes_and_named_columns'
+    tmp_path.mkdir()
     commands = tmp_path / "commands-vampire"
     commands.mkdir()
     _write_executable(commands / "vampire", """#!/bin/bash
@@ -250,8 +271,9 @@ fi
     malformed = _prepare_vampire_run(plugin_root, tmp_path, commands / "vampire", "RUN-vampire-malformed")
     assert _run_pbs(template, malformed, {**env, "MALFORMED_VAMPIRE": "1"}).returncode != 0
 
-
-def test_vampire_rejects_an_omitted_manifest_entry_before_execution(plugin_root, tmp_path):
+    # Vampire rejects an omitted manifest entry before execution.
+    tmp_path = root / 'vampire_rejects_an_omitted_manifest_entry_before_execution'
+    tmp_path.mkdir()
     commands = tmp_path / "commands-vampire-omitted"
     commands.mkdir()
     calls = tmp_path / "omitted.calls"
@@ -272,8 +294,9 @@ def test_vampire_rejects_an_omitted_manifest_entry_before_execution(plugin_root,
     assert result.returncode != 0
     assert not calls.exists()
 
-
-def test_vampire_rejects_an_absolute_manifest_entry_before_execution(plugin_root, tmp_path):
+    # Vampire rejects an absolute manifest entry before execution.
+    tmp_path = root / 'vampire_rejects_an_absolute_manifest_entry_before_execution'
+    tmp_path.mkdir()
     commands = tmp_path / "commands-vampire-absolute"
     commands.mkdir()
     calls = tmp_path / "absolute.calls"
@@ -298,8 +321,9 @@ def test_vampire_rejects_an_absolute_manifest_entry_before_execution(plugin_root
     assert result.returncode != 0
     assert not calls.exists()
 
-
-def test_pack_helper_excludes_models_and_large_files(plugin_root, tmp_path):
+    # Pack helper excludes models and large files.
+    tmp_path = root / 'pack_helper_excludes_models_and_large_files'
+    tmp_path.mkdir()
     source = tmp_path / "source"
     destination = tmp_path / "packed"
     source.mkdir()
@@ -311,15 +335,3 @@ def test_pack_helper_excludes_models_and_large_files(plugin_root, tmp_path):
     ], capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert {p.name for p in destination.iterdir()} == {"exchange.out", "M_vs_T.png", "manifest.included", "manifest.skipped"}
-
-
-def test_scientific_changes_stop_while_rendering_defects_repair(plugin_root):
-    backend = plugin_root / "skills/calc-execute/references/backends"
-    magnetic = (backend / "vasp/common.md").read_text()
-    mae = (backend / "vasp/mae.md").read_text()
-    windows = (backend / "wannier90/common.md").read_text()
-    assert "MAGMOM" in magnetic
-    assert "Repair rendering defects automatically" in magnetic
-    assert "stop when the intended physical order is not determined" in magnetic
-    assert "unapproved direction blocks" in mae and "$calc-to-spec" in mae
-    assert "Changed, shared, missing, or reordered values block" in windows and "$calc-to-spec" in windows

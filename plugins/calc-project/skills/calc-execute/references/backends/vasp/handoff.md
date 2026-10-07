@@ -1,5 +1,5 @@
-# VASP server-side handoff
+# VASP 服务器端交接
 
-Resolve every source from the selected Spec's exact upstream task and current Run. Never infer an upstream Run from neighboring directories. Large `CHGCAR` and `WAVECAR` files remain server-side and are excluded from local transfer.
+从所选 Spec 指定的准确上游 Task 和 current Run 解析每个来源。不得从相邻目录推测上游 Run。大型 `CHGCAR` 和 `WAVECAR` 保留在服务器，并排除在本地传输之外。
 
-During `run.sh prepare`, call `copy_immutable SOURCE DESTINATION || return 1` once per declared file. Band uses the accepted SCF `outputs/CHGCAR`; Wannier pre-run uses the accepted SCF `outputs/CHGCAR` and `outputs/WAVECAR`; MAE uses the one approved SCF `outputs/CHGCAR` for both directional Runs. Existing differing destinations stop preparation. Record source and destination paths and compare bytes before validation and transient review.
+执行 `run.sh prepare` 时，对每个声明文件分别调用一次 `copy_immutable SOURCE DESTINATION || return 1`。Band 使用已接受 SCF 的 `outputs/CHGCAR`；Wannier pre-run 使用已接受 SCF 的 `outputs/CHGCAR` 和 `outputs/WAVECAR`；MAE 的两个方向 Run 使用同一个已批准 SCF 的 `outputs/CHGCAR`。目标路径已有不同文件时，准备必须停止。验证和瞬时评审前记录来源与目标路径，并比较文件字节。

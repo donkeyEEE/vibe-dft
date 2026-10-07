@@ -29,10 +29,10 @@ def valid_argv(tmp_path: Path, message: str = "continue **carefully**") -> list[
     ]
 
 
-def test_builds_fixed_context_envelope(load_script, tmp_path):
+def test_monitor_validates_inputs_and_builds_wake_envelope(load_script, tmp_path):
     monitor = load_script(SCRIPT)
-    config = monitor.parse_args(valid_argv(tmp_path))
-
+    argv = valid_argv(tmp_path)
+    config = monitor.parse_args(argv)
     assert monitor.build_delivery(config) == (
         "PBS_JOB_LEFT_QSTAT\n"
         "host=mu01\n"
@@ -41,11 +41,7 @@ def test_builds_fixed_context_envelope(load_script, tmp_path):
         f"run={tmp_path / 'TASK-001' / 'RUN-001'}\n"
         "instruction=continue **carefully**"
     )
-
-
-@pytest.mark.parametrize(
-    ("option", "value", "error"),
-    [
+    for option, value, error in (
         ("--host", "mu01; reboot", "host"),
         ("--job-id", "123.mu01; reboot", "job ID"),
         ("--thread-id", "old-thread", "thread ID"),
@@ -53,88 +49,42 @@ def test_builds_fixed_context_envelope(load_script, tmp_path):
         ("--message", "界" * 5462, "16 KiB"),
         ("--interval", "0", "interval"),
         ("--interval", "nan", "interval"),
-    ],
-)
-def test_rejects_invalid_values(load_script, tmp_path, option, value, error):
+        ("--spec", "relative-spec.md", "Spec"),
+    ):
+        invalid = argv.copy()
+        if option in invalid:
+            invalid[invalid.index(option) + 1] = value
+        else:
+            invalid.extend([option, value])
+        with pytest.raises(ValueError, match=error):
+            monitor.parse_args(invalid)
+
+
+def test_monitor_waits_then_delivers_once_even_when_queue_fails(load_script, tmp_path):
     monitor = load_script(SCRIPT)
-    argv = valid_argv(tmp_path)
-    if option in argv:
-        argv[argv.index(option) + 1] = value
-    else:
-        argv.extend([option, value])
-
-    with pytest.raises(ValueError, match=error):
-        monitor.parse_args(argv)
-
-
-def test_requires_existing_absolute_spec_and_run(load_script, tmp_path):
-    monitor = load_script(SCRIPT)
-    argv = valid_argv(tmp_path)
-    argv[argv.index("--spec") + 1] = "relative-spec.md"
-
-    with pytest.raises(ValueError, match="Spec"):
-        monitor.parse_args(argv)
-
-
-def test_qstat_loads_remote_profile_and_zero_waits(load_script, tmp_path):
-    monitor = load_script(SCRIPT)
-    config = monitor.parse_args(valid_argv(tmp_path))
-    calls = []
+    config = monitor.parse_args(valid_argv(tmp_path, message="next\nstep"))
+    calls, sleeps = [], []
     statuses = iter([0, 7])
 
-    def runner(argv):
+    def query(argv):
         calls.append(argv)
         return SimpleNamespace(returncode=next(statuses))
 
-    sleeps = []
-    status = monitor.wait_until_left_qstat(config, runner=runner, sleep=sleeps.append)
-
-    assert status == 7
-    assert calls == [
-        [
-            "ssh",
-            "mu01",
-            "source /etc/profile >/dev/null 2>&1 && exec qstat 123.mu01",
-        ],
-        [
-            "ssh",
-            "mu01",
-            "source /etc/profile >/dev/null 2>&1 && exec qstat 123.mu01",
-        ],
-    ]
+    assert monitor.wait_until_left_qstat(config, runner=query, sleep=sleeps.append) == 7
+    assert calls == [[
+        "ssh", "mu01", "source /etc/profile >/dev/null 2>&1 && exec qstat 123.mu01",
+    ]] * 2
     assert sleeps == [30.0]
 
+    for status in (0, 19):
+        calls.clear()
 
-def test_nonzero_qstat_causes_exactly_one_queue_attempt(load_script, tmp_path):
-    monitor = load_script(SCRIPT)
-    config = monitor.parse_args(valid_argv(tmp_path, message="next\nstep"))
-    calls = []
+        def deliver(argv):
+            calls.append(argv)
+            return SimpleNamespace(returncode=status)
 
-    def runner(argv):
-        calls.append(argv)
-        return SimpleNamespace(returncode=0)
-
-    assert monitor.deliver(config, runner=runner) == 0
-    assert calls == [
-        [
-            "codex",
-            "queue",
-            "--thread",
-            THREAD_ID,
-            "--message",
-            monitor.build_delivery(config),
-        ]
-    ]
-
-
-def test_queue_failure_is_returned_without_retry(load_script, tmp_path):
-    monitor = load_script(SCRIPT)
-    config = monitor.parse_args(valid_argv(tmp_path))
-    calls = []
-
-    def runner(argv):
-        calls.append(argv)
-        return SimpleNamespace(returncode=19)
-
-    assert monitor.deliver(config, runner=runner) == 19
-    assert len(calls) == 1
+        assert monitor.deliver(config, runner=deliver) == status
+        assert calls == [[
+            "codex", "queue", "--thread", THREAD_ID,
+            "--message", monitor.build_delivery(config),
+        ]]

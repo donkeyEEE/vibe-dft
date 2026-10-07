@@ -1,94 +1,49 @@
-# Calculation Troubleshooting
+# 计算故障排查
 
-Read this reference for every selected task with an abnormal preparation,
-validation, review, execution, numerical result, resource use, or claimed
-completion. It owns the diagnostic loop from locating the anomaly through
-verified disposition. The Spec remains the scientific authority, and the Run
-and task retain their actual states throughout the loop.
+选定 Task 的准备、验证、评审、执行、数值结果、资源使用或完成声明异常时读取。
+本流程负责定位异常、补证、处置与验证；Spec 保持科学权威，Run 与 Task 如实记录状态。
 
-## Locate the anomaly and define the problem
+## 定位异常并定义问题
 
-Resolve the selected Spec, task, current Run, declared upstream Runs, target
-environment, and applicable backend references. Inspect the smallest relevant
-set of Run inputs, validation or review findings, scheduler evidence, logs,
-outputs, timestamps, and resource observations. Preserve full failed logs and
-other evidence while diagnosis is active.
+解析 Spec、Task、current Run、声明的上游 Runs、目标环境及适用后端参考。
+检查相关输入、验证或评审发现、调度器证据、日志、输出、时间戳与资源观测，保留完整失败日志。
+说明异常、受阻环节、已知范围和需要改变的具体条件。仅结果不符合预期而无执行异常的解释请求，
+交给对应研究工作流。
 
-State the observed anomaly, what it prevents, its known scope, and the concrete
-condition that must change. Distinguish an execution symptom from a scientific
-result that merely differs from expectation. A request to reinterpret results
-without an execution anomaly belongs outside this workflow.
+日志、确定性检查或后端规则已确定一个直接的执行根因时，进入[简单纠错](simple-correction.md)，
+可按其条件原地修复，无需先展示方案选择；保留可能仍有写入者、已接受证据、provenance 或比较价值的 Run，
+变更快照须重新取得提交资格。
 
-If logs, deterministic checks, or loaded backend rules establish one direct
-execution-only root cause, enter [simple correction](simple-correction.md).
-That branch may repair an eligible current Run in place without first
-presenting a solution choice. Simple correction still preserves any Run with
-an active or possible writer, adopted task evidence, required provenance, or
-comparison value, and it requalifies every changed snapshot before submission.
+## 委派检查与补充证据
 
-## Gather missing evidence
+按[通用委派规则](../SKILL.md#原则)决定只读检查是否委派或并行，围绕当前诊断问题指定证据范围。
+主 agent 负责根因和方案判断；冲突或关键缺口未消除前，保留未确认结论。
 
-For a problem that is not simple correction, first inspect relevant stable
-notes under the selected calculation line's `02-计算规范/`. Treat those notes as
-evidence subject to the current Spec and actual Run, not as permission to copy
-a past change blindly.
+非简单纠错先查选定计算线的 `02-计算规范/` 稳定笔记，结合当前 Spec 与 Run 判断适用性。
+仍有软件或环境事实缺口时，调用 `$dev-engineering:research`，交给 `gpt-5.6-luna` 后台 agent。
+提供观测证据、软件版本、准确问题及科学边界，由其完成检索、原始来源追溯和综合，
+在 `/tmp` 下唯一目录写一份带引用的 Markdown 报告，包含直接回答、支持证据、诊断影响、
+不确定性与适用范围。主 agent 审阅报告并结合 Task 证据决定根因、处置和检查。
+调研可确认软件行为、输入含义、命令、环境、产物和机械校验规则；科学判断、Spec 和外部授权仍由原入口负责。
 
-When those notes and the current authorities do not resolve the uncertainty,
-invoke `$dev-engineering:research`. Request a `gpt-5.6-luna` background agent
-and give it the exact diagnostic question, observed evidence, relevant software
-and version, and scientific boundaries it must not decide. Direct its single
-cited Markdown artifact to a uniquely scoped directory under `/tmp`, rather
-than into the calculation project. The research skill owns source selection,
-primary-source tracing, citation, and the background reading process.
+## 选择并实施方案
 
-Read the returned artifact and synthesize it with the task evidence. Research
-can establish software behavior, input meaning, commands, environment facts,
-products, or mechanical checks. It is neither a root-cause decision nor a
-task-level execution plan, Spec override, scientific judgment, or external
-authorization.
+每个可行方案都说明证据与疑似根因的关系、拟改内容、受影响 Run 产物、风险、科学或成本影响及针对性检查。
+存在竞争技术方案时，选择证据支持最充分的一项并验证，将备选方案与选择理由保留在排查记录中。
 
-## Select and apply a solution
+在既有科学含义和用户约束内实施技术方案。科学承诺或 Spec 变更交 `$calc-to-spec` 按本次设计模式处理；
+稳定配置变更交 `$calc-setup`。提交、取消、同步、资源或成本调整及清理随选定 Spec 执行，
+先检查目标与影响，再记录动作。按诊断需要调整耦合变量，不限定每次只改一个变量。
+变更 prepared 快照后，旧 digest、验证和评审失效，重新走准备、验证及 `$calc-review`。
 
-For every viable solution, relate the evidence to the suspected cause and name
-the intended changes, affected Run artifacts, material risks, scientific or
-cost effects, and targeted checks. When competing technical solutions remain,
-choose the one best supported by evidence, then test it against the targeted checks.
-Preserve alternatives and the reason for the choice in the troubleshooting record.
+## 验证并结束
 
-Technical solutions proceed within the approved scientific meaning and the
-user's explicit constraints. A solution that changes a scientific commitment
-or requires a Spec change goes through `$calc-to-spec` for approval. Stable
-project configuration changes go through `$calc-setup`. Handle submission,
-cancellation, synchronization, resource or cost changes, and cleanup as part of
-the selected Spec's execution; inspect the target and impact before acting and
-record the result.
+实施前明确直接回应问题的检查，实施后核对检查及新失败证据。
+原异常消失、针对性检查通过且 Task 可恢复适当生命周期时，排查完成；额外重复计算不作为通用完成条件。
+检查失败或出现新异常时，保留证据，按新事实回到问题定义、稳定笔记、调研或方案选择。
+没有安全路径时报告已确认事实、排除原因、剩余假设、尝试方案和可行后续动作，保持状态真实。
 
-Apply the selected solution through the owning execution path. Change the set
-of coupled variables the diagnosis requires; calculation troubleshooting does
-not impose a single-variable rule. A changed prepared snapshot loses its prior
-digest, validation, and review and must pass the normal preparation,
-validation, and `$calc-review` path again.
-
-## Verify and conclude the loop
-
-Before applying a solution, name checks that directly respond to the defined
-problem. After applying it, inspect those checks and any new failure evidence.
-Troubleshooting succeeds only when the original anomaly is absent, the targeted
-checks pass, and the task can resume its appropriate execution lifecycle. An
-extra repetition solely to establish reproducibility is not a universal
-completion requirement.
-
-If a check fails or exposes a new anomaly, preserve the evidence and loop back
-to problem definition, stable notes, research, or solution selection as the
-new facts require. If no safe path remains, report confirmed facts, excluded
-causes, remaining hypotheses, attempted solutions, and available next actions;
-leave the authoritative task and Run states truthful.
-
-After success, report the effective solution, evidence, and applicability
-boundary. When the finding is reusable and verified, write an independent stable
-note under `02-计算规范/`, citing the temporary research evidence and its
-applicability boundary. This workflow does not create a
-task-specific troubleshooting log under `04-问题排查/`, and an unverified solution
-is never promoted as stable calculation knowledge. A finding worth independent
-inquiry may be handed to `$calc-issue` through the execution workflow; that
-separate Issue record does not replace this diagnostic loop.
+成功后报告有效方案、证据和适用边界。已验证且可复用的发现写为 `02-计算规范/` 下独立稳定笔记，
+引用临时调研证据及适用范围；未验证方案不提升为稳定知识。
+本流程不在 `04-问题排查/` 创建 Task 专属排查日志；值得独立探究的发现可经执行流程交 `$calc-issue`，
+Issue 记录不替代当前排查。
