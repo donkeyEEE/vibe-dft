@@ -16,9 +16,9 @@ Path: <data-root-relative-task-path>
 Blocked by:
 Condition: always
 
-Purpose: <task purpose>
+Purpose: <本任务要回答什么，以及答案如何影响研究>
 
-Acceptance: <acceptance condition>
+Acceptance: <什么证据足以完成该任务>
 
 #### 运行（Run）
 
@@ -47,14 +47,15 @@ Spec 内的 `TASK-NNN` ID，且图必须无环。`Condition` 为 `always`，或�
 Task 被取消时，该 Task 的状态为 `failed`；不明确之处回到 Spec 设计。
 
 `判断` 节说明本 Spec 的连贯研究目标，可以包含相关的探索与判断。
-研究推理由 `$domain-research` 指导，记录决定科学问题、解释或可比性的参数。只有当
-`$calc-execute` 具备确定性的后端、软件配置或上游证据依据，且该选择不改变科学含义时，
-未写入 Spec 的参数才可由执行负责；Spec 中的显式值具有约束力。
+研究推理由 `$domain-research` 指导，记录方法条件、影响研究判断的选择和必要比较约束。
+未写入 Spec 的普通数值参数由执行负责，依据当前用途、适用计算规范和已有证据选择，记录在
+Run inputs 中；选择可能改变研究判断或依据不足时返回设计。Spec 中的显式值具有约束力。
 
-`Acceptance` 说明 Task 的完成条件，供执行阶段判断是否推进。探索任务可以要求取得
-指定观察、工件、诊断或比较，并说明其对后续选择的作用；完成任务不要求得到有利的科学结果，
-也不等于机制已被证实。验证投入、定量阈值及停止规则由 `$domain-research` 根据研究目的
-和用户具体要求指导，实际采用的要求记录于 Spec。
+`Purpose` 说明本任务要回答什么，以及答案如何影响研究；实现步骤说明其支持的科学用途。
+`Acceptance` 说明什么证据足以完成该任务。方法、参数和模型假设写在上下文中，精度与
+不确定性只在需要时补充。探索任务可通过取得指定观察、工件、诊断或比较完成；完成不要求
+得到有利的科学结果，也不等于机制已被证实。验证投入、定量阈值及停止规则由
+`$domain-research` 根据研究目的和用户具体要求指导，实际采用的要求记录于 Spec。
 concluded Spec 在同一文件中加入以下一节：
 
 ```markdown

@@ -6,6 +6,7 @@ import stat
 import subprocess
 from pathlib import Path
 
+import pytest
 
 TEMPLATE_ROOT = Path("skills/calc-execute/assets/templates")
 SCRIPT_ROOT = Path("skills/calc-execute/scripts")
@@ -80,7 +81,7 @@ def test_magnetic_asset_provenance_plotting_and_scientific_boundaries(plugin_roo
         "skills/calc-execute/scripts/wannier90/plot_wannier_fit_dn.py": "f8943842e5c49d51ce069e0d7c3c9b7545ea31d58d7e3d8c08812ce16beebbc4",
         "skills/calc-execute/scripts/vampire/plot.py": "eec9ac3fa6cb8445f8958c01382f89d934e37e55bed860088000f9888e83d8f5",
         "skills/calc-execute/scripts/vampire/pack_magnetic_results.sh": "5e31889219ebeae18aa6390aa154a46cf3f60810332d7933af022fa9912f510e",
-        "skills/calc-execute/assets/templates/wannier90/wannier-run.env.template": "2c7e6fae9d91f6933558fd9b3bfdbc19b31852aa03043d1f1fa28bacf9389a8b",
+        "skills/calc-execute/assets/templates/wannier90/wannier-run.env.template": "e4c4385530b764c380e068dd13608e098a96ae38be2ce4acc2549083a0b0d497",
     }
     for target, digest in expected.items():
         assert hashlib.sha256((plugin_root / target).read_bytes()).hexdigest() == digest
@@ -237,6 +238,86 @@ printf 'output:material-magnetisation\n' > TB2J_results/Vampire/input
     for name in ("cluster-env.sh", "POSCAR", "OUTCAR", "wannier90.1_hr.dat", "wannier90.2_hr.dat", "wannier90.1_centres.xyz"):
         (missing / "inputs" / name).write_bytes((inputs / name).read_bytes())
     assert _run_pbs(rendered, missing, env).returncode != 0
+
+@pytest.mark.parametrize(
+    "fit_plot,diagnostic_inputs,band_output,missing_core,expected_success",
+    [
+        ("0", False, False, False, True),
+        ("1", True, True, False, True),
+        (None, True, True, False, True),
+        ("1", False, True, False, False),
+        (None, False, True, False, False),
+        ("1", True, False, False, False),
+        ("0", False, False, True, False),
+        ("invalid", False, False, False, False),
+    ],
+)
+def test_wannier_task_diagnostics_and_required_outputs(
+    plugin_root, tmp_path, fit_plot, diagnostic_inputs, band_output,
+    missing_core, expected_success,
+):
+    run = _make_run(tmp_path, "RUN-wannier")
+    inputs = run / "inputs"
+    commands = tmp_path / "commands"
+    commands.mkdir()
+    calls = tmp_path / "wannier.calls"
+    _write_executable(commands / "mpirun", '#!/bin/bash\nexec "$@"\n')
+    _write_executable(commands / "wannier90", """#!/bin/bash
+seed=$1
+printf '%s\\n' "$seed" >> "$FAKE_WANNIER_CALLS"
+printf 'converged\\n' > "${seed}.wout"
+printf 'centres\\n' > "${seed}_centres.xyz"
+if test "$FAKE_MISSING_CORE" = 0; then printf 'hr\\n' > "${seed}_hr.dat"; fi
+if test "$FAKE_BAND_OUTPUT" = 1; then printf 'band\\n' > "${seed}_band.dat"; fi
+""")
+    (inputs / "cluster-env.sh").write_text(
+        f'export WANNIER90_EXE="{commands / "wannier90"}"\n'
+        'export WANNIER90_MPI_LAUNCHER=mpirun\n'
+    )
+    env_text = (
+        "export UP_DIS_WIN_MIN=-2\nexport UP_DIS_WIN_MAX=2\n"
+        "export UP_DIS_FROZ_MIN=-1\nexport UP_DIS_FROZ_MAX=1\n"
+        "export DN_DIS_WIN_MIN=-3\nexport DN_DIS_WIN_MAX=3\n"
+        "export DN_DIS_FROZ_MIN=-1.5\nexport DN_DIS_FROZ_MAX=1.5\n"
+        "export PLOT_EMIN=-2\nexport PLOT_EMAX=2\n"
+    )
+    if fit_plot is not None:
+        env_text += f"export WANNIER_FIT_PLOT={fit_plot}\n"
+    (inputs / "wannier-run.env").write_text(env_text)
+    for spin in (1, 2):
+        for suffix in ("win", "amn", "mmn", "eig"):
+            (inputs / f"wannier90.{spin}.{suffix}").write_text("num_wann = 2\n")
+    if diagnostic_inputs:
+        for name in ("REFORMATTED_BAND_UP.dat", "REFORMATTED_BAND_DW.dat", "DOSCAR"):
+            (inputs / name).write_text("diagnostic\n")
+        for spin in ("up", "dn"):
+            (inputs / f"plot_wannier_fit_{spin}.py").write_text(
+                "import sys\nfrom pathlib import Path\n"
+                "Path(sys.argv[sys.argv.index('--output') + 1]).write_text('plot')\n"
+            )
+    before = {p.name: p.read_bytes() for p in inputs.iterdir()}
+    result = _run_pbs(
+        plugin_root / TEMPLATE_ROOT / "wannier90/run.pbs.template", run,
+        {
+            "PATH": f"{commands}{os.pathsep}{os.environ['PATH']}",
+            "FAKE_WANNIER_CALLS": str(calls),
+            "FAKE_MISSING_CORE": str(int(missing_core)),
+            "FAKE_BAND_OUTPUT": str(int(band_output)),
+            # Ambient settings must not disable plots for legacy snapshots.
+            "WANNIER_FIT_PLOT": "0",
+        },
+    )
+    assert (result.returncode == 0) == expected_success, result.stderr
+    assert {p.name: p.read_bytes() for p in inputs.iterdir()} == before
+    if expected_success:
+        assert calls.read_text().splitlines() == ["wannier90.1", "wannier90.2"]
+        for spin in (1, 2):
+            assert (run / f"outputs/wannier90.{spin}_hr.dat").stat().st_size > 0
+        for spin in ("up", "dn"):
+            assert (run / f"outputs/band_structure-{spin}.png").exists() == (fit_plot != "0")
+    elif fit_plot == "invalid" or not diagnostic_inputs and fit_plot != "0":
+        assert not calls.exists()
+
 
 def test_vampire_model_manifest_output_and_result_packaging(plugin_root, tmp_path):
     root = tmp_path
