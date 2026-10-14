@@ -329,10 +329,14 @@ def build_content_artifact(
         "complete": bool(attachments)
         and all(
             a["kind"] != "error"
-            and not (
-                a.get("indexed_pages") is not None
-                and a.get("total_pages") is not None
-                and a["indexed_pages"] < a["total_pages"]
+            and not any(
+                a.get(indexed) is not None
+                and a.get(total) is not None
+                and a[indexed] < a[total]
+                for indexed, total in (
+                    ("indexed_pages", "total_pages"),
+                    ("indexed_chars", "total_chars"),
+                )
             )
             for a in attachments
         ),
@@ -385,6 +389,14 @@ def _attachment_artifact(client, item_key, metadata, attachment, mode, out_dir):
                         "attachment_key": attachment_key,
                         "indexed_pages": fulltext.get("indexedPages"),
                         "total_pages": fulltext.get("totalPages"),
+                        **(
+                            {
+                                "indexed_chars": fulltext.get("indexedChars"),
+                                "total_chars": fulltext.get("totalChars"),
+                            }
+                            if "indexedChars" in fulltext or "totalChars" in fulltext
+                            else {}
+                        ),
                     },
                 )
         if mode == "indexed-text":

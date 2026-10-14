@@ -147,7 +147,7 @@ class LocalWrites:
         return result
 
 
-def editable(obj):
+def object_data(obj):
     return deepcopy(obj.get("data", obj))
 
 
@@ -188,7 +188,7 @@ def select_targets(api, library, selection):
             all_collections, _ = api.get(library + "/collections")
             for parent in collections:
                 for row in all_collections:
-                    data = editable(row)
+                    data = object_data(row)
                     if (
                         data.get("parentCollection") == parent
                         and data["key"] not in collections
@@ -312,7 +312,7 @@ def prepare(api, request):
             )
         targets.add(path)
         obj, _ = api.get(path, missing=action == "create")
-        before = editable(obj) if obj else None
+        before = object_data(obj) if obj else None
         if action == "create" and obj:
             raise WriteError("Creation key already exists")
         entry = {
@@ -386,7 +386,29 @@ def prepare(api, request):
                 entry["affected"], _ = api.get(path + "/items")
                 entry["subcollections"], _ = api.get(library + "/collections")
         elif action == "fulltext":
-            entry["after"] = deepcopy(op.get("data", {}))
+            data = op.get("data", {})
+            allowed = {
+                "content",
+                "indexedPages",
+                "totalPages",
+                "indexedChars",
+                "totalChars",
+            }
+            if (
+                not isinstance(data, dict)
+                or set(data) - allowed
+                or not isinstance(data.get("content"), str)
+            ):
+                raise WriteError(
+                    "Full-text data requires content and supported count fields only; identity fields are forbidden"
+                )
+            if any(
+                type(value) is not int or value < 0
+                for name, value in data.items()
+                if name != "content"
+            ):
+                raise WriteError("Full-text counts must be nonnegative integers")
+            entry["after"] = deepcopy(data)
             entry["fulltext_before"], _ = api.get(path + "/fulltext", missing=True)
             _, headers = api.get(library + "/items?limit=1")
             entry["library_version"] = next(
@@ -479,7 +501,11 @@ def upload(api, path, op):
         if status != 204:
             raise WriteError(f"Upload commit HTTP {status}")
     obj, _ = api.get(path)
-    return editable(obj).get("md5") == op["after"]["md5"]
+    return object_data(obj).get("md5") == op["after"]["md5"]
+
+
+def operation_delta(op):
+    return {k: v for k, v in op["after"].items() if op["before"].get(k) != v}
 
 
 def execute(api, plan, approval, destructive_approval=None):
@@ -517,7 +543,7 @@ def execute(api, plan, approval, destructive_approval=None):
         body: Any
         try:
             obj, _ = api.get(path, missing=True)
-            current = editable(obj) if obj else None
+            current = object_data(obj) if obj else None
             if op["action"] == "create" and obj:
                 if same_fields(current, op["after"]):
                     result["status"] = "already-applied"
@@ -530,7 +556,7 @@ def execute(api, plan, approval, destructive_approval=None):
                 and op["action"] in {"update", "trash"}
                 and same_fields(
                     current,
-                    {k: v for k, v in op["after"].items() if op["before"].get(k) != v},
+                    operation_delta(op),
                 )
             ):
                 result["status"] = "already-applied"
@@ -614,7 +640,7 @@ def execute(api, plan, approval, destructive_approval=None):
                         method, target, body = (
                             "POST",
                             library + "/fulltext",
-                            [{"key": op["key"], **op["after"]}],
+                            [{**op["after"], "key": op["key"]}],
                         )
                         if str(initial_library_version) != str(op["library_version"]):
                             raise WriteError(
@@ -624,11 +650,7 @@ def execute(api, plan, approval, destructive_approval=None):
                             "If-Unmodified-Since-Version": str(current_library_version)
                         }
                     elif op["resource"] != "items":
-                        fields = {
-                            k: v
-                            for k, v in op["after"].items()
-                            if op["before"].get(k) != v
-                        }
+                        fields = operation_delta(op)
                         method, target, body = (
                             "POST",
                             f"{library}/{op['resource']}",
@@ -641,11 +663,7 @@ def execute(api, plan, approval, destructive_approval=None):
                         method, target, body = (
                             "PATCH",
                             path,
-                            {
-                                k: v
-                                for k, v in op["after"].items()
-                                if op["before"].get(k) != v
-                            },
+                            operation_delta(op),
                         )
                     status, _, response = api.write(method, target, body, headers)
                     if status not in {200, 201, 204}:
@@ -664,16 +682,12 @@ def execute(api, plan, approval, destructive_approval=None):
                         readback, _ = api.get(path, missing=action == "delete")
                         expected = op["after"]
                         if action == "update" and not op.get("type_conversion"):
-                            expected = {
-                                k: v
-                                for k, v in op["after"].items()
-                                if op["before"].get(k) != v
-                            }
+                            expected = operation_delta(op)
                         verified = (
                             readback is None
                             if action == "delete"
                             else readback is not None
-                            and same_fields(editable(readback), expected)
+                            and same_fields(object_data(readback), expected)
                         )
                 result["status"] = "verified" if verified else "verification-failed"
         except (WriteError, OSError, KeyError, TypeError) as error:

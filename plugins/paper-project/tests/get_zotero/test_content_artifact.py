@@ -213,3 +213,28 @@ def test_all_attachments_are_exposed_even_when_si_is_first(tmp_path):
     assert "Supplemental derivation" in text and "Main article results" in text
     assert "IMG23456" in text
     assert manifest["coverage"]["complete"] is False
+
+
+def test_partial_character_index_is_reported_as_incomplete(tmp_path):
+    responses = base_responses()
+    responses["/api/users/0/items/ABCD1234/children"] = [
+        {
+            "key": "HTML2345",
+            "data": {
+                "itemType": "attachment",
+                "contentType": "text/html",
+                "title": "Article snapshot",
+            },
+        }
+    ]
+    responses["/api/users/0/items/HTML2345/fulltext"] = {
+        "content": "Partial text",
+        "indexedChars": 12,
+        "totalChars": 3000,
+    }
+    manifest = zotero.build_content_artifact(
+        FakeClient(responses), "ABCD1234", "auto", tmp_path
+    )
+    assert manifest["attachments"][0]["indexed_chars"] == 12
+    assert manifest["attachments"][0]["total_chars"] == 3000
+    assert manifest["coverage"]["complete"] is False

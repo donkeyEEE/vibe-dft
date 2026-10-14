@@ -24,3 +24,5 @@ Local writes require Zotero 10+ and the API's runtime capabilities. The local im
 ## Validation
 
 CLI tests use a simulated local API for preview, authorization, concurrency, partial failures, creation, deletion, index writes and file uploads. Real Zotero 10.0.6 validation used disposable objects and cleaned them up, while the reported paper was only read. No pre-existing literature was modified.
+
+Final validation: configured repository suite 279 passed, 2 skipped; mypy passed for the three changed runtime modules. A fresh real-Zotero validation completed all 17 steps successfully and confirmed zero remaining temporary objects. Standards and Spec review findings (partial character indexing and full-text target override) were fixed with regressions and independently rechecked.

@@ -636,3 +636,21 @@ def test_batch_deletion_accepts_only_version_changes_from_its_own_writes(tmp_pat
         ],
     )
     assert report["ok"]
+
+
+def test_fulltext_payload_cannot_override_the_approved_target(tmp_path):
+    library = ExtendedLibrary()
+    library.objects["/api/users/0/items/ABCD2345"]["data"]["itemType"] = "attachment"
+    with pytest.raises(ValueError, match="fulltext|Full-text"):
+        prepare(
+            tmp_path,
+            library,
+            [
+                {
+                    "action": "fulltext",
+                    "key": "ABCD2345",
+                    "data": {"key": "BCDE3456", "content": "Wrong-target attempt"},
+                }
+            ],
+        )
+    assert all(method == "GET" for method, _, _ in library.calls)
