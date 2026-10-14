@@ -2,6 +2,10 @@
 
 Get Zotero uses the least invasive source that can answer the reading question. Zotero remains the default text provider; the original local PDF is a targeted verification source, not the default full-document ingestion path.
 
+## Attachment coverage
+
+默认枚举并读取选定文献的所有直接附件，正文、SI、图片和表格分别标明来源。先按附件标签初步判断角色，再核对标题页或索引开头；不得仅返回列表中的第一个 PDF。每个附件分别执行以下读取顺序，报告不可读附件和索引缺页。只有 SI 时明确正文缺失；不自动下载外部链接或修改附件。
+
 ## Routing order
 
 1. Read Zotero highlights and child notes relevant to the question.

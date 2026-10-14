@@ -1,10 +1,7 @@
 from pathlib import Path
 import sys
 
-
-SCRIPTS = (
-    Path(__file__).resolve().parents[2] / "skills" / "get-zotero" / "scripts"
-)
+SCRIPTS = Path(__file__).resolve().parents[2] / "skills" / "get-zotero" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 import zotero  # noqa: E402
@@ -77,7 +74,9 @@ def base_responses() -> dict[str, object]:
     }
 
 
-def test_indexed_text_is_written_as_artifact_without_inline_body(tmp_path: Path) -> None:
+def test_indexed_text_is_written_as_artifact_without_inline_body(
+    tmp_path: Path,
+) -> None:
     responses = base_responses()
     responses["/api/users/0/items/EFGH5678/fulltext"] = {
         "content": "Paragraph one.\n\nParagraph two.",
@@ -172,3 +171,45 @@ def test_parser_exposes_content_modes() -> None:
     assert args.command == "content"
     assert args.content_mode == "indexed-text"
     assert args.out_dir == "/tmp/out"
+
+
+def test_all_attachments_are_exposed_even_when_si_is_first(tmp_path):
+    responses = base_responses()
+    responses["/api/users/0/items/ABCD1234/children"] = [
+        {
+            "key": "SI234567",
+            "data": {
+                "itemType": "attachment",
+                "contentType": "application/pdf",
+                "title": "Supporting Information",
+            },
+        },
+        PDF_CHILD,
+        {
+            "key": "IMG23456",
+            "data": {
+                "itemType": "attachment",
+                "contentType": "image/png",
+                "title": "Figure",
+            },
+        },
+    ]
+    responses["/api/users/0/items/SI234567/fulltext"] = {
+        "content": "Supplemental derivation"
+    }
+    responses["/api/users/0/items/EFGH5678/fulltext"] = {
+        "content": "Main article results"
+    }
+    responses["/api/users/0/items/IMG23456/fulltext"] = (404, {})
+    responses["/api/users/0/items/IMG23456/file/view/url"] = (404, {})
+    manifest = zotero.build_content_artifact(
+        FakeClient(responses), "ABCD1234", "auto", tmp_path
+    )
+    assert len(manifest["attachments"]) == 3
+    assert manifest["attachments"][0]["role"] == "supplement"
+    assert manifest["attachments"][1]["role"] == "unknown"
+    assert manifest["attachments"][2]["kind"] == "error"
+    text = Path(manifest["content"]["path"]).read_text()
+    assert "Supplemental derivation" in text and "Main article results" in text
+    assert "IMG23456" in text
+    assert manifest["coverage"]["complete"] is False

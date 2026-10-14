@@ -130,7 +130,7 @@ $calc-project:calc-execute 推进 SPEC-001 中当前可执行的 Task 和 Run。
 
 | Skill | 用途 |
 | --- | --- |
-| [get-zotero](plugins/paper-project/skills/get-zotero/SKILL.md) | 从 Zotero Desktop 只读获取题录、索引正文或本地 PDF。 |
+| [get-zotero](plugins/paper-project/skills/get-zotero/SKILL.md) | 读取 Zotero 题录及全部文献附件，按用户授权维护元数据、分类、笔记和附件等。 |
 | [get-notes](plugins/paper-project/skills/get-notes/SKILL.md) | 将选定的 Zotero 文献整理为项目内中文研究笔记或稿件素材库。 |
 | [literature-review](plugins/paper-project/skills/literature-review/SKILL.md) | 从 Web 或指定 Zotero 分类检索证据并生成 Markdown 文献综述。 |
 | [liteparse](plugins/paper-project/skills/liteparse/SKILL.md) | 提取 PDF、Office 文档和图片的文字与版面坐标，支持 OCR 和页面渲染。 |

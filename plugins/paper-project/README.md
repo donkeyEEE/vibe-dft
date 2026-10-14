@@ -9,7 +9,7 @@ Codex 插件。插件中的技能通过 `paper-project:<skill-name>` 命名空�
 - [pr-intro](skills/pr-intro/SKILL.md)：撰写或重构以证据为基础的 Physical Review 论文引言。
 - `prl-figure`：创建、修改和审查投稿级科学图件。
 - `citation-validator`：检查 DOCX 稿件中的引用是否真正支持相邻主张。
-- `get-zotero`：从 Zotero 只读获取题录、索引正文或本地 PDF。
+- `get-zotero`：读取 Zotero 题录及全部直接附件，并按用户授权维护文献库；应用授权统一给 Codex。
 - `get-notes`：通过 `get-zotero` 获取选定文献并生成项目内中文研究笔记。
 其余可用技能以安装后 `codex plugin list` 和 Codex 技能列表为准。
 

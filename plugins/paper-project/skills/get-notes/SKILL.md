@@ -51,3 +51,7 @@ python3 <plugin-root>/skills/get-zotero/scripts/zotero.py content \
 ```
 
 批量处理时逐篇写入；单篇失败不删除已有文件，也不阻断其他文献。Zotero、PDF 和目标目录中的无关文件始终保持不变。
+
+### 全部附件覆盖
+
+消费 get-zotero 的 `attachments` 清单，默认读取所选文献全部直接附件，逐项检查 artifact 或错误。正文和 SI 分别标明来源，标签角色须根据内容核实。多附件 `content` 汇总文本不能替代其中 PDF、图片或表格的读取；使用相应工具补齐，索引缺页时核对原文件，报告无法读取与正文缺失，不能将 SI 当作完整正文。本流程仍只调用读取命令，不因 get-zotero 支持写入而获得修改授权。

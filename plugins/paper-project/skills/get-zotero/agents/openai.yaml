@@ -1,7 +1,7 @@
 interface:
-  display_name: "Zotero 文献获取"
-  short_description: "只读获取 Zotero 题录、索引正文或原始 PDF"
-  default_prompt: "使用 $get-zotero 从 Zotero 只读获取这篇文献的题录与正文内容。"
+  display_name: "Zotero 文献读取与管理"
+  short_description: "读取全部文献附件，按用户授权维护 Zotero 文献库"
+  default_prompt: "使用 $get-zotero 读取这篇文献及全部附件；需要维护文献库时先明确具体变更并取得用户授权。"
 
 policy:
   allow_implicit_invocation: true

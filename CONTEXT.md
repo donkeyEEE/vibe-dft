@@ -92,6 +92,14 @@ _Avoid_: ask-dnk（当前名称）
 
 `plugins/paper-project` 面向学术研究与论文工作；写作资源全部下放到实际消费它们的 skill 的 `references/`，不保留插件级 `resources/`。
 
+**Zotero 变更授权（Zotero Change Authorization）**：
+用户对具体库、对象、操作与修改内容的授权；明确指令本身可以构成授权，宽泛整理请求先批准具体方案。删除与文件覆盖须单独授权。
+_Avoid_: 应用技术授权、Always Allow
+
+**Zotero 应用授权（Zotero Application Authorization）**：
+本机 Zotero 授予 Codex 使用写入接口的技术权限；Always Allow 后所有使用 get-zotero 的 Codex 工作流共用该权限。它不代替具体变更授权。
+_Avoid_: 变更批准、任意文献修改授权
+
 **文献综述来源模式（Literature Review Source Mode）**:
 `literature-review` 单次运行所采用的证据入口。Web 模式是未指定来源时的默认入口；Zotero 模式递归使用用户指定分类及全部子分类；只有用户明确要求时才同时采用两者组成混合模式。来源模式决定本次可纳入的文献边界，不代表正式系统综述的可复现检索协议。
 _Avoid_: 数据库类型、检索策略、系统综述模式

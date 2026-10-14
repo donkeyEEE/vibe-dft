@@ -74,6 +74,7 @@ def test_get_zotero_documents_the_versioned_artifact_contract() -> None:
     text = (GET_ZOTERO / "SKILL.md").read_text()
     assert "schema_version" in text
     assert "--mode {auto,indexed-text,pdf}" in text
-    assert "不生成研究笔记" in text
+    assert "研究笔记生成由 get-notes 负责" in text
+    assert "用户明确要求写入 Zotero 笔记时使用本 skill" in text
     for kind in ("text-file", "pdf-file", "metadata-only", "error"):
         assert kind in text

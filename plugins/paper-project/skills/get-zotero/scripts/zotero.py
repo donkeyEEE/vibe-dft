@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Sequence
 
+from write_api import WriteError, add_commands
 from attachment_paths import AttachmentPathError, resolve_attachment_path
 from runtime_config import (
     ConfigError,
@@ -25,7 +26,6 @@ from runtime_config import (
     config_path,
     load_runtime_config,
 )
-
 
 LOCAL_USER = "/api/users/0"
 API_VERSION_HEADERS = {"Zotero-API-Version": "3"}
@@ -133,9 +133,7 @@ class ZoteroClient:
                 method="POST",
                 headers=headers,
             )
-            with self.opener(
-                request, timeout=self.config.timeout_seconds
-            ) as response:
+            with self.opener(request, timeout=self.config.timeout_seconds) as response:
                 return Response(
                     status=response.status,
                     headers=dict(response.headers.items()),
@@ -228,17 +226,6 @@ def artifact_metadata(item: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _pdf_attachment(children: list[dict[str, Any]]) -> dict[str, Any] | None:
-    for child in children:
-        data = child.get("data", child)
-        if (
-            data.get("itemType") == "attachment"
-            and data.get("contentType") == "application/pdf"
-        ):
-            return child
-    return None
-
-
 def _artifact_manifest(
     item_key: str, metadata: dict[str, Any], content: dict[str, Any]
 ) -> dict[str, Any]:
@@ -253,35 +240,113 @@ def _artifact_manifest(
 def build_content_artifact(
     client: ZoteroClient, item_key: str, mode: str, out_dir: Path
 ) -> dict[str, Any]:
-    """Fetch one parent item and expose its content as a file artifact."""
+    """Expose every direct attachment while preserving the v1 content discriminator."""
     if mode not in {"auto", "indexed-text", "pdf"}:
         raise ValueError(f"Unsupported content mode: {mode}")
-
-    quoted_item_key = urllib.parse.quote(item_key)
-    item = api_get(client, f"{LOCAL_USER}/items/{quoted_item_key}")
+    quoted = urllib.parse.quote(item_key)
+    item = api_get(client, f"{LOCAL_USER}/items/{quoted}")
     metadata = artifact_metadata(item)
-    children = api_get(client, f"{LOCAL_USER}/items/{quoted_item_key}/children")
-    attachment = _pdf_attachment(children if isinstance(children, list) else [])
-    if attachment is None:
-        if mode != "auto":
-            return _artifact_manifest(
-                item_key,
-                metadata,
-                {
-                    "kind": "error",
-                    "code": "pdf-attachment-not-found",
-                    "next_step": (
-                        "Attach a local PDF in Zotero or request auto mode for "
-                        "metadata-only evidence."
-                    ),
-                },
-            )
-        return _artifact_manifest(
-            item_key,
-            metadata,
-            {"kind": "metadata-only", "source": "metadata-abstract-only"},
+    children = api_get(client, f"{LOCAL_USER}/items/{quoted}/children")
+    attachments = []
+    for child in children:
+        data = child.get("data", child)
+        if data.get("itemType") != "attachment":
+            continue
+        content = _attachment_artifact(
+            client, item_key, metadata, child, mode, out_dir
+        )["content"]
+        hints = " ".join(
+            str(data.get(field, "")) for field in ("title", "filename", "url")
         )
+        supplement = bool(
+            re.search(r"supplement|supporting|\bSI\b|\bSM\b|补充", hints, re.I)
+        )
+        attachments.append(
+            {
+                **content,
+                "title": data.get("title"),
+                "content_type": data.get("contentType"),
+                "role": "supplement" if supplement else "unknown",
+                "role_basis": (
+                    "attachment-label-hint"
+                    if supplement
+                    else "requires-content-inspection"
+                ),
+            }
+        )
+    if not attachments:
+        content = (
+            {"kind": "metadata-only", "source": "metadata-abstract-only"}
+            if mode == "auto"
+            else {
+                "kind": "error",
+                "code": "pdf-attachment-not-found",
+                "next_step": "No direct attachments found; use metadata-only evidence.",
+            }
+        )
+    elif len(attachments) == 1 and attachments[0]["kind"] in {
+        "text-file",
+        "pdf-file",
+        "error",
+    }:
+        content = {
+            k: v
+            for k, v in attachments[0].items()
+            if k not in {"title", "content_type", "role", "role_basis"}
+        }
+    else:
+        out_dir = out_dir.expanduser().resolve()
+        out_dir.mkdir(parents=True, exist_ok=True)
+        path = out_dir / f"{item_key}-attachments.txt"
+        sections = [
+            "Attachment coverage. Inspect every listed source; labels are hints, not verified roles.\n"
+        ]
+        for attachment in attachments:
+            sections.append(
+                f"\n=== {attachment.get('attachment_key', 'unknown')} | {attachment.get('title')} | {attachment['role']} | {attachment['kind']} ===\n"
+            )
+            if attachment["kind"] == "text-file":
+                sections.append(Path(attachment["path"]).read_text(encoding="utf-8"))
+            elif attachment.get("path"):
+                sections.append(
+                    f"Read the local artifact with a format-appropriate tool: {attachment['path']}\n"
+                )
+            else:
+                sections.append(
+                    f"UNREADABLE: {attachment.get('code')}: {attachment.get('next_step')}\n"
+                )
+        path.write_text("".join(sections), encoding="utf-8")
+        content = {
+            "kind": "text-file",
+            "path": str(path),
+            "source": "attachment-bundle",
+            "requires_attachment_inspection": True,
+        }
+    result = _artifact_manifest(item_key, metadata, content)
+    result["attachments"] = attachments
+    result["coverage"] = {
+        "scope": "all-direct-attachments",
+        "complete": bool(attachments)
+        and all(
+            a["kind"] != "error"
+            and not (
+                a.get("indexed_pages") is not None
+                and a.get("total_pages") is not None
+                and a["indexed_pages"] < a["total_pages"]
+            )
+            for a in attachments
+        ),
+        "unreadable": [
+            a.get("attachment_key") for a in attachments if a["kind"] == "error"
+        ],
+        "role_verification_required": [
+            a.get("attachment_key") for a in attachments if a["role"] == "unknown"
+        ],
+    }
+    return result
 
+
+def _attachment_artifact(client, item_key, metadata, attachment, mode, out_dir):
     attachment_data = attachment.get("data", attachment)
     attachment_key = attachment.get("key") or attachment_data.get("key")
     if not attachment_key:
@@ -296,7 +361,9 @@ def build_content_artifact(
         )
     quoted_attachment_key = urllib.parse.quote(str(attachment_key))
 
-    if mode in {"auto", "indexed-text"}:
+    if mode in {"auto", "indexed-text"} and not str(
+        attachment_data.get("contentType", "")
+    ).startswith(("image/", "audio/", "video/")):
         response = client.request(
             f"{LOCAL_USER}/items/{quoted_attachment_key}/fulltext"
         )
@@ -345,7 +412,11 @@ def build_content_artifact(
                 item_key,
                 metadata,
                 {
-                    "kind": "pdf-file",
+                    "kind": (
+                        "pdf-file"
+                        if attachment_data.get("contentType") == "application/pdf"
+                        else "local-file"
+                    ),
                     "path": str(resolved.path.resolve()),
                     "source": "local-pdf",
                     "attachment_key": attachment_key,
@@ -421,7 +492,9 @@ def export_bibtex(
     include_children: bool = False,
 ) -> str:
     if item_key:
-        params = query({"itemKey": item_key, "format": "bibtex", "limit": API_PAGE_LIMIT})
+        params = query(
+            {"itemKey": item_key, "format": "bibtex", "limit": API_PAGE_LIMIT}
+        )
         return api_response(client, f"{LOCAL_USER}/items?{params}").text
 
     endpoint = "items" if include_children else "items/top"
@@ -503,9 +576,11 @@ def doctor_payload(
             "running": root.ok,
             "status": root.status,
             "error_code": None if root.ok else "local-api-unavailable",
-            "next_step": None
-            if root.ok
-            else "Enable the local API in the Zotero interface, then run doctor again.",
+            "next_step": (
+                None
+                if root.ok
+                else "Enable the local API in the Zotero interface, then run doctor again."
+            ),
             "zotero_version": root.headers.get("X-Zotero-Version"),
             "api_version": root.headers.get("Zotero-API-Version"),
             "selected_endpoint_source": selected.source,
@@ -515,12 +590,14 @@ def doctor_payload(
         api = {
             "running": False,
             "status": None,
-            "error_code": "explicit-host-unreachable"
-            if explicit
-            else "zotero-unreachable",
-            "next_step": "Check the configured host and port, then run doctor again."
-            if explicit
-            else "Start Zotero and enable its local API in the Zotero interface.",
+            "error_code": (
+                "explicit-host-unreachable" if explicit else "zotero-unreachable"
+            ),
+            "next_step": (
+                "Check the configured host and port, then run doctor again."
+                if explicit
+                else "Start Zotero and enable its local API in the Zotero interface."
+            ),
             "zotero_version": None,
             "api_version": None,
             "selected_endpoint_source": None,
@@ -605,17 +682,25 @@ def cmd_inventory(args: argparse.Namespace, client: ZoteroClient) -> None:
         collection_key = urllib.parse.quote(args.collection_key, safe="")
         endpoint = f"collections/{collection_key}/{endpoint}"
     params = query({"sort": "title", "direction": "asc"})
-    rows = [summarize_item(item) for item in api_get(client, f"{LOCAL_USER}/{endpoint}?{params}")]
+    rows = [
+        summarize_item(item)
+        for item in api_get(client, f"{LOCAL_USER}/{endpoint}?{params}")
+    ]
     dump_json(rows) if args.json else print_items(rows)
 
 
 def cmd_collections(args: argparse.Namespace, client: ZoteroClient) -> None:
-    rows = [summarize_collection(collection) for collection in api_get(client, f"{LOCAL_USER}/collections")]
+    rows = [
+        summarize_collection(collection)
+        for collection in api_get(client, f"{LOCAL_USER}/collections")
+    ]
     if args.json:
         dump_json(rows)
         return
     for row in rows:
-        parent = f" parent={row['parentCollection']}" if row.get("parentCollection") else ""
+        parent = (
+            f" parent={row['parentCollection']}" if row.get("parentCollection") else ""
+        )
         print(f"{row.get('key') or '':10} {row.get('name') or ''}{parent}")
 
 
@@ -634,12 +719,17 @@ def cmd_groups(args: argparse.Namespace, client: ZoteroClient) -> None:
         dump_json(rows)
         return
     for row in rows:
-        print(f"{row.get('id') or '':>10} {row.get('type') or '':12} {row.get('name') or ''}")
+        print(
+            f"{row.get('id') or '':>10} {row.get('type') or '':12} {row.get('name') or ''}"
+        )
 
 
 def cmd_search(args: argparse.Namespace, client: ZoteroClient) -> None:
     params = query({"q": args.query})
-    rows = [summarize_item(item) for item in api_get(client, f"{LOCAL_USER}/items/top?{params}")]
+    rows = [
+        summarize_item(item)
+        for item in api_get(client, f"{LOCAL_USER}/items/top?{params}")
+    ]
     if args.with_bibtex_keys:
         for row in rows:
             bibtex = export_bibtex(client, row.get("key")) if row.get("key") else ""
@@ -650,7 +740,8 @@ def cmd_search(args: argparse.Namespace, client: ZoteroClient) -> None:
 
 def cmd_export_bibtex(args: argparse.Namespace, client: ZoteroClient) -> None:
     write_text_output(
-        export_bibtex(client, args.item_key, include_children=args.include_children), args.out
+        export_bibtex(client, args.item_key, include_children=args.include_children),
+        args.out,
     )
 
 
@@ -669,13 +760,17 @@ def cmd_citations(args: argparse.Namespace, client: ZoteroClient) -> None:
 
 
 def cmd_children(args: argparse.Namespace, client: ZoteroClient) -> None:
-    data = api_get(client, f"{LOCAL_USER}/items/{urllib.parse.quote(args.item_key)}/children")
+    data = api_get(
+        client, f"{LOCAL_USER}/items/{urllib.parse.quote(args.item_key)}/children"
+    )
     rows = [summarize_item(item) for item in data]
     dump_json(rows) if args.json else print_items(rows)
 
 
 def cmd_fulltext(args: argparse.Namespace, client: ZoteroClient) -> None:
-    data = api_get(client, f"{LOCAL_USER}/items/{urllib.parse.quote(args.attachment_key)}/fulltext")
+    data = api_get(
+        client, f"{LOCAL_USER}/items/{urllib.parse.quote(args.attachment_key)}/fulltext"
+    )
     content = data.get("content", "") if isinstance(data, dict) else str(data)
     if args.out is None:
         print(content)
@@ -687,14 +782,19 @@ def cmd_fulltext(args: argparse.Namespace, client: ZoteroClient) -> None:
         {
             "path": str(path),
             "chars": len(content),
-            "indexedPages": data.get("indexedPages") if isinstance(data, dict) else None,
+            "indexedPages": (
+                data.get("indexedPages") if isinstance(data, dict) else None
+            ),
             "totalPages": data.get("totalPages") if isinstance(data, dict) else None,
         }
     )
 
 
 def cmd_file_url(args: argparse.Namespace, client: ZoteroClient) -> None:
-    raw = api_get(client, f"{LOCAL_USER}/items/{urllib.parse.quote(args.attachment_key)}/file/view/url")
+    raw = api_get(
+        client,
+        f"{LOCAL_USER}/items/{urllib.parse.quote(args.attachment_key)}/file/view/url",
+    )
     if args.resolve:
         resolved = resolve_attachment_path(
             str(raw), client.config.mode, client.config.path_mappings
@@ -725,7 +825,9 @@ def cmd_content(args: argparse.Namespace, client: ZoteroClient) -> None:
 
 def add_json_flag(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
-        "--json", action="store_true", help="Print JSON instead of a compact text summary"
+        "--json",
+        action="store_true",
+        help="Print JSON instead of a compact text summary",
     )
 
 
@@ -753,7 +855,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     inventory = subcommands.add_parser("inventory", help="List Zotero items")
     inventory.add_argument(
-        "--include-children", action="store_true", help="Include child notes and attachments"
+        "--include-children",
+        action="store_true",
+        help="Include child notes and attachments",
     )
     inventory.add_argument(
         "--collection-key",
@@ -773,7 +877,9 @@ def build_parser() -> argparse.ArgumentParser:
     add_json_flag(tags)
     tags.set_defaults(func=cmd_tags)
 
-    groups = subcommands.add_parser("groups", help="List synced group libraries visible locally")
+    groups = subcommands.add_parser(
+        "groups", help="List synced group libraries visible locally"
+    )
     add_json_flag(groups)
     groups.set_defaults(func=cmd_groups)
 
@@ -783,7 +889,9 @@ def build_parser() -> argparse.ArgumentParser:
     add_json_flag(search)
     search.set_defaults(func=cmd_search)
 
-    export = subcommands.add_parser("export-bibtex", help="Export Zotero items as BibTeX")
+    export = subcommands.add_parser(
+        "export-bibtex", help="Export Zotero items as BibTeX"
+    )
     export.add_argument("--item-key")
     export.add_argument("--include-children", action="store_true")
     export.add_argument(
@@ -797,7 +905,9 @@ def build_parser() -> argparse.ArgumentParser:
     add_json_flag(citations)
     citations.set_defaults(func=cmd_citations)
 
-    children = subcommands.add_parser("children", help="List child notes/attachments for an item")
+    children = subcommands.add_parser(
+        "children", help="List child notes/attachments for an item"
+    )
     children.add_argument("item_key")
     add_json_flag(children)
     children.set_defaults(func=cmd_children)
@@ -814,7 +924,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     file_url.add_argument("attachment_key")
     file_url.add_argument(
-        "--resolve", action="store_true", help="Resolve and verify the local platform path"
+        "--resolve",
+        action="store_true",
+        help="Resolve and verify the local platform path",
     )
     file_url.set_defaults(func=cmd_file_url)
 
@@ -837,6 +949,7 @@ def build_parser() -> argparse.ArgumentParser:
     content.add_argument("--out-dir", required=True)
     content.set_defaults(func=cmd_content)
 
+    add_commands(subcommands)
     return parser
 
 
@@ -845,7 +958,9 @@ def main(argv: list[str] | None = None) -> int:
     system = platform.system()
     release = platform.release()
     try:
-        proc_version = Path("/proc/version").read_text(encoding="utf-8", errors="replace")
+        proc_version = Path("/proc/version").read_text(
+            encoding="utf-8", errors="replace"
+        )
     except OSError:
         proc_version = ""
     cli = {
@@ -861,7 +976,13 @@ def main(argv: list[str] | None = None) -> int:
         endpoints = candidate_endpoints(config)
         args.config_exists = config_path(system, os.environ, Path.home()).exists()
         args.func(args, ZoteroClient(config, endpoints))
-    except (ConfigError, ZoteroConnectionError) as error:
+    except (
+        ConfigError,
+        ZoteroConnectionError,
+        WriteError,
+        ValueError,
+        OSError,
+    ) as error:
         exit_with(str(error))
     return 0
 

@@ -19,7 +19,7 @@ Important constraints:
 
 - Use `/api/users/0/...` for the local user by default.
 - Local API reads do not require an API key.
-- The local API is read-only; write requests are not supported there.
+- Local reads remain unauthenticated. Zotero 10+ also supports writes with runtime local authorization, Server ID and version preconditions; see [写入方案与授权](write-operations.md). Earlier versions retain read access only.
 - Atom output is not supported locally.
 - Attachment file URLs and full text can expose local file paths or document text. Retrieve them only for a user-authorized literature task and only when the reading question requires that evidence; do not reveal local paths in normal output.
 
