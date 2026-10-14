@@ -1,5 +1,5 @@
 interface:
-  display_name: "Zotero 研究笔记"
+  display_name: "Get Notes"
   short_description: "将选定 Zotero 文献转为项目内中文研究笔记"
   default_prompt: "使用 $get-notes 将我选定的 Zotero 文献整理为项目内中文研究笔记。"
 

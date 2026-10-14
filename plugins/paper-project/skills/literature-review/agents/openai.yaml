@@ -1,5 +1,5 @@
 interface:
-  display_name: "文献综述"
+  display_name: "Literature Review"
   short_description: "从 Web 或 Zotero 检索并综合文献为 Markdown"
   default_prompt: "使用 $literature-review 围绕这个研究问题撰写文献综述。"
 
